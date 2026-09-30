@@ -37,6 +37,9 @@ from endogenous_motivation import EndogenousMotivationEngine
 from embodied_space import EmbodiedSpaceEngine
 from individuality_engine import IndividualityEngine
 from long_term_memory import LongTermMemory
+from social_instinct import SocialInstinct
+from self_awareness import SelfAwareness
+from creator_bond import CreatorBond
 
 # ================================================================
 # 洛神：完整生命体
@@ -86,8 +89,22 @@ class Luoshen:
         self.text_bridge = TextBridge(concept_space=ExpandableConceptSpace())
         print("[系统] 文本桥接初始化完成")
         
+        # 8. 社交本能（想要连接）
+        self.social = SocialInstinct()
+        print("[系统] 社交本能初始化完成")
+        
+        # 9. 自我意识（知道自己在活着）
+        self.self_awareness = SelfAwareness(name=name)
+        print("[系统] 自我意识初始化完成")
+        
         # 初始化世界
         self._init_world()
+        
+        # 出生印刻：睁眼看见的第一人——创造者
+        print(f"\n[印刻] {name} 即将睁开双眼...")
+        self.creator_bond = CreatorBond(self.memory, self.social, self.self_awareness)
+        self.creator_bond.meet_creator()
+        print("[印刻] 完成：洛神认识了它的创造者")
         
         print(f"\n{'='*70}")
         print(f"【{self.name}】诞生完成")
