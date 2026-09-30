@@ -1,0 +1,134 @@
+{
+  "evolved": [
+    {
+      "trial": 0,
+      "survived": 400,
+      "alive": true,
+      "mse": 0.01388669388652376
+    },
+    {
+      "trial": 0,
+      "survived": 400,
+      "alive": true,
+      "mse": 0.08523075946806494
+    },
+    {
+      "trial": 0,
+      "survived": 400,
+      "alive": true,
+      "mse": 0.016261310196617074
+    },
+    {
+      "trial": 1,
+      "survived": 400,
+      "alive": true,
+      "mse": 0.006852848614442665
+    },
+    {
+      "trial": 1,
+      "survived": 400,
+      "alive": true,
+      "mse": 0.0584157393043486
+    },
+    {
+      "trial": 1,
+      "survived": 400,
+      "alive": true,
+      "mse": 0.01827579448817653
+    },
+    {
+      "trial": 2,
+      "survived": 400,
+      "alive": true,
+      "mse": 0.007980704237502264
+    },
+    {
+      "trial": 2,
+      "survived": 400,
+      "alive": true,
+      "mse": 0.056804289287474406
+    },
+    {
+      "trial": 2,
+      "survived": 400,
+      "alive": true,
+      "mse": 0.02479029110298646
+    },
+    {
+      "trial": 3,
+      "survived": 400,
+      "alive": true,
+      "mse": 0.011909145848156107
+    },
+    {
+      "trial": 3,
+      "survived": 400,
+      "alive": true,
+      "mse": 0.10375396765089477
+    },
+    {
+      "trial": 3,
+      "survived": 400,
+      "alive": true,
+      "mse": 0.021858619258825675
+    },
+    {
+      "trial": 4,
+      "survived": 400,
+      "alive": true,
+      "mse": 0.011696756731462801
+    },
+    {
+      "trial": 4,
+      "survived": 400,
+      "alive": true,
+      "mse": 0.06451365111203612
+    },
+    {
+      "trial": 4,
+      "survived": 400,
+      "alive": true,
+      "mse": 0.025913422203999576
+    }
+  ],
+  "baseline": [
+    {
+      "trial": 0,
+      "survived": 400,
+      "alive": true,
+      "mse": 0.09155831908613182
+    },
+    {
+      "trial": 1,
+      "survived": 400,
+      "alive": true,
+      "mse": 0.04143471480083069
+    },
+    {
+      "trial": 2,
+      "survived": 400,
+      "alive": true,
+      "mse": 0.10838580795183188
+    },
+    {
+      "trial": 3,
+      "survived": 400,
+      "alive": true,
+      "mse": 0.11718260647722363
+    },
+    {
+      "trial": 4,
+      "survived": 400,
+      "alive": true,
+      "mse": 0.10095477267653422
+    }
+  ],
+  "summary": {
+    "evo_survival": 400.0,
+    "evo_mse": 0.03520959955943412,
+    "base_survival": 400.0,
+    "base_mse": 0.09190324419851045,
+    "survival_better": false,
+    "prediction_better": true
+  }
+}

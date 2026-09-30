@@ -1,0 +1,50 @@
+[PATCH] ray.init: retry wrapper (7 attempts + cleanup + wait=180s)
+[PATCH] LLMClient noretry patch failed: AGENTSOCIETY_LLM_API_KEY is required. Please set this environment variable before running AgentSociety2.
+
+======================================================================
+Evolution v13 — Individual Info Foraging + Learnable Attractors
+n_orgs=30 steps/gen=400 regions=9 independent envs
+======================================================================
+
+GEN    0 | alive=30/30 | fit=0.6668/0.6441 | pred=0.38607 | INFO=11.6977 | INTRIN=1.181 boredom=0.0000 | region_div=9
+GEN    5 | alive=30/30 | fit=0.6749/0.6534 | pred=0.35100 | INFO=11.8365 | INTRIN=1.252 boredom=0.0000 | region_div=8
+GEN   10 | alive=30/30 | fit=0.6769/0.6501 | pred=0.36066 | INFO=11.6653 | INTRIN=1.189 boredom=0.0000 | region_div=9
+GEN   15 | alive=30/30 | fit=0.6909/0.6571 | pred=0.34054 | INFO=11.5499 | INTRIN=1.165 boredom=0.0000 | region_div=8
+GEN   20 | alive=30/30 | fit=0.6652/0.6484 | pred=0.36826 | INFO=12.1154 | INTRIN=1.225 boredom=0.0000 | region_div=9
+GEN   25 | alive=30/30 | fit=0.6785/0.6518 | pred=0.35345 | INFO=11.8807 | INTRIN=1.236 boredom=0.0000 | region_div=9
+GEN   30 | alive=30/30 | fit=0.6866/0.6508 | pred=0.36140 | INFO=11.6529 | INTRIN=1.256 boredom=0.0000 | region_div=8
+GEN   35 | alive=30/30 | fit=0.6762/0.6496 | pred=0.36219 | INFO=11.9821 | INTRIN=1.203 boredom=0.0000 | region_div=9
+GEN   40 | alive=30/30 | fit=0.6888/0.6479 | pred=0.36940 | INFO=11.8348 | INTRIN=1.240 boredom=0.0000 | region_div=9
+GEN   45 | alive=30/30 | fit=0.6853/0.6445 | pred=0.38647 | INFO=11.6167 | INTRIN=1.173 boredom=0.0000 | region_div=8
+GEN   50 | alive=30/30 | fit=0.6734/0.6484 | pred=0.36750 | INFO=11.3569 | INTRIN=1.147 boredom=0.0000 | region_div=9
+GEN   55 | alive=30/30 | fit=0.6767/0.6502 | pred=0.36012 | INFO=11.8761 | INTRIN=1.258 boredom=0.0000 | region_div=9
+GEN   60 | alive=30/30 | fit=0.6672/0.6434 | pred=0.38567 | INFO=11.9091 | INTRIN=1.218 boredom=0.0000 | region_div=9
+GEN   65 | alive=30/30 | fit=0.6674/0.6425 | pred=0.39225 | INFO=12.0479 | INTRIN=1.212 boredom=0.0000 | region_div=7
+GEN   70 | alive=30/30 | fit=0.6730/0.6453 | pred=0.38185 | INFO=11.7932 | INTRIN=1.235 boredom=0.0000 | region_div=9
+GEN   75 | alive=30/30 | fit=0.6772/0.6493 | pred=0.36628 | INFO=11.8877 | INTRIN=1.262 boredom=0.0000 | region_div=8
+GEN   80 | alive=30/30 | fit=0.6721/0.6474 | pred=0.37645 | INFO=11.7492 | INTRIN=1.229 boredom=0.0000 | region_div=9
+GEN   85 | alive=30/30 | fit=0.6604/0.6444 | pred=0.38022 | INFO=11.6226 | INTRIN=1.234 boredom=0.0000 | region_div=9
+GEN   90 | alive=30/30 | fit=0.6733/0.6431 | pred=0.39262 | INFO=11.8379 | INTRIN=1.287 boredom=0.0000 | region_div=9
+GEN   95 | alive=30/30 | fit=0.6911/0.6420 | pred=0.39089 | INFO=11.8629 | INTRIN=1.260 boredom=0.0000 | region_div=9
+GEN  100 | alive=30/30 | fit=0.6680/0.6451 | pred=0.38065 | INFO=11.8023 | INTRIN=1.214 boredom=0.0000 | region_div=9
+GEN  105 | alive=30/30 | fit=0.6661/0.6442 | pred=0.38407 | INFO=11.7707 | INTRIN=1.205 boredom=0.0000 | region_div=9
+GEN  110 | alive=30/30 | fit=0.6591/0.6417 | pred=0.39303 | INFO=11.5520 | INTRIN=1.211 boredom=0.0000 | region_div=9
+GEN  115 | alive=30/30 | fit=0.6759/0.6415 | pred=0.39866 | INFO=12.0679 | INTRIN=1.234 boredom=0.0000 | region_div=9
+GEN  120 | alive=30/30 | fit=0.6743/0.6429 | pred=0.38868 | INFO=11.7925 | INTRIN=1.294 boredom=0.0000 | region_div=8
+GEN  125 | alive=30/30 | fit=0.6660/0.6428 | pred=0.39402 | INFO=11.4650 | INTRIN=1.153 boredom=0.0000 | region_div=9
+GEN  130 | alive=30/30 | fit=0.6534/0.6389 | pred=0.40161 | INFO=11.6665 | INTRIN=1.197 boredom=0.0000 | region_div=8
+GEN  135 | alive=30/30 | fit=0.6748/0.6458 | pred=0.37564 | INFO=11.6679 | INTRIN=1.217 boredom=0.0000 | region_div=9
+GEN  140 | alive=30/30 | fit=0.6699/0.6412 | pred=0.39654 | INFO=11.6094 | INTRIN=1.184 boredom=0.0000 | region_div=9
+GEN  145 | alive=30/30 | fit=0.6592/0.6412 | pred=0.39510 | INFO=11.5210 | INTRIN=1.195 boredom=0.0000 | region_div=9
+GEN  150 | alive=30/30 | fit=0.6599/0.6418 | pred=0.38915 | INFO=11.6837 | INTRIN=1.218 boredom=0.0000 | region_div=9
+GEN  155 | alive=30/30 | fit=0.6724/0.6457 | pred=0.37834 | INFO=11.7415 | INTRIN=1.233 boredom=0.0000 | region_div=9
+GEN  160 | alive=30/30 | fit=0.6629/0.6433 | pred=0.38472 | INFO=11.3431 | INTRIN=1.166 boredom=0.0000 | region_div=8
+GEN  165 | alive=30/30 | fit=0.6846/0.6486 | pred=0.36646 | INFO=11.6032 | INTRIN=1.246 boredom=0.0000 | region_div=9
+GEN  170 | alive=30/30 | fit=0.6669/0.6423 | pred=0.38988 | INFO=11.6794 | INTRIN=1.201 boredom=0.0000 | region_div=8
+GEN  175 | alive=30/30 | fit=0.6738/0.6456 | pred=0.38068 | INFO=11.8983 | INTRIN=1.235 boredom=0.0000 | region_div=8
+GEN  180 | alive=30/30 | fit=0.6604/0.6463 | pred=0.37473 | INFO=11.8207 | INTRIN=1.248 boredom=0.0000 | region_div=8
+GEN  185 | alive=30/30 | fit=0.6776/0.6481 | pred=0.36994 | INFO=11.4125 | INTRIN=1.223 boredom=0.0000 | region_div=8
+GEN  190 | alive=30/30 | fit=0.6765/0.6482 | pred=0.37398 | INFO=11.8809 | INTRIN=1.285 boredom=0.0000 | region_div=9
+GEN  195 | alive=30/30 | fit=0.7033/0.6459 | pred=0.38231 | INFO=11.2604 | INTRIN=1.204 boredom=0.0000 | region_div=8
+
+保存到 evolution_log_v13.json

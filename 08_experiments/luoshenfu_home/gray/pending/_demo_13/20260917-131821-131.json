@@ -1,0 +1,19 @@
+{
+  "id": "20260917-131821-131",
+  "ts": "2026-09-17T13:18:21",
+  "user": "_demo_13",
+  "source": "test",
+  "content": "天气很好",
+  "status": "[已回滚]",
+  "eval_at": "2026-09-17T13:18:21",
+  "eval_result": "有反例",
+  "counterexamples": [
+    {
+      "seq": 0,
+      "matched": "气",
+      "type": "confirm"
+    }
+  ],
+  "confirmed_at": "2026-09-17T13:18:21",
+  "rolled_back_at": "2026-09-17T13:18:21"
+}

@@ -1,0 +1,50 @@
+[PATCH] ray.init: retry wrapper (7 attempts + cleanup + wait=180s)
+[PATCH] LLMClient noretry patch failed: AGENTSOCIETY_LLM_API_KEY is required. Please set this environment variable before running AgentSociety2.
+
+======================================================================
+Evolution v16 — Yuan Longping Hybrid Vigor + Multi-Niche IM
+n_orgs=30 steps/gen=400 regions=9 STABLE | 70% hybrid + 30% mutant
+======================================================================
+
+GEN    0 | alive=30/30 | fit=0.6609/0.6376 | pred=0.41768 | INFO=10.6507 | INTRIN=1.363 boring=0.0000 | region_div=9 | HYBRID=0.000 inbr=1.00
+GEN    5 | alive=30/30 | fit=0.6651/0.5437 | pred=0.36630 | INFO=10.7901 | INTRIN=1.336 boring=0.0000 | region_div=8 | HYBRID=0.000 inbr=0.84
+GEN   10 | alive=30/30 | fit=0.6640/0.5263 | pred=0.36636 | INFO=11.4967 | INTRIN=1.333 boring=0.0000 | region_div=9 | HYBRID=0.000 inbr=0.81
+GEN   15 | alive=30/30 | fit=0.6549/0.5668 | pred=0.37930 | INFO=11.3192 | INTRIN=1.410 boring=0.0000 | region_div=9 | HYBRID=0.000 inbr=0.88
+GEN   20 | alive=30/30 | fit=0.6603/0.5755 | pred=0.37778 | INFO=11.0506 | INTRIN=1.382 boring=0.0000 | region_div=9 | HYBRID=0.000 inbr=0.89
+GEN   25 | alive=30/30 | fit=0.6588/0.5751 | pred=0.37917 | INFO=11.0015 | INTRIN=1.321 boring=0.0000 | region_div=9 | HYBRID=0.000 inbr=0.89
+GEN   30 | alive=30/30 | fit=0.6634/0.5018 | pred=0.36200 | INFO=11.1268 | INTRIN=1.411 boring=0.0000 | region_div=9 | HYBRID=0.000 inbr=0.77
+GEN   35 | alive=30/30 | fit=0.6793/0.5604 | pred=0.36998 | INFO=11.6121 | INTRIN=1.490 boring=0.0000 | region_div=9 | HYBRID=0.000 inbr=0.87
+GEN   40 | alive=30/30 | fit=0.6624/0.5250 | pred=0.37111 | INFO=11.5770 | INTRIN=1.528 boring=0.0000 | region_div=8 | HYBRID=0.000 inbr=0.81
+GEN   45 | alive=30/30 | fit=0.6579/0.5413 | pred=0.38263 | INFO=11.7441 | INTRIN=1.515 boring=0.0000 | region_div=6 | HYBRID=0.000 inbr=0.84
+GEN   50 | alive=30/30 | fit=0.6518/0.4627 | pred=0.38728 | INFO=11.3103 | INTRIN=1.497 boring=0.0000 | region_div=8 | HYBRID=0.000 inbr=0.72
+GEN   55 | alive=30/30 | fit=0.6678/0.5015 | pred=0.36605 | INFO=11.3932 | INTRIN=1.530 boring=0.0000 | region_div=8 | HYBRID=0.000 inbr=0.77
+GEN   60 | alive=30/30 | fit=0.6805/0.4637 | pred=0.38158 | INFO=11.2884 | INTRIN=1.505 boring=0.0000 | region_div=9 | HYBRID=0.000 inbr=0.72
+GEN   65 | alive=30/30 | fit=0.6679/0.4886 | pred=0.38834 | INFO=11.1715 | INTRIN=1.475 boring=0.0000 | region_div=8 | HYBRID=0.000 inbr=0.76
+GEN   70 | alive=30/30 | fit=0.6637/0.4650 | pred=0.37227 | INFO=11.7977 | INTRIN=1.568 boring=0.0000 | region_div=8 | HYBRID=0.000 inbr=0.72
+GEN   75 | alive=30/30 | fit=0.6824/0.6044 | pred=0.36883 | INFO=11.5057 | INTRIN=1.582 boring=0.0000 | region_div=8 | HYBRID=0.000 inbr=0.93
+GEN   80 | alive=30/30 | fit=0.6675/0.5453 | pred=0.36691 | INFO=11.6303 | INTRIN=1.537 boring=0.0000 | region_div=6 | HYBRID=0.000 inbr=0.84
+GEN   85 | alive=30/30 | fit=0.6718/0.4665 | pred=0.37389 | INFO=11.6772 | INTRIN=1.559 boring=0.0000 | region_div=7 | HYBRID=0.000 inbr=0.72
+GEN   90 | alive=30/30 | fit=0.6736/0.4672 | pred=0.36855 | INFO=11.5596 | INTRIN=1.574 boring=0.0000 | region_div=8 | HYBRID=0.000 inbr=0.72
+GEN   95 | alive=30/30 | fit=0.6604/0.4630 | pred=0.39768 | INFO=11.5383 | INTRIN=1.508 boring=0.0000 | region_div=8 | HYBRID=0.000 inbr=0.72
+GEN  100 | alive=30/30 | fit=0.6624/0.4643 | pred=0.39041 | INFO=11.3903 | INTRIN=1.462 boring=0.0000 | region_div=8 | HYBRID=0.000 inbr=0.72
+GEN  105 | alive=30/30 | fit=0.6883/0.4632 | pred=0.39986 | INFO=11.2734 | INTRIN=1.467 boring=0.0000 | region_div=9 | HYBRID=0.000 inbr=0.72
+GEN  110 | alive=30/30 | fit=0.6771/0.4623 | pred=0.40292 | INFO=10.6089 | INTRIN=1.373 boring=0.0000 | region_div=9 | HYBRID=0.000 inbr=0.72
+GEN  115 | alive=30/30 | fit=0.6705/0.4690 | pred=0.36656 | INFO=12.3591 | INTRIN=1.621 boring=0.0000 | region_div=6 | HYBRID=0.000 inbr=0.72
+GEN  120 | alive=30/30 | fit=0.6747/0.4666 | pred=0.38336 | INFO=11.6357 | INTRIN=1.572 boring=0.0000 | region_div=5 | HYBRID=0.000 inbr=0.72
+GEN  125 | alive=30/30 | fit=0.6642/0.4702 | pred=0.34754 | INFO=12.1832 | INTRIN=1.666 boring=0.0001 | region_div=7 | HYBRID=0.000 inbr=0.72
+GEN  130 | alive=30/30 | fit=0.6902/0.5751 | pred=0.34868 | INFO=11.6825 | INTRIN=1.569 boring=0.0000 | region_div=9 | HYBRID=0.000 inbr=0.88
+GEN  135 | alive=30/30 | fit=0.6700/0.5840 | pred=0.34695 | INFO=12.0013 | INTRIN=1.598 boring=0.0001 | region_div=8 | HYBRID=0.000 inbr=0.89
+GEN  140 | alive=30/30 | fit=0.6748/0.5589 | pred=0.34087 | INFO=11.6029 | INTRIN=1.566 boring=0.0000 | region_div=8 | HYBRID=0.000 inbr=0.85
+GEN  145 | alive=30/30 | fit=0.6721/0.5271 | pred=0.33240 | INFO=12.1326 | INTRIN=1.626 boring=0.0000 | region_div=7 | HYBRID=0.000 inbr=0.80
+GEN  150 | alive=30/30 | fit=0.7014/0.5490 | pred=0.35817 | INFO=11.4427 | INTRIN=1.516 boring=0.0004 | region_div=9 | HYBRID=0.000 inbr=0.84
+GEN  155 | alive=30/30 | fit=0.6738/0.4864 | pred=0.36898 | INFO=11.4269 | INTRIN=1.509 boring=0.0000 | region_div=7 | HYBRID=0.000 inbr=0.75
+GEN  160 | alive=30/30 | fit=0.6868/0.5095 | pred=0.29056 | INFO=11.7498 | INTRIN=1.582 boring=0.0001 | region_div=9 | HYBRID=0.000 inbr=0.76
+GEN  165 | alive=30/30 | fit=0.6830/0.5329 | pred=0.34858 | INFO=10.8262 | INTRIN=1.404 boring=0.0002 | region_div=9 | HYBRID=0.000 inbr=0.81
+GEN  170 | alive=30/30 | fit=0.6943/0.4782 | pred=0.37750 | INFO=10.6323 | INTRIN=1.442 boring=0.0000 | region_div=9 | HYBRID=0.000 inbr=0.73
+GEN  175 | alive=30/30 | fit=0.6748/0.4729 | pred=0.34411 | INFO=11.0644 | INTRIN=1.440 boring=0.0000 | region_div=9 | HYBRID=0.000 inbr=0.72
+GEN  180 | alive=30/30 | fit=0.6897/0.4979 | pred=0.35618 | INFO=10.8381 | INTRIN=1.364 boring=0.0000 | region_div=9 | HYBRID=0.000 inbr=0.76
+GEN  185 | alive=30/30 | fit=0.6757/0.4834 | pred=0.33013 | INFO=11.7446 | INTRIN=1.570 boring=0.0000 | region_div=8 | HYBRID=0.000 inbr=0.73
+GEN  190 | alive=30/30 | fit=0.6957/0.4783 | pred=0.31553 | INFO=11.6838 | INTRIN=1.542 boring=0.0000 | region_div=9 | HYBRID=0.000 inbr=0.72
+GEN  195 | alive=30/30 | fit=0.7061/0.4824 | pred=0.35168 | INFO=11.0026 | INTRIN=1.462 boring=0.0000 | region_div=9 | HYBRID=0.000 inbr=0.73
+
+Logged to evolution_log_v16.json

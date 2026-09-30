@@ -1,0 +1,138 @@
+{
+  "evolved": [
+    {
+      "trial": 0,
+      "survived": 318,
+      "alive": false,
+      "mse": 10.690274870620067,
+      "nodes": 4
+    },
+    {
+      "trial": 0,
+      "survived": 348,
+      "alive": false,
+      "mse": 11.683254809211427,
+      "nodes": 8
+    },
+    {
+      "trial": 0,
+      "survived": 366,
+      "alive": false,
+      "mse": 14.120054007956641,
+      "nodes": 7
+    },
+    {
+      "trial": 1,
+      "survived": 317,
+      "alive": false,
+      "mse": 9.751722728972489,
+      "nodes": 4
+    },
+    {
+      "trial": 1,
+      "survived": 355,
+      "alive": false,
+      "mse": 12.53400659607609,
+      "nodes": 8
+    },
+    {
+      "trial": 1,
+      "survived": 374,
+      "alive": false,
+      "mse": 14.783250741651388,
+      "nodes": 7
+    },
+    {
+      "trial": 2,
+      "survived": 308,
+      "alive": false,
+      "mse": 9.548051891982265,
+      "nodes": 4
+    },
+    {
+      "trial": 2,
+      "survived": 359,
+      "alive": false,
+      "mse": 12.700924166931065,
+      "nodes": 8
+    },
+    {
+      "trial": 2,
+      "survived": 364,
+      "alive": false,
+      "mse": 15.352043508820007,
+      "nodes": 7
+    },
+    {
+      "trial": 3,
+      "survived": 313,
+      "alive": false,
+      "mse": 9.355949877130492,
+      "nodes": 4
+    },
+    {
+      "trial": 3,
+      "survived": 345,
+      "alive": false,
+      "mse": 11.213304881955398,
+      "nodes": 8
+    },
+    {
+      "trial": 3,
+      "survived": 351,
+      "alive": false,
+      "mse": 13.84555153165077,
+      "nodes": 7
+    },
+    {
+      "trial": 4,
+      "survived": 313,
+      "alive": false,
+      "mse": 8.268715624746736,
+      "nodes": 4
+    },
+    {
+      "trial": 4,
+      "survived": 359,
+      "alive": false,
+      "mse": 10.808588399161879,
+      "nodes": 8
+    },
+    {
+      "trial": 4,
+      "survived": 348,
+      "alive": false,
+      "mse": 14.170614459081376,
+      "nodes": 7
+    }
+  ],
+  "baseline": [
+    {
+      "survival": 51,
+      "mse": 7.984070885439287
+    },
+    {
+      "survival": 47,
+      "mse": 7.254042523603122
+    },
+    {
+      "survival": 34,
+      "mse": 7.869020706724166
+    },
+    {
+      "survival": 36,
+      "mse": 8.630804358831162
+    },
+    {
+      "survival": 29,
+      "mse": 8.220010422228873
+    }
+  ],
+  "summary": {
+    "evo_survival": 342.53333333333336,
+    "evo_mse": 11.921753873063206,
+    "base_survival": 39.4,
+    "base_mse": 7.991589779365322,
+    "superior": true
+  }
+}

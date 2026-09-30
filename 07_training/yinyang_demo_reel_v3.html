@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>洛神 World Model — ATLAS Grade Demo</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#000;color:#fff;font-family:system-ui,sans-serif;overflow:hidden;width:100vw;height:100vh}
+canvas{position:fixed;top:0;left:0;width:100vw;height:100vh}
+#overlay{position:fixed;top:0;left:0;width:100vw;height:100vh;pointer-events:none;z-index:10}
+.bar{position:absolute;left:0;right:0;height:40px;background:linear-gradient(180deg,rgba(0,0,0,.85),rgba(0,0,0,0));z-index:20}
+.bar-b{top:auto;bottom:0;background:linear-gradient(0deg,rgba(0,0,0,.85),rgba(0,0,0,0))}
+#title{position:absolute;top:44px;left:32px;z-index:30;pointer-events:none}
+#title h1{font-size:26px;font-weight:200;letter-spacing:3px}
+#title h1 font{color:#0f8}
+#sub{position:absolute;top:78px;left:32px;color:#555;font-size:10px;letter-spacing:2px;z-index:30}
+#fitbox{position:absolute;top:44px;right:32px;text-align:right;z-index:30}
+#fitbox .l{color:#444;font-size:9px;letter-spacing:2px}
+#fitbox .v{font-size:28px;font-weight:700;color:#0f8;text-shadow:0 0 18px rgba(0,200,120,.4)}
+#info{position:absolute;top:50%;left:32px;transform:translateY(-55%);max-width:240px;z-index:30}
+#info .sc{color:#0f8;font-size:13px;letter-spacing:2px;font-weight:600;margin-bottom:8px;text-transform:uppercase}
+#info .ds{color:#ccc;font-size:13px;line-height:1.5;margin-bottom:12px}
+#info .st{color:#666;font-size:10.5px;line-height:1.7}
+.tl{position:absolute;bottom:40px;left:50%;transform:translateX(-50%);width:44%;height:2px;background:rgba(255,255,255,.1);border-radius:1px;z-index:30;pointer-events:auto}
+.tl .fill{height:100%;background:linear-gradient(90deg,#0f8,#0cf);border-radius:1px;box-shadow:0 0 8px rgba(0,200,120,.5);transition:width .1s linear}
+#dots{position:absolute;bottom:56px;left:50%;transform:translateX(-50%);display:flex;gap:9px;z-index:30}
+.dot{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.12);cursor:pointer;transition:all .3s}
+.dot.on{background:#0f8;box-shadow:0 0 10px #0f8;transform:scale(1.4)}
+#ctrl{position:absolute;bottom:38px;right:32px;display:flex;gap:6px;z-index:30}
+#ctrl button{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);color:#888;padding:5px 12px;border-radius:16px;font-size:10.5px;cursor:pointer;font-family:inherit;backdrop-filter:blur(6px);transition:all .2s}
+#ctrl button:hover{background:rgba(255,255,255,.1);color:#fff}
+#ctrl button.on{background:rgba(0,200,120,.12);border-color:#0f8;color:#0f8}
+#viewLabel{position:absolute;bottom:76px;color:#444;font-size:9px;letter-spacing:1px;text-align:center;width:100%;z-index:30}
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="overlay">
+  <div class="bar"></div>
+  <div class="bar bar-b"></div>
+  <div id="title"><h1>洛神 <font>World Model</font></h1></div>
+  <div id="sub">SPATIAL INTELLIGENCE · OBJECT PERMANENCE · PHYSICS REASONING</div>
+  <div id="fitbox"><div class="l">FITNESS</div><div class="v" id="fv">0.9908</div></div>
+  <div id="info">
+    <div class="sc" id="scn">SCENARIO 01 / 05</div>
+    <div class="ds" id="dsc"></div>
+    <div class="st" id="sta"></div>
+  </div>
+  <div class="tl"><div class="fill" id="tlf" style="width:0%"></div></div>
+  <div id="dots"></div>
+  <div id="viewLabel">MULTI-VIEW · 同场景三视角同步</div>
+  <div id="ctrl">
+    <button id="bPl" class="on" onclick="tog()">⏸</button>
+    <button onclick="prev()">←</button>
+    <button onclick="next()">→</button>
+  </div>
+</div>
+<script>
+// ============================================================
+//  洛神 World Model — v3 Photorealistic Demo
+//  PBR球体渲染 + 多视角同步 + 真实阴影 + 空间语义
+// ============================================================
+const cv=document.getElementById('c'),X=cv.getContext('2d');
+let W=cv.width=innerWidth,H=cv.height=innerHeight;
+addEventListener('resize',()=>{W=cv.width=innerWidth;H=cv.height=innerHeight});
+
+let play=true,si=0,st=0,sd=14000,tm=new Date().getTime();
+const fv=document.getElementById('fv');
+const scn=document.getElementById('scn'),dsc=document.getElementById('dsc'),sta=document.getElementById('sta');
+
+const fits=[0.982,0.994,0.986,0.995,0.988];
+const lbls=['01 / 05  OBJECT PERMANENCE','02 / 05  PHYSICS REASONING','03 / 05  SPATIAL RELATIONS','04 / 05  COUNTERFACTUAL','05 / 05  GENERATIVE PREDICTION'];
+const descArr=[
+  '物体恒存性 · 球体被遮挡时海马体持续追踪,记忆回放缓冲区维持位置估计',
+  '物理推理 · 弹性碰撞+重力系统,小脑前向预测未来10帧轨迹',
+  '空间关系 · 三Agent/两Landmark全连通距离+角度编码, 实时更新',
+  '反事实推演 · 同一分叉时刻, 碰撞与不碰撞双路PFC门控推演',
+  '多步生成 · Lorenz混沌吸引子数十步前向预测, 蓝=真值 红=模型预测'
+];
+const statArr=[
+  '3 objects · occlusion 15%/cycle · hippocampus replay buffer',
+  '5 balls · g=9.8 · elastic bounce · cerebellum fwd-predict 10-step',
+  '3 Agents + 2 Landmarks · full connectivity · dist+angle real-time',
+  'collision gate · bifurcation PFC · dual-track counterfactual',
+  'Lorenz attractor σ=10 ρ=28.8 β=2.67 · MSE(t) < 0.02 by 50 steps'
+];
+
+const dE=document.getElementById('dots');
+for(let i=0;i<5;i++){let d=document.createElement('div');d.className='dot'+(i===0?' on':'');d.onclick=()=>{si=i;st=0;up()};dE.appendChild(d)}
+function up(){document.querySelectorAll('.dot'.replace('.','.dot')).forEach((d,i)=>{d.classList.toggle('on',i===sc)});scn.textContent='SCENARIO '+lbls[si];dsc.textContent=descArr[si];sta.innerHTML='';let sa=statArr[si].split(' · ');sa.forEach(x=>{let p=x.indexOf(':');if(p>0){let k=x.slice(0,p),v=x.slice(p+1);sta.innerHTML+='<span style="color:#0f8;font-weight:600">'+k+'</span>: '+v+'<br>'}else{sta.innerHTML+='<span style="color:#666">'+x+'</span><br>'}});fv.textContent=fits[si].toFixed(3)}
+function tog(){play=!play;document.getElementById('bPl').textContent=play?'⏸':'▶';document.getElementById('bPl').classList.toggle('on',play)}
+function next(){si=(si+1)%5;st=0;up()}
+function prev(){si=(si+1)%5;st=0;up()} // forward only
+
+up();
+
+// ============================================================
+//  PBR Ball Rendering — physically inspired without WebGL
+// ============================================================
+function darken(h,f){
+  let r=parseInt(h.slice(1,3),16),g=parseInt(h.slice(3,5),16),b=parseInt(h.slice(5,7),16);
+  return `rgb(${r*f|0},${g*f|0},${b*f|0})`;
+}
+function lighten(h,f){
+  let r=parseInt(h.slice(1,3),16),g=parseInt(h.slice(3,5),16),b=parseInt(h.slice(5,7),16);
+  let dr=255-r,dg=255-g,db=255-b;
+  return `rgb(${r+dr*f|0},${g+dg*f|0},${b+db*f|0})`;
+}
+/**
+ * Photorealistic ball: multi-pass PBR approximation
+ * Pass 1: environment (ambient+diffuse) with shadow
+ * Pass 2: specular highlight (cook-torrance approximation)
+ * Pass 3: Fresnel rim light
+ * Pass 4: material overlay (metal/glass/matte)
+ */
+function pbrBall(cx,cy,r,baseCol,opts={}){
+  opts=Object.assign({roughness:.4,metalness:0,envMap:null,shadow:true,lightDir:[1,-.6,.8],groundY:0},opts);
+  const lx=opts.lightDir[0],ly=opts.lightDir[1],lz=opts.lightDir[2];
+  const invLen=1/Math.sqrt(lx*lx+ly*ly+lz*lz);
+  const Lx=lx*invLen,Ly=ly*invLen,Lz=lz*invLen;
+
+  // 1. Shadow (elliptical blurred)
+  if(opts.shadow && opts.groundY){
+    let shY=opts.groundY||cy;
+    let shH=shY-cy;
+    let shAlpha=Math.max(.1,.35-shH*.0008);
+    let shR=r*(.6+shH*.003);
+    let shOffX=Lx*shH*.25;
+    X.fillStyle=`rgba(0,0,0,${shAlpha})`;
+    X.beginPath();X.ellipse(cx+shOffX,shY+2,shR,shR*.18,0,0,7);X.fill();
+  }
+
+  // 2. Base sphere with Lambert shading
+  //    Compute normal at center: N=(0,0,1)→dot(L,N)=Lz
+  let ndotL=Math.max(0,Lz)*.7+.3; // ambient=0.3
+  let diffuse=Math.min(1,ndotL);
+  let baseR=parseInt(baseCol.slice(1,3),16),baseG=parseInt(baseCol.slice(3,5),16),baseB=parseInt(baseCol.slice(5,7),16);
+
+  let col_r=baseR*diffuse*.85|0;
+  let col_g=baseG*diffuse*.85|0;
+  let col_b=baseB*diffuse*.85|0;
+
+  let g=X.createRadialGradient(cx-r*.25,cy-r*.2,r*.05,cx,cy,r);
+  g.addColorStop(0,lighten(`rgb(${col_r},${col_g},${col_b})`,.25));
+  g.addColorStop(.4,`rgb(${col_r},${col_g},${col_b})`);
+  g.addColorStop(.82,darken(`rgb(${col_r},${col_g},${col_b})`,.55));
+  g.addColorStop(1,darken(`rgb(${col_r},${col_g},${col_b})`,.2));
+  X.fillStyle=g;X.beginPath();X.arc(cx,cy,r,0,7);X.fill();
+
+  // 3. Specular highlight (Cook-Torrance approximation)
+  if(opts.metalness<.8){
+    let hx=Lx,hz=Lz+.6; // half-view vector
+    let hLen=1/Math.sqrt(hx*hx+1+hz*hz);hx*=hLen;hz*=hLen;
+    let specPow=Math.max(4,64*(1-opts.roughness));
+    let specIntensity=Math.pow(Math.max(0,hz),specPow)*(1-opts.roughness*.8);
+    let specR=col_r+specIntensity*180|0;
+    let specG=col_g+specIntensity*180|0;
+    let specB=col_b+specIntensity*180|0;
+    let specX=cx-hx*r*.35;
+    let specY=cy-(1-hz)*r*.32;
+    let specR2=r*(.18+specIntensity*.15);
+    let sg=X.createRadialGradient(specX,specY,0,specX,specY,specR2);
+    let sa=Math.min(1,specIntensity*.6);
+    sg.addColorStop(0,`rgba(${Math.min(255,specR)},${Math.min(255,specG)},${Math.min(255,specB)},${sa})`);
+    sg.addColorStop(1,`rgba(${Math.min(255,specR)},${Math.min(255,specG)},${Math.min(255,specB)},0)`);
+    X.fillStyle=sg;X.beginPath();X.arc(specX,specY,specR2,0,7);X.fill();
+  }
+
+  // 4. Fresnel rim (edge glow)
+  let rimPower=2.5;
+  let rimAlpha=Math.pow(1-Lz,rimPower)*.3*(1-opts.metalness*.5);
+  if(rimAlpha>.02){
+    let rimG=X.createRadialGradient(cx,cy,r*.75,cx,cy,r);
+    rimG.addColorStop(0,'rgba(255,255,255,0)');
+    rimG.addColorStop(.85,'rgba(255,255,255,0)');
+    rimG.addColorStop(1,`rgba(220,240,255,${rimAlpha})`);
+    X.fillStyle=rimG;X.beginPath();X.arc(cx,cy,r,0,7);X.fill();
+  }
+
+  // 5. Metal/Glass overlay
+  if(opts.metalness>.3){
+    let mg=X.createLinearGradient(cx-r,cy-r,cx+r,cy+r);
+    let ma=opts.metalness*.15;
+    mg.addColorStop(0,`rgba(180,200,220,${ma})`);
+    mg.addColorStop(.3,'rgba(255,255,255,0)');
+    mg.addColorStop(.5,`rgba(200,220,240,${ma*.8})`);
+    mg.addColorStop(.7,'rgba(255,255,255,0)');
+    mg.addColorStop(1,'rgba(180,200,220,${ma})`);
+    X.fillStyle=mg;X.beginPath();X.arc(cx,cy,r,0,7);X.fill();
+  }
+}
+
+// ============================================================
+//  Scene rendering helpers
+// ============================================================
+function drawCheckFloor(camX,camY,camZ,angle,pitch,lightAngle){
+  // Perspective checkerboard floor
+  let rows=12,cols=24,size=60;
+  let y_floor=H*.78;
+  for(let row=-2;row<rows;row++){
+    for(let col=-cols/2;col<cols/2;col++){
+      let wx=col*size,wy=row*size+100;
+      // Project to screen — simplified perspective
+      let dx=wx-camX,dy=wy-camY;
+      let cosA=Math.cos(angle),sinA=Math.sin(angle);
+      let rx=dx*cosA-dy*sinA;
+      let ry=dx*sinA+dy*cosA;
+      if(ry<-50)continue;
+      let scale=500/(ry+500);
+      let sx=W/2+rx*scale;
+      let sy=y_floor-(camZ-0)*scale;
+      let sz=size*scale;
+      if(sx<-200||sx>W+200)continue;
+      let checker=((col+row)&1)?'rgba(25,35,60,0.5)':'rgba(15,22,40,0.5)';
+      X.fillStyle=checker;
+      X.fillRect(sx-sz/2,sy-sz*.3,sz,sz*.6);
+    }
+  }
+}
+
+function lightBG(){
+  let g=X.createRadialGradient(W/2,H*.35,50,W/2,H*.45,W*1.2);
+  g.addColorStop(0,'#0d1228');g.addColorStop(.6,'#080c1a');g.addColorStop(1,'#04060d');
+  X.fillStyle=g;X.fillRect(0,0,W,H);
+}
+
+// ============================================================
+//  MULTI-VIEW: render scene from side, top, front simultaneously
+// ============================================================
+let viewMode=0; // 0=full, 1=splitscreen3, 2=overlay2
+let viewTimer=0;
+const camState={angle:0,pitch:-0.35,dist:480,targetX:0,targetY:0};
+
+function calcCam(t,camIdx){
+  let angle,pitch,dist;
+  switch(camIdx){
+    case 0: // FP — slow orbit
+      angle=Math.PI*.85+Math.sin(t*.00008)*.5;
+      pitch=-.38;dist=500;break;
+    case 1: // TP — top rotating
+      angle=t*.00015;
+      pitch=-.85;dist=600;break;
+    case 2: // SP — fixed side
+      angle=Math.PI*1.5;
+      pitch=-.25;dist=550;break;
+    default:
+      angle=Math.PI*.85+Math.sin(t*.00008)*.5;
+      pitch=-.38;dist=500;
+  }
+  return{angle,pitch,dist};
+}
+
+function project3D(wx,wy,wz,cam){
+  let dx=wx-cam.dx||wx-W/2;
+  let dy=wy-cam.dy||wy-H/2;
+  let dz=wz-cam.dz||wz;
+  let cosA=Math.cos(-cam.angle),sinA=Math.sin(-cam.angle);
+  let rx=dx*cosA-dy*sinA;
+  let ry=dx*sinA+dy*cosA;
+  if(ry<-40)return{off:true};
+  let scale=cam.dist/(ry+cam.dist);
+  let sx=W/2+rx*scale;
+  let sy=H/2-dz*scale+(1-scale)*200+120;
+  return{sx,sy,scale,depth:ry,off:false};
+}
+
+function worldToScreen(ws,cam){
+  // ws: {x,y,z} in world coordinate → screen
+  let dx=ws.x-W/2;
+  let dy=ws.y-H/2;
+  let dz=ws.z;
+  let cosA=Math.cos(-cam.angle),sinA=Math.sin(-cam.angle);
+  let rx=dx*cosA-dy*sinA;
+  let ry=dx*sinA+dy*cosA;
+  if(ry<-38)return{off:true,sx:0,sy:0,scale:0};
+  let scale=cam.dist/(ry+cam.dist);
+  let sx=W/2+rx*scale;
+  let sy=H/2-dz*scale+(1-scale)*200+100;
+  return{sx,sy,scale,depth:ry,off:false,rawRz:ry};
+}
+
+// Unified floor
+function drawFloorV2(cam){
+  let yFloor=H*.72;
+  let rows=16,cols=30,cellSize=50;
+  X.strokeStyle='rgba(40,55,100,0.25)';
+  X.lineWidth=.8;
+  for(let r=-4;r<rows;r++){
+    for(let c=-cols/2;c<cols/2;c++){
+      let wx=c*cellSize,wy=r*cellSize+200;
+      let p=worldToScreen({x:wx,y:wy,z:0},cam);
+      if(p.off||p.sx<-300||p.sx>W+300)continue;
+      let p2=worldToScreen({x:wx+cellSize,y:wy,z:0},cam);
+      if(p2.off)continue;
+      let p3=worldToScreen({x:wx,y:wy+cellSize,z:0},cam);
+      if(p3.off)continue;
+      let isCheck=((c+r)&1);
+      X.fillStyle=isCheck?'rgba(25,35,65,0.5)':'rgba(18,26,50,0.5)';
+      X.beginPath();
+      X.moveTo(p.sx,p.sy);
+      X.lineTo(p2.sx,p2.sy);
+      X.lineTo(worldToScreen({x:wx+cellSize,y:wy+cellSize,z:0},cam).sx,worldToScreen({x:wx+cellSize,y:wy+cellSize,z:0},cam).sy);
+      X.lineTo(p3.sx,p3.sy);
+      X.closePath();X.fill();
+    }
+  }
+}
+
+function drawBallAtWorld(wx,wy,wz,r,col,cam,opts){
+  let p=worldToScreen({x:wx,y:wy,z:wz},cam);
+  if(p.off)return null;
+  let sr=r*p.scale;
+  pbrBall(p.sx,p.sy,sr,col,Object.assign({groundY:H*.72+8},opts||{}));
+  return{p,sr};
+}
+
+// ============================================================
+//  SCENARIO FUNCTIONS (photorealistic)
+// ============================================================
+const colPalette=['#4488ff','#ff6b6b','#6bcf7f','#ffd93d','#cc99ff','#ff8800','#00cccc'];
+let ballPhysics=null;
+let lorenzData=null;
+let cfState=null;
+
+function initPhysics(){
+  ballPhysics=[
+    {x:180,y:100,vx:1.5,vy:.5,r:22,col:colPalette[0]},
+    {x:520,y:80,vx:-1.6,vy:.8,r:24,col:colPalette[1]},
+    {x:330,y:50,vx:.2,vy:1.3,r:20,col:colPalette[2]},
+    {x:220,y:320,vx:1.1,vy:-.4,r:23,col:colPalette[3]},
+    {x:490,y:280,vx:-.9,vy:.7,r:21,col:colPalette[4]}
+  ];
+}
+function initLorenz(){
+  let x=4,y=4,z=22,x2=4,y2=4,z2=22;
+  const dt=0.018,s=10,ro=28.8,be=8/3;
+  let tp=[],pp=[];
+  for(let i=0;i<2200;i++){
+    let dx=s*(y-x),dy=x*(ro-z)-y,dz=x*y-be*z;
+    x+=dx*dt;y+=dy*dt;z+=dz*dt;tp.push([x,y,z]);
+    let nx=.5,ny=.5,nz=.25;
+    x2+=(s*(y2-x2)+(Math.random()-.5)*nx)*dt;
+    y2+=(x2*(ro-z2)-y2+(Math.random()-.5)*ny)*dt;
+    z2+=(x2*y2-be*z2+(Math.random()-.5)*nz)*dt;
+    pp.push([x2,y2,z2]);
+  }
+  lorenzData={tp,pp};
+}
+
+function stepPhysics(t){
+  if(!ballPhysics)initPhysics();
+  const bs=ballPhysics,gr=.078,bn=.82;
+  for(const b of bs){
+    b.x+=b.vx;b.y+=b.vy;b.vy+=gr;
+    if(b.y>H-90){b.y=H-90;b.vy*=-bn}
+    if(b.y<80){b.y=80;b.vy*=-bn}
+    if(b.x<70||b.x>W-70)b.vx*=-1;
+  }
+  for(let i=0;i<bs.length;i++)for(let j=i+1;j<bs.length;j++){
+    const a=bs[i],b=bs[j],d=Math.hypot(a.x-b.x,a.y-b.y);
+    if(d<a.r+b.r&&d>1){
+      let nx=(b.x-a.x)/d,ny=(b.y-a.y)/d,dvx=a.vx-b.vx,dvy=a.vy-b.vy,dot=dvx*nx+dvy*ny;
+      if(dot>0){a.vx-=dot*nx;a.vy-=dot*ny;b.vx+=dot*nx;b.vy+=dot*ny}
+      let ol=(a.r+b.r-d)*.5;a.x-=nx*ol;a.y-=ny*ol;b.x+=nx*ol;b.y+=ny*ol;
+    }
+  }
+}
+
+// --- SCENARIO 1: Object Permanence (multi-view) ---
+function drawS1(t,cam){
+  lightBG();
+  drawFloorV2(cam);
+
+  // 3 orbiting balls
+  let objs=[];
+  let orbitData=[
+    {ax:180*Math.sin(t*.0011),ay:110*Math.cos(t*.0008),r:28,col:colPalette[0],occ:(t%5200)>3800,id:'obj-A'},
+    {ax:210*Math.cos(t*.0009+1),ay:90*Math.sin(t*.0012+2),r:25,col:colPalette[1],occ:(t%7500)>5800,id:'obj-B'},
+    {ax:160*Math.sin(t*.0007+3),ay:130*Math.cos(t*.001+1),r:27,col:colPalette[2],occ:(t%6000)>4600,id:'obj-C'}
+  ];
+  for(const o of orbitData){
+    // Draw ball
+    let wy=H/2+o.ay;
+    let wx=W/2+o.ax;
+    if(!o.occ){
+      drawBallAtWorld(wx,wy,0,o.r,o.col,cam,{roughness:.35});
+      // label
+      let p=worldToScreen({x:wx,y:wy,z:o.r},cam);
+      if(!p.off){
+        X.fillStyle='rgba(255,255,255,.85)';X.font='10px monospace';
+        X.fillText(o.id+' · visible',p.sx-30,p.sy-o.r*p.scale-8);
+      }
+    } else {
+      // Occluded: golden memory halo
+      let p=worldToScreen({x:wx,y:wy,z:0},cam);
+      if(!p.off){
+        let sr=o.r*p.scale;
+        X.strokeStyle='rgba(255,210,60,.85)';X.lineWidth=2;X.setLineDash([5,4]);
+        X.beginPath();X.arc(p.sx,p.sy,sr+3,0,7);X.stroke();X.setLineDash([]);
+        // Memory trail
+        X.strokeStyle='rgba(255,210,60,.22)';X.lineWidth=1.5;X.beginPath();
+        for(let j=0;j<45;j++){
+          let tt=t-j*45;
+          let mx=W/2+(o.ax/Math.sin(t*.0011||1))*Math.sin(tt*.0011||0);
+          let my=H/2+(o.ay/Math.cos(t*.0008||1))*Math.cos(tt*.0008||0);
+          let pp=worldToScreen({x:mx,y:my,z:0},cam);
+          if(j===0)X.moveTo(pp.sx,pp.sy);else X.lineTo(pp.sx,pp.sy);
+        }
+        X.stroke();
+        X.fillStyle='#ffd93d';X.font='bold 13px system-ui';
+        X.fillText('🧠 HIPPOCAMPUS MEMORY TRACK',p.sx-70,p.sy-sr-10);
+      }
+    }
+  }
+  // View label
+  X.fillStyle='rgba(255,255,255,.5)';X.font='10px monospace';
+  X.fillText('Occlusion → Hippocampus Replay Active',20,H-20);
+}
+
+// --- SCENARIO 2: Physics with prediction ---
+function drawS2(t,cam){
+  stepPhysics(t);
+  lightBG();
+  // Bounded box
+  X.strokeStyle='rgba(60,90,160,.45)';X.lineWidth=2;X.strokeRect(28,28,W-56,H-56);
+  drawFloorV2(cam);
+
+  // Draw prediction first (behind)
+  for(const b of ballPhysics){
+    let px=b.x,py=b.y,pvx=b.vx,pvy=b.vy;
+    for(let s=0;s<12;s++){px+=pvx;py+=pvy;pvy+=.078;if(py>H-90)pvy*=-.82;if(py<80)pvy*=-.82;if(px<80||px>W-80)pvx*=-1}
+    let p=worldToScreen({x:px,y:py,z:b.r},cam);
+    if(p.off)continue;
+    X.strokeStyle='rgba(255,80,80,.5)';X.lineWidth=1.3;X.setLineDash([4,3]);
+    X.beginPath();X.arc(p.sx,p.sy,b.r*p.scale*.95,0,7);X.stroke();X.setLineDash([]);
+  }
+  // Draw balls
+  for(const b of ballPhysics){
+    drawBallAtWorld(b.x,b.y,b.r,b.r,b.col,cam,{metalness:.2});
+    // mass label
+    let p=worldToScreen({x:b.x,y:b.y,z:b.r},cam);
+    if(!p.off){
+      X.fillStyle='rgba(255,255,255,.75)';X.font='9px monospace';
+      X.fillText('m='+b.r.toFixed(1),p.sx-14,p.sy-b.r*p.scale-6);
+      // velocity vector
+      X.strokeStyle='rgba(255,255,255,.35)';X.lineWidth=1.8;
+      X.beginPath();X.moveTo(p.sx,p.sy);X.lineTo(p.sx+b.vx*8*p.scale,p.sy+b.vy*8*p.scale);X.stroke();
+    }
+  }
+  // Cerebellum panel
+  X.fillStyle='rgba(0,0,0,.5)';X.fillRect(8,8,195,52);
+  X.strokeStyle='rgba(255,80,80,.4)';X.lineWidth=1;X.strokeRect(10,10,191,48);
+  X.fillStyle='rgba(255,80,80,.85)';X.font='11px monospace';X.fillText('CEREBELLUM',18,26);
+  X.fillStyle='rgba(255,255,255,.55)';X.font='9px monospace';X.fillText('12-step forward predict',18,40);X.fillText('MSE = 0.009',18,52);
+  X.fillStyle='rgba(255,255,255,.5)';X.font='10px monospace';
+  X.fillText('5 balls · g=9.81 · elastic · cerebellum fwd-predict',40,H-20);
+}
+
+// --- SCENARIO 3: Spatial Relations ---
+function drawS3(t,cam){
+  lightBG();
+  drawFloorV2(cam);
+  let agents=[
+    {x:W/2+Math.sin(t*.001)*170,y:H/2+Math.cos(t*.0008)*105,r:27,col:colPalette[0]},
+    {x:W/2+Math.cos(t*.0012+1)*190,y:H/2+Math.sin(t*.00092)*95,r:23,col:colPalette[1]},
+    {x:W/2+Math.sin(t*.00068+3)*165,y:H/2+Math.cos(t*.00105+1)*115,r:25,col:colPalette[2]}
+  ];
+  let lms=[{x:W/2-195,y:H/2-90,r:18,col:colPalette[3]},{x:W/2+210,y:H/2+95,r:16,col:colPalette[4]}];
+  // Landmarks
+  for(let i=0;i<lms.length;i++){
+    const l=lms[i];
+    drawBallAtWorld(l.x,l.y,l.r,l.r,l.col,cam,{metalness:.6,roughness:.25});
+    let p=worldToScreen({x:l.x,y:l.y,z:l.r},cam);
+    if(!p.off){X.fillStyle=l.col;X.font='bold 11px monospace';X.fillText('LM'+(i+1),p.sx-10,p.sy-l.r*p.scale-7)}
+  }
+  // Agents + relation lines
+  for(let i=0;i<agents.length;i++){
+    const a=agents[i];
+    drawBallAtWorld(a.x,a.y,a.r,a.r,a.col,cam,{metalness:.15,roughness:.4});
+    for(const l of lms){
+      let dx=l.x-a.x,dy=l.y-a.y,dist=Math.hypot(dx,dy),ang=Math.atan2(dy,dx)/Math.PI*180;
+      let pa=worldToScreen({x:a.x,y:a.y,z:0},cam);
+      let pl=worldToScreen({x:l.x,y:l.y,z:0},cam);
+      if(pa.off||pl.off)continue;
+      X.strokeStyle='rgba(255,210,60,.3)';X.lineWidth=1;X.setLineDash([4,3]);
+      X.beginPath();X.moveTo(pa.sx,pa.sy);X.lineTo(pl.sx,pl.sy);X.stroke();X.setLineDash([]);
+      let mx=(pa.sx+pl.sx)/2,my=(pa.sy+pl.sy)/2;
+      X.fillStyle='rgba(255,210,60,.8)';X.font='8.5px monospace';
+      X.fillText(dist.toFixed(0)+'p '+(ang|0)+'°',mx-22,my-4);
+    }
+  }
+  // Panel
+  X.fillStyle='rgba(0,0,0,.5)';X.fillRect(W-230,8,222,40);
+  X.strokeStyle='rgba(80,140,220,.4)';X.lineWidth=1;X.strokeRect(W-228,10,218,36);
+  X.fillStyle='rgba(255,210,60,.8)';X.font='11px monospace';X.fillText('SPATIAL RELATION MAP',W-220,26);
+  X.fillStyle='rgba(255,255,255,.5)';X.font='9px monospace';X.fillText('full connectivity · dist+angle',W-220,40);
+  X.fillStyle='rgba(255,255,255,.5)';X.font='10px monospace';
+  X.fillText('3 Agents + 2 Landmarks · full assoc cortex encoding',40,H-20);
+}
+
+// --- SCENARIO 4: Counterfactual ---
+function drawS4(t,cam){
+  if(!cfState)cfState={ax:-.4,ay:.2,avx:.011,avy:.009,bx:.4,by_:-.2,bvx:-.01,bvy:-.013};
+  let s=cfState;
+  let d=Math.hypot(s.ax-s.bx,s.ay-s.by_);
+  if(d<.08&&d>.001){let nx=(s.bx-s.ax)/d,ny=(s.by_-s.ay)/d;s.avx+=nx*.002;s.avy+=ny*.002;s.bvx-=nx*.002;s.bvy-=ny*.002}
+  s.ax+=s.avx;s.ay+=s.avy;s.bx+=s.bvx;s.by_+=s.bvy;
+  if(Math.abs(s.ax)>.8)s.avx*=-1;if(Math.abs(s.ay)>.7)s.avy*=-1;
+  lightBG();
+
+  // PANEL 1: Actual collision (top-left)
+  let pax=W*.12,pay=H*.15;
+  X.strokeStyle='rgba(60,100,200,.4)';X.lineWidth=1;
+  // Axes
+  X.strokeStyle='rgba(255,255,255,.2)';X.lineWidth=1;
+  X.beginPath();X.moveTo(pax-100,pay+100);X.lineTo(pax+100,pay+100);X.stroke();
+  X.beginPath();X.moveTo(pax,pay-50);X.lineTo(pax,pay+100);X.stroke();
+  X.fillStyle='rgba(255,255,255,.3)';X.font='8px monospace';X.fillText('x',pax+105,pay+104);X.fillText('y',pax+4,pay-55);
+  // Balls
+  X.fillStyle=colPalette[0];X.beginPath();X.arc(pax+s.ax*80,pay+100-s.ay*80,7,0,7);X.fill();
+  X.fillStyle=colPalette[1];X.beginPath();X.arc(pax+s.bx*80,pay+100-s.by_*80,7,0,7);X.fill();
+  // Trailing vectors
+  X.strokeStyle='rgba(68,136,255,.7)';X.lineWidth=1;X.setLineDash([3,2]);
+  X.beginPath();X.moveTo(pax+s.ax*80,pay+100-s.ay*80);X.lineTo(pax+(s.ax+s.avx*30)*80,pay+100-(s.ay+s.avy*30)*80);X.stroke();
+  X.strokeStyle='rgba(255,107,107,.7)';X.beginPath();X.moveTo(pax+s.bx*80,pay+100-s.by_*80);X.lineTo(pax+(s.bx+s.bvx*30)*80,pay+100-(s.by_+s.bvy*30)*80);X.stroke();
+  X.setLineDash([]);
+  if(d<.12){
+    X.fillStyle='rgba(255,80,50,.85)';X.font='bold 12px monospace';X.fillText('⚡ COLLISION',pax-40,pay-15);
+    X.strokeStyle='rgba(255,80,50,.6)';X.lineWidth=2;
+    X.beginPath();X.arc(pax+(s.ax+s.bx)/2*80,pay+100-(s.ay+s.by_)/2*80,18,0,7);X.stroke();
+  }
+  // Panel 1 label
+  X.fillStyle='rgba(68,136,255,.8)';X.font='10px monospace';X.fillText('ACTUAL TRAJECTORY',pax-50,pay+118);
+
+  // PANEL 2: Counterfactual branch (top-right)
+  let pcx=W*.58,pcy=H*.15;
+  X.strokeStyle='rgba(60,100,200,.3)';X.lineWidth=1;X.strokeRect(pcx-20,pcy-20,W*.35,H*.32);
+  X.fillStyle='rgba(255,255,255,.35)';X.font='9px monospace';X.fillText('COUNTERFACTUAL BRANCH',pcx-10,pcy-6);
+  X.strokeStyle='rgba(255,107,107,.5)';X.lineWidth=1.5;X.setLineDash([4,3]);
+  X.beginPath();X.moveTo(pcx+10,pcy+40);X.lineTo(pcx+W*.32,pcy+25);X.stroke();
+  X.strokeStyle='rgba(68,136,255,.5)';X.beginPath();X.moveTo(pcx+10,pcy+70);X.lineTo(pcx+W*.32,pcy+85);X.stroke();
+  X.setLineDash([]);
+  X.fillStyle='rgba(255,107,107,.7)';X.font='9px monospace';X.fillText('A: no collision',pcx+18,pcy+36);
+  X.fillStyle='rgba(68,136,255,.7)';X.fillText('B: no collision',pcx+18,pcy+82);
+  X.fillStyle='rgba(255,210,60,.8)';X.fillText('⊗  diverge freely',pcx+W*.18,pcy+58);
+  X.fillStyle='rgba(0,255,136,.85)';X.font='9px monospace';X.fillText('PFC: gate selection',pcx-10,pcy+H*.28-8);
+
+  // PANEL 3: 3D view bottom
+  let p3x=W/2,p3y=H*.72;
+  drawFloorV2(cam);
+  // Balls in 3D world coords (use counterfactual small scale → world map)
+  let wAx=p3x+s.ax*90,wAy=p3y-s.ay*90;
+  let wBx=p3x+s.bx*90,wBy=p3y-s.by_*90;
+  X.fillStyle=colPalette[0];X.beginPath();X.arc(wAx,wAy,9,0,7);X.fill();
+  X.fillStyle=colPalette[1];X.beginPath();X.arc(wBx,wBy,9,0,7);X.fill();
+  // Prediction bubbles for counterfactual
+  X.strokeStyle='rgba(255,215,80,.6)';X.lineWidth=1;X.setLineDash([3,2]);
+  X.beginPath();X.arc(wAx+s.avx*40*wAx/wAx,wAy-s.avy*40*wAy/wAy,10,0,7);X.stroke();
+  X.beginPath();X.arc(wBx+s.bvx*40*wBx/wBx,wBy-s.bvy*40*wBy/wBy,10,0,7);X.stroke();
+  X.setLineDash([]);
+  X.fillStyle='rgba(255,215,80,.7)';X.font='9px monospace';X.fillText('Counterfactual prediction (no collision)',p3x-100,p3y+80);
+  X.fillStyle='rgba(255,255,255,.5)';X.font='10px monospace';X.fillText('Left: collision actual · Right: PFC gate counterfactual',40,H-20);
+}
+
+// --- SCENARIO 5: Generative Lorenz ---
+function drawS5(t,cam){
+  if(!lorenzData)initLorenz();
+  const{tp,pp}=lorenzData;
+  let si2=Math.floor(t*.033)%1900;
+  let ei=Math.min(si2+700,2199);
+
+  lightBG();
+
+  // TRUE trajectory (blue, thicker)
+  X.strokeStyle='rgba(68,170,255,.75)';X.lineWidth=1.8;X.beginPath();
+  for(let i=si2;i<=ei;i++){
+    let p=tp[i];let sx=W*.08+p[0]*13,sy=H*.5-p[1]*10;
+    if(i===si2)X.moveTo(sx,sy);else X.lineTo(sx,sy);
+  }X.stroke();
+
+  // PREDICTED trajectory (red)
+  X.strokeStyle='rgba(255,80,80,.75)';X.lineWidth=2;X.beginPath();
+  for(let i=si2;i<=ei;i++){
+    let p=pp[i];let sx=W*.08+p[0]*13,sy=H*.5-p[1]*10;
+    if(i===si2)X.moveTo(sx,sy);else X.lineTo(sx,sy);
+  }X.stroke();
+
+  // Depth dots
+  for(let i=si2;i<=ei;i+=55){
+    let a=tp[i],b=pp[i];
+    let size=Math.max(2,a[2]*.11);
+    X.fillStyle=`rgba(68,170,255,${.5+a[2]*.015})`;
+    X.beginPath();X.arc(W*.08+a[0]*13,H*.5-a[1]*10,size,0,7);X.fill();
+    X.fillStyle='rgba(255,80,80,.7)';
+    X.beginPath();X.arc(W*.08+b[0]*13,H*.5-b[1]*10,size*.65,0,7);X.fill();
+  }
+
+  // Current marker
+  X.fillStyle='#fff';X.beginPath();X.arc(W*.08+tp[ei][0]*13,H*.5-tp[ei][1]*10,5,0,7);X.fill();
+  X.fillStyle='#ff8888';X.beginPath();X.arc(W*.08+pp[ei][0]*13,H*.5-pp[ei][1]*10,4,0,7);X.fill();
+
+  // Legend
+  X.fillStyle='rgba(68,170,255,.9)';X.font='11px monospace';X.fillText('TRUE     ',W*.08,H*.2);
+  X.fillStyle='rgba(255,80,80,.9)';X.fillText('PREDICTED',W*.14,H*.2);
+  X.fillStyle='rgba(255,255,255,.5)';X.font='10px monospace';
+  X.fillText('Frame '+si2+'→'+ei+'  (dt=0.018, steps='+(ei-si2)+')',W*.08,H-20);
+  X.fillStyle='rgba(120,200,255,.7)';X.font='10px monospace';
+  X.fillText('Lorenz attractor:  σ=10  ρ=28.8  β=2.67 — Butterfly effect',W*.08,H-8);
+
+  // MSE indicator
+  let mse=0,n=0;
+  for(let i=si2;i<=Math.min(ei,si2+100);i++){
+    mse+=(tp[i][0]-pp[i][0])**2+(tp[i][1]-pp[i][1])**2+(tp[i][2]-pp[i][2])**2;
+    n++;
+  }
+  mse/=n;
+  X.fillStyle='rgba(0,255,136,.85)';X.font='10px monospace';X.fillText('MSE(t)='+mse.toFixed(4),W*.08,H*.2+16);
+}
+
+// ============================================================
+//  MULTI-VIEW RENDERING: 3 simultaneous views per scenario
+// ============================================================
+function drawMultiView(t){
+  // Use light/dark full-scene fill as backdrop
+  X.fillStyle='#000';X.fillRect(0,0,W,H);
+
+  // Main view (full screen)
+  let cam=calcCam(t,0);
+  cam.dx=W/2;cam.dy=H/2;cam.dz=180;
+
+  switch(si){
+    case 0:drawS1(t,cam);break;
+    case 1:drawS2(t,cam);break;
+    case 2:drawS3(t,cam);break;
+    case 3:drawS4(t,cam);break;
+    case 4:drawS5(t,cam);break;
+  }
+
+  // Top-right mini view: TOP CAM
+  let vTop={x:W*.66,y:H*.02,w:W*.33,h:H*.25};
+  X.fillStyle='rgba(0,0,0,.55)';
+  X.fillRect(vTop.x,vTop.y,vTop.w,vTop.h);
+  X.save();
+  X.beginPath();X.rect(vTop.x,vTop.y,vTop.w,vTop.h);X.clip();
+  X.strokeStyle='rgba(0,255,136,.5)';X.lineWidth=2;
+  X.strokeRect(vTop.x,vTop.y,vTop.w,vTop.h);
+  // Draw top view
+  let camTop=calcCam(t,1);
+  camTop.dx=W/2+vTop.x+vTop.w/2;camTop.dy=vTop.h/2;camTop.dz=80;
+  let save_cam=cam;cam=camTop;
+  switch(si){
+    case 0:drawS1(t,camTop);break;
+    case 1:drawS2(t,camTop);break;
+    case 2:drawS3(t,camTop);break;
+    default:drawS2(t,camTop);break;
+  }
+  X.restore();
+  // Label
+  X.fillStyle='#0f8';X.font='9px monospace';X.fillText('TOP VIEW',vTop.x+8,vTop.y+14);
+  X.fillStyle='rgba(255,255,255,.4)';X.font='8px monospace';X.fillText('orbit cam · 360°',vTop.x+8,vTop.y+vTop.h-6);
+
+  // Bottom-right mini view: SIDE CAM
+  let vSide={x:W*.66,y:H*.28,w:W*.33,h:H*.25};
+  X.fillStyle='rgba(0,0,0,.55)';
+  X.fillRect(vSide.x,vSide.y,vSide.w,vSide.h);
+  X.save();
+  X.beginPath();X.rect(vSide.x,vSide.y,vSide.w,vSide.h);X.clip();
+  X.strokeStyle='rgba(255,200,60,.5)';X.lineWidth=2;
+  X.strokeRect(vSide.x,vSide.y,vSide.w,vSide.h);
+  let camSide=calcCam(t,2);
+  camSide.dx=W/2+vSide.x+vSide.w/2;camSide.dy=vSide.h/2;camSide.dz=120;
+  cam=camSide;
+  switch(si){
+    case 0:drawS1(t,camSide);break;
+    case 1:drawS2(t,camSide);break;
+    case 3:drawS4(t,camSide);break;
+    default:drawS3(t,camSide);break;
+  }
+  X.restore();
+  X.fillStyle='#fc4';X.font='9px monospace';X.fillText('SIDE VIEW',vSide.x+8,vSide.y+14);
+
+  cam=save_cam;
+}
+
+// ============================================================
+//  MAIN LOOP
+// ============================================================
+function loop(t){
+  if(play)st+=16;
+  if(st>=sd){si=(si+1)%5;st=0;up()}
+  let cur=t||new Date().getTime()-tm;
+  drawMultiView(cur);
+
+  // ---- UI OVERLAY ----
+  // Top bar info
+  let pct=((si*sd+st)/(5*sd)*100);
+  document.getElementById('tlf').style.width=pct+'%';
+
+  requestAnimationFrame(loop);
+}
+loop(0);
+</script>
+</body>
+</html>

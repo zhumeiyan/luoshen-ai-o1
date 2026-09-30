@@ -1,0 +1,27 @@
+# 洛神赋1.1 — 所有痕时间线索引
+# 生成时间: 2026-09-19
+# 格式: 文件名 | 开始时间 | 结束时间 | 记录数 | 字节 | schema | 跑的什么
+# 原始痕一个都没动，索引是新增的
+
+痕文件                    | 内部时间起点            | 内部时间终点            | 记录数  | 字节    | schema头部                                          | 跑的什么
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------
+coupled_loop_trace.jsonl   | step=0                  | step=50000              | 101     | 12462   | step,i,m,a,delta_m,delta_a,ext_m,ext_a               | 音频-视频耦合对齐实验，50000步收敛
+cycle_dump_1000.txt        | cycle=0                 | cycle=999               | 1000    | 55000   | cycle,m,a                                           | Hebbian循环1000轮，看权重收敛到哪
+state_stream.tsv           | gt=0,day=0              | gt=43199,day=29,tick=1439 | 43201   | 3954281 | gt,day,tick_in_day,sel,drv_*,env_human_act,env_dog_* | 30天×双向耦合长跑，洛神+狗共跑
+frustration_trace.tsv      | day=0                   | day=28                  | 30      | 1044    | day,want_sum,spoke_sum,frustration,pressure,cumulative_frustration | 30天frustration累计曲线
+body_trace.jsonl           | 2026-09-18T19:24:49     | 2026-09-18T19:29:08     | 10      | 7933    | ts,wall_clock_utc,wall_clock_local,tick_count,cost_ms,dt_min,real_hour,age_y,stage,sel,served,inputs_consumed,state,env,ref,hormones,voice_aperture,frustration_pool,served_total | living_daemon主 daemon tick 1-10
+body_input_queue.tsv       | —                       | —                       | 1       | 38      | type,content                                        | 真人注入输入队列，1条文本"hi 洛神"
+face_recognition_report.tsv| round=all               | round=all               | 1       | 176     | round,mean_sim_to_author,std_sim,s12,s13,s23,s_base_diff,base_social_heat,final_social_heat,n_frames,n_repeats | 人脸/声音签名相似度报告，58帧3轮
+presence_trace.tsv         | round=0,tick_abs=0      | round=4,tick_abs=999    | 1001    | 194160  | round,tick_abs,phase_idx,phase,who_intensity,elapsed_minutes,age_y,_social_heat,_boredom,voice_aperture,sel_need,sel_drive,state_*,env_*,ref_*,driv_*,served_* | presence实验：谁在/谁不在，5轮×1000tick
+spike_source_trace.tsv     | mode=baseline,round=0,tick=0 | mode=no_social_serve,round=1,tick=79 | 961 | 121669 | mode,who,round,tick,heat_at_leave,heat,sel_need,sel_drive,served,voice,ref_*,state_* | spike source实验：作者vs陌生人，social不serve
+heat_decay_trace.tsv       | mode=pure,round=0,tick=0 | mode=full,round=2,tick=39 | 481    | 16635   | mode,round,who,tick,heat_at_leave,heat               | heat decay实验： bond heat在ref中衰减速率
+
+# 按文件修改时间排序的文件顺序:
+# 1. coupled_loop_trace.jsonl   2026-09-18 08:25:39
+# 2. cycle_dump_1000.txt        2026-09-18 08:59:41
+# 3. state_stream.tsv           2026-09-18 18:11:18  (+ frustration_trace.tsv 同秒)
+# 4. body_trace.jsonl           2026-09-18 19:29:08  (+ body_input_queue.tsv 同秒)
+# 5. face_recognition_report.tsv 2026-09-18 19:58:39
+# 6. presence_trace.tsv         2026-09-19 04:17:27
+# 7. spike_source_trace.tsv     2026-09-19 05:59:14
+# 8. heat_decay_trace.tsv       2026-09-19 06:11:21

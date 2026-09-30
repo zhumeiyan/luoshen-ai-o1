@@ -1,0 +1,6 @@
+[PATCH] ray.init: retry wrapper (7 attempts + cleanup + wait=180s)
+[PATCH] LLMClient noretry patch failed: AGENTSOCIETY_LLM_API_KEY is required. Please set this environment variable before running AgentSociety2.
+  File "/mnt/data/catpaw/home/workspace/重新来/yinyang_evo_v15.py", line 577
+    elif mutant_count < n_mutant:
+                                 ^
+IndentationError: unindent does not match any outer indentation level

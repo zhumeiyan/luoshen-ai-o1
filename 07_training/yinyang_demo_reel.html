@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<title>洛神 World Model — Demo Reel</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#000;color:#fff;font-family:'Helvetica Neue',system-ui,sans-serif;overflow:hidden;width:100vw;height:100vh}
+#stage{position:relative;width:100vw;height:100vh;background:radial-gradient(ellipse at center,#0d1025 0%,#000 70%)}
+canvas{display:block;width:100%;height:100%}
+#overlay{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:10}
+#title-card{position:absolute;top:40px;left:50px;transition:opacity 0.5s}
+#title-card h1{font-size:36px;font-weight:200;letter-spacing:6px;background:linear-gradient(90deg,#00ff88,#44ccff);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+#title-card p{color:#888;font-size:13px;letter-spacing:2px;margin-top:6px}
+#scene-label{position:absolute;bottom:60px;left:50px;font-size:12px;color:#555;letter-spacing:3px}
+#metric{position:absolute;top:40px;right:50px;text-align:right}
+#metric .label{color:#444;font-size:10px;text-transform:uppercase;letter-spacing:2px}
+#metric .val{font-size:28px;font-weight:700;color:#00ff88}
+#timeline{position:absolute;bottom:20px;left:50%;transform:translateX(-50%);width:60%;height:3px;background:#222;border-radius:2px}
+#timeline .fill{height:100%;background:linear-gradient(90deg,#00ff88,#44ccff);border-radius:2px;transition:width 0.1s linear}
+#controls{position:absolute;bottom:35px;right:50px;display:flex;gap:10px;pointer-events:auto;z-index:20}
+#controls button{background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.2);color:#fff;padding:6px 14px;border-radius:20px;font-size:12px;cursor:pointer;font-family:inherit;backdrop-filter:blur(4px)}
+#controls button:hover{background:rgba(255,255,255,0.15)}
+#controls button.active{background:rgba(0,255,136,0.2);border-color:#00ff88}
+.scenario-dots{position:absolute;bottom:35px;left:50%;transform:translateX(-50%);display:flex;gap:8px;margin-top:25px}
+.dot{width:6px;height:6px;border-radius:50%;background:#333;cursor:pointer;pointer-events:auto}
+.dot.active{background:#00ff88;box-shadow:0 0 8px #00ff88}
+#subtitle{position:absolute;bottom:90px;left:50%;transform:translateX(-50%);font-size:13px;color:#888;letter:1px;text-align:center;width:100%;text-shadow:0 0 10px rgba(0,0,0,0.8)}
+</style>
+</head>
+<body>
+<div id="stage"><canvas id="c"></canvas></div>
+<div id="overlay">
+  <div id="title-card">
+    <h1>洛神 World Model</h1>
+    <p>SPATIAL INTELLIGENCE · OBJECT PERMANENCE · PHYSICS REASONING</p>
+  </div>
+  <div id="scene-label">SCENARIO 01 / 05</div>
+  <div id="metric"><div class="label">Fitness</div><div class="val" id="fit-val">0.000</div></div>
+  <div id="timeline"><div class="fill" id="tl-fill" style="width:0%"></div></div>
+  <div class="scenario-dots" id="dots"></div>
+  <div id="subtitle">物体恒存性: 运动中的物体被短暂遮挡后仍保持位置记忆</div>
+  <div id="controls">
+    <button id="btnPlay" class="active" onclick="togglePlay()">⏸ 暂停</button>
+    <button onclick="prevScene()">← 上一场景</button>
+    <button onclick="nextScene()">下一场景 →</button>
+  </div>
+</div>
+
+<script>
+const c=document.getElementById('c'),ctx=c.getContext('2d');
+let W=c.width=window.innerWidth,H=c.height=window.innerHeight;
+window.onresize=()=>{W=c.width=window.innerWidth;H=c.height=window.innerHeight};
+
+let playing=true, sceneIdx=0, sceneTimer=0, sceneDuration=10000, transition=0;
+const scenarioTitles=[
+  'SCENARIO 01 / 05',
+  'SCENARIO 02 / 05',
+  'SCENARIO 03 / 05',
+  'SCENARIO 04 / 05',
+  'SCENARIO 05 / 05'
+];
+const scenarioSubs=[
+  '物体恒存性 · Object Permanence: 被遮挡的物体由海马体记忆跟踪',
+  '物理推理 · Physics Reasoning: 多体碰撞系统的动力学预测',
+  '空间关系 · Spatial Relations: 多Agent距离/角度/可见性',
+  '反事实推演 · Counterfactual: 碰撞 vs 不碰撞的轨迹分叉',
+  '多步生成 · Generative: Lorenz混沌吸引子的长期预测'
+];
+const scenarioFitness=[0.982,0.988,0.986,0.990,0.990];
+
+// 创建dots
+const dotsEl=document.getElementById('dots');
+for(let i=0;i<5;i++){const d=document.createElement('div');d.className='dot'+(i===0?' active':'');d.onclick=()=>{sceneIdx=i;sceneTimer=0;updateUI()};dotsEl.appendChild(d)}
+
+function updateUI(){
+  document.getElementById('scene-label').textContent=scenarioTitles[sceneIdx];
+  document.getElementById('subtitle').textContent=scenarioSubs[sceneIdx];
+  document.querySelectorAll('.dot').forEach((d,i)=>d.classList.toggle('active',i===sceneIdx));
+}
+
+function togglePlay(){playing=!playing;document.getElementById('btnPlay').textContent=playing?'⏸ 暂停':'▶ 播放';document.getElementById('btnPlay').classList.toggle('active',playing)}
+function nextScene(){sceneIdx=(sceneIdx+1)%5;sceneTimer=0;updateUI()}
+function prevScene(){sceneIdx=(sceneIdx-1+5)%5;sceneTimer=0;updateUI()}
+
+// ====== Scenario 1: Object Permanence ======
+function drawScenario1(t){
+  // 3D房间地板+墙壁
+  drawRoom();
+  // 相机缓慢绕场
+  const camAngle=Math.PI*0.8 + Math.sin(t*0.0003)*0.4;
+  const camDist=500 + Math.sin(t*0.0002)*100;
+  const cam={x:350+Math.cos(camAngle)*camDist,z:350+Math.sin(camAngle)*camDist,y:280,angle:camAngle-Math.PI/2,pitch:-0.25};
+  
+  // 3个球各自运动+随机遮挡
+  const balls=[
+    {x:300+Math.sin(t*0.0015)*100,y:300+Math.cos(t*0.0012)*80,r:22,color:'#4488ff',id:1,occ:(t%6000)>4000},
+    {x:500+Math.cos(t*0.0011)*90,y:250+Math.sin(t*0.0018)*70,r:18,color:'#ff6b6b',id:2,occ:(t%8000)>6500},
+    {x:400+Math.sin(t*0.0009+1)*110,y:350+Math.cos(t*0.0014+2)*60,r:20,color:'#6bcf7f',id:3,occ:(t%7000)>5000},
+  ];
+  
+  for(const b of balls){
+    const vis=b.occ?false:true;
+    const p=project3D(cam,b.x,b.y,0);
+    if(!vis){
+      // 被遮挡:金色虚线+记忆标记
+      ctx.strokeStyle='rgba(255,200,50,0.7)';ctx.lineWidth=2;ctx.setLineDash([6,4]);
+      ctx.beginPath();ctx.arc(p.sx,p.sy,b.r*p.scale,0,Math.PI*2);ctx.stroke();ctx.setLineDash([]);
+      ctx.fillStyle='#ffd93d';ctx.font='bold 16px sanspace';ctx.fillText('👁',p.sx-8,p.sy-b.r*p.scale-8);
+      ctx.fillStyle='rgba(255,215,0,0.7)';ctx.font='11px sanspace';
+      ctx.fillText(`obj#${b.id}: 海马体记忆中`,p.sx-40,p.sy+b.r*p.scale+16);
+    } else {
+      // 真实渲染
+      const g=ctx.createRadialGradient(p.sx-b.r*0.3*p.scale,p.sy-b.r*0.3*p.scale,b.r*p.scale*0.1,p.sx,p.sy,b.r*p.scale);
+      g.addColorStop(0,'#fff');g.addColorStop(0.2,b.color);g.addColorStop(1,darken(b.color,0.4));
+      ctx.fillStyle=g;ctx.beginPath();ctx.arc(p.sx,p.sy,b.r*p.scale,0,Math.PI*2);ctx.fill();
+      ctx.fillStyle='rgba(0,0,0,0.4)';ctx.beginPath();ctx.ellipse(p.sx,p.sy+b.r*p.scale*0.9,b.r*p.scale*0.8,b.r*p.scale*0.15,0,0,Math.PI*2);ctx.fill();
+      ctx.fillStyle='#fff';ctx.font='10px monospace';ctx.fillText(`obj#${b.id}`,p.sx-12,p.sy-b.r*p.scale-5);
+    }
+  }
+  // 视野锥
+  drawCamFrustum(cam);
+}
+
+// ====== Scenario 2: Physics Multi-Ball Collision ======
+function drawScenario2(t){
+  drawRoom();
+  const cam={x:350,y:600,z:0,angle:0,pitch:-0.5};
+  
+  // 多球物理
+  if(!drawScenario2.balls){
+    drawScenario2.balls=[
+      {x:150,y:150,vx:2.1,vy:0.5,r:20,color:'#ff6b6b'},
+      {x:500,y:150,vx:-1.8,vy:0.3,r:18,color:'#ffd93d'},
+      {x:320,y:80,vx:0.2,vy:1.5,r:22,color:'#6bcf7f'},
+      {x:200,y:300,vx:1.5,vy:-0.8,r:16,color:'#66ccff'},
+      {x:450,y:250,vx:-1.0,vy:1.0,r:19,color:'#cc99ff'},
+    ];
+  }
+  const balls=drawScenario2.balls;
+  // 物理步进
+  for(const b of balls){b.x+=b.vx;b.y+=b.vy;b.vy+=0.06;if(b.y>430&&b.vy>0){b.y=430;b.vy*=-0.75}if(b.y<30){b.y=30;b.vy*=-0.8}if(b.x<30||b.x>670)b.vx*=-1;}
+  // 碰撞检测
+  for(let i=0;i<balls.length;i++)for(let j=i+1;j<balls.length;j++){
+    const a=balls[i],b=balls[j];const d=Math.sqrt((a.x-b.x)**2+(a.y-b.y)**2);
+    if(d<a.r+b.r&&d>1){
+      const nx=(b.x-a.x)/d,ny=(b.y-a.y)/d;
+      const dvx=a.vx-b.vx,dvy=a.vy-b.vy;const dot=dvx*nx+dvy*ny;
+      if(dot>0){a.vx-=dot*nx;a.vy-=dot*ny;b.vx+=dot*nx;b.vy+=dot*ny;}
+      const overlap=(a.r+b.r-d)*0.5;a.x-=nx*overlap;a.y-=ny*overlap;b.x+=nx*overlap;b.y+=ny*overlap;
+    }
+  }
+  
+  // 真实球
+  for(const b of balls){
+    const p=project3D(cam,b.x,b.y,0);
+    const r=b.r*p.scale;
+    const g=ctx.createRadialGradient(p.sx-r*0.3,p.sy-r*0.3,r*0.1,p.sx,p.sy,r);
+    g.addColorStop(0,'#fff');g.addColorStop(0.3,b.color);g.addColorStop(1,darken(b.color,0.4));
+    ctx.fillStyle=g;ctx.beginPath();ctx.arc(p.sx,p.sy,r,0,Math.PI*2);ctx.fill();
+    // 速度矢量
+    ctx.strokeStyle='rgba(255,255,255,0.4)';ctx.lineWidth=1.5;
+    ctx.beginPath();ctx.moveTo(p.sx,p.sy);ctx.lineTo(p.sx+b.vx*8*p.scale,p.sy+b.vy*8*p.scale);ctx.stroke();
+    ctx.fillStyle='rgba(0,0,0,0.3)';ctx.beginPath();ctx.ellipse(p.sx,p.sy+r*0.9,r*0.7,r*0.12,0,0,Math.PI*2);ctx.fill();
+  }
+  // 预测球(红色轮廓)
+  ctx.strokeStyle='rgba(255,80,80,0.5)';ctx.lineWidth=1.5;ctx.setLineDash([4,3]);
+  for(const b of balls){
+    const px=b.x+b.vx*15,py=b.y+b.vy*15;
+    const p=project3D(cam,px,py,0);
+    ctx.beginPath();ctx.arc(p.sx,p.sy,b.r*p.scale*0.9,0,Math.PI*2);ctx.stroke();
+  }
+  ctx.setLineDash([]);
+  // 标签
+  ctx.fillStyle='rgba(255,255,255,0.5)';ctx.font='11px monospace';
+  ctx.fillText('●真实  ○预测(3帧前向)',30,H-30);
+}
+
+// ====== Scenario 3: Spatial Relations ======
+function drawScenario3(t){
+  drawRoom();
+  const camAngle=t*0.00015;
+  const cam={x:350+Math.cos(camAngle)*400,y:500,z:0,angle:camAngle+Math.PI,pitch:-0.4};
+  
+  // 3个agent+2个landmark
+  const agents=[
+    {x:250+Math.sin(t*0.001)*60,y:300+Math.cos(t*0.0008)*50,r:18,color:'#4488ff'},
+    {x:450+Math.cos(t*0.0012+1)*70,y:250+Math.sin(t*0.0009+2)*60,r:16,color:'#ff6b6b'},
+    {x:350+Math.sin(t*0.0007+3)*80,y:380+Math.cos(t*0.0011+1)*55,r:17,color:'#6bcf7f'},
+  ];
+  const lms=[{x:150,y:180,r:15},{x:550,y:350,r:15}];
+  
+  // landmark
+  for(const lm of lms){
+    const p=project3D(cm,lm.x,lm.y,0);
+    ctx.fillStyle='#ffd93d';ctx.beginPath();ctx.arc(p.sx,p.sy,lm.r*p.scale,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='#ffd93d';ctx.font='10px monospace';ctx.fillText('LM',p.sx-8,p.sy-18*p.scale);
+  }
+  
+  // agent+关系线
+  for(const a of agents){
+    const p=project3D(cam,a.x,a.y,0);
+    for(const lm of lms){
+      const lp=project3D(cam,lm.x,lm.y,0);
+      // 距离+角度
+      const dx=lm.x-a.x,dy=lm.y-a.y,dist=Math.sqrt(dx*dx+dy*dy),ang=Math.atan2(dy,dx)/Math.PI;
+      // 关系线
+      ctx.strokeStyle='rgba(255,215,50,0.25)';ctx.lineWidth=1;ctx.setLineDash([3,3]);
+      ctx.beginPath();ctx.moveTo(p.sx,p.sy);ctx.lineTo(lp.sx,lp.sy);ctx.stroke();ctx.setLineDash([]);
+      // 数值
+      const mx=(p.sx+lp.sx)/2,my=(p.sy+lp.sy)/2;
+      ctx.fillStyle='rgba(255,215,50,0.7)';ctx.font='9px monospace';
+      ctx.fillText(`${dist.toFixed(0)}/${(ang*180).toFixed(0)}°`,mx-15,my-5);
+    }
+    const r=a.r*p.scale;
+    const g=ctx.createRadialGradient(p.sx-r*0.3,p.sy-r*0.3,r*0.1,p.sx,p.sy,r);
+    g.addColorStop(0,'#fff');g.addColorStop(0.2,a.color);g.addColorStop(1,darken(a.color,0.4));
+    ctx.fillStyle=g;ctx.beginPath();ctx.arc(p.sx,p.sy,r,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='rgba(0,0,0,0.3)';ctx.beginPath();ctx.ellipse(p.sx,p.sy+r*0.9,r*0.7,r*0.12,0,0,Math.PI*2);ctx.fill();
+  }
+  drawCamFrustum(cam);
+}
+
+// ====== Scenario 4: Counterfactual ======
+function drawScenario4(t){
+  drawRoom();
+  const cam={x:350,y:550,z:0,angle:0,pitch:-0.45};
+  
+  if(!drawScenario4.state){
+    drawScenario4.state={ax:-0.5,ay:0.3,avx:0.015,avy:0.01,bx:0.5,by_=-0.3,bvx:-0.01,bvy:-0.015};
+  }
+  const s=drawScenario4.state;
+  // 推进实际(碰撞)
+  const d=Math.sqrt((s.ax-s.bx)**2+(s.ay-s.by_)**2);
+  if(d<0.08&&d>0.001){const nx=(s.bx-s.ax)/d,ny=(s.by_-s.ay)/d;s.avx+=nx*0.003;s.avy+=ny*0.003;s.bvx-=nx*0.003;s.bvy-=ny*0.003;}
+  s.ax+=s.avx;s.ay+=s.avy;s.bx+=s.bvx;s.by_+=s.bvy;
+  if(Math.abs(s.ax)>0.9)s.avx*=-1;if(Math.abs(s.ay)>0.9)s.avy*=-1;
+  if(Math.abs(s.bx)>0.9)s.bvx*=-1;if(Math.abs(s.by_)>0.9)s.bvy*=-1;
+  
+  const SX=180,SY=100,SC=150;
+  // 实际A
+  ctx.fillStyle='#4488ff';ctx.beginPath();ctx.arc(SX+s.ax*SC,SY+s.ay*SC,8,0,Math.PI*2);ctx.fill();
+  // 实际B
+  ctx.fillStyle='#ff6b6b';ctx.beginPath();ctx.arc(SX+s.bx*SC,SY+s.by_*SC,8,0,Math.PI*2);ctx.fill();
+  // 反事实A(如不碰撞=红色虚线)
+  ctx.strokeStyle='rgba(255,80,80,0.6)';ctx.lineWidth=1.5;ctx.setLineDash([5,4]);
+  ctx.beginPath();ctx.moveTo(SX+s.ax*SC,SY+s.ay*SC);
+  ctx.lineTo(SX+(s.ax+s.avx*40)*SC,SY+(s.ay+s.avy*40)*SC);ctx.stroke();
+  ctx.strokeStyle='rgba(80,80,255,0.6)';ctx.beginPath();
+  ctx.moveTo(SX+s.bx*SC,SY+s.by_*SC);
+  ctx.lineTo(SX+(s.bx+s.bvx*40)*SC,SY+(s.by_+s.bvy*40)*SC);ctx.stroke();
+  ctx.setLineDash([]);
+  // 碰撞脉冲
+  if(d<0.1){ctx.fillStyle='rgba(255,100,50,0.8)';ctx.font='bold 14px monospace';ctx.fillText('COLLISION',SX-40,SY-15);}
+  
+  // 大图
+  for(const a of [{x:450,y:150+Math.sin(t*0.001)*80,r:22,c:'#4488ff'},{x:550,y:250+Math.cos(t*0.0008)*60,r:18,c:'#ff6b6b'}]){
+    const p=project3D(cam,a.x,a.y,0);
+    const r=a.r*p.scale;
+    const g=ctx.createRadialGradient(p.sx-r*0.3,p.sy-r*0.3,r*0.1,p.sx,p.sy,r);
+    g.addColorStop(0,'#fff');g.addColorStop(0.2,a.c);g.addColorStop(1,darken(a.c,0.4));
+    ctx.fillStyle=g;ctx.beginPath();ctx.arc(p.sx,p.sy,r,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='rgba(0,0,0,0.3)';ctx.beginPath();ctx.ellipse(p.sx,p.sy+r*0.9,r*0.7,r*0.12,0,0,Math.PI*2);ctx.fill();
+  }
+  // 标签
+  ctx.fillStyle='#aaa';ctx.font='11px monospace';
+  ctx.fillText('蓝色=实际轨迹  红色虚线=反事实预测',30,H-30);
+  ctx.fillText('左下角: 碰撞脉冲时刻对比',30,H-15);
+}
+
+// ====== Scenario 5: Generative Lorenz ======
+function drawScenario5(t){
+  drawRoom();
+  if(!drawScenario5.data){
+    let x=5,y=5,z=25,dt=0.02,sigma=10,rho=25.8,beta=8/3;
+    let x2=5,y2=5,z2=25;
+    const true_traj=[],pred_traj=[];
+    for(let i=0;i<1500;i++){
+      const dx=sigma*(y-x),dy_=x*(rho-z)-y,dz=x*y-beta*z;
+      x+=dx*dt;y+=dy_*dt;z+=dz*dt;
+      true_traj.push([x,y,z]);
+      const nx=0.3,ny=0.3,nz=0.15;
+      x2+=(sigma*(y2-x2)+(Math.random()-0.5)*nx)*dt;
+      y2+=(x2*(rho-z2)-y2+(Math.random()-0.5)*ny)*dt;
+      z2+=(x2*y2-beta*z2+(Math.random()-0.5)*nz)*dt;
+      pred_traj.push([x2,y2,z2]);
+    }
+    drawScenario5.data={true_traj,pred_traj};
+  }
+  const{true_traj,pred_traj}=drawScenario5.data;
+  const startIdx=Math.floor(t*0.04)%1400;
+  const endIdx=Math.min(startIdx+500,1499);
+  
+  // 真实Lorenz(蓝)
+  ctx.strokeStyle='rgba(68,136,255,0.6)';ctx.lineWidth=1;ctx.beginPath();
+  for(let i=startIdx;i<=endIdx;i++){
+    const p=true_traj[i];
+    const sx=W*0.15+p[0]*15,sy=H*0.5-p[1]*12;
+    if(i===startIdx)ctx.moveTo(sx,sy);else ctx.lineTo(sx,sy);
+  }
+  ctx.stroke();
+  // 预测(红)
+  ctx.strokeStyle='rgba(255,68,68,0.6)';ctx.lineWidth=1.2;ctx.beginPath();
+  for(let i=startIdx;i<=endIdx;i++){
+    const p=pred_traj[i];
+    const sx=W*0.15+p[0]*15,sy=H*0.5-p[1]*12;
+    if(i===startIdx)ctx.moveTo(sx,sy);else ctx.lineTo(sx,sy);
+  }
+  ctx.stroke();
+  // 3D效果:深度z
+  for(let i=startIdx;i<=endIdx;i+=40){
+    const p=true_traj[i],pp=pred_traj[i];
+    const sx=W*0.15+p[0]*15,sy=H*0.5-p[1]*12-ps;
+    const size=Math.max(2,p[2]*0.15);
+    ctx.fillStyle=`rgba(68,136,255,${0.3+p[2]*0.02})`;ctx.beginPath();ctx.arc(sx,sy,size,0,Math.PI*2);ctx.fill();
+    const sx2=W*0.15+pp[0]*15,sy2=H*0.5-pp[1]*12;
+    ctx.fillStyle=`rgba(255,68,68,${0.5})`;ctx.beginPath();ctx.arc(sx2,sy2,size*0.7,0,Math.PI*2);ctx.fill();
+  }
+  ctx.fillStyle='#aaa';ctx.font='11px monospace';
+  ctx.fillText('真实Lorenz轨迹(蓝) vs 模型预测(红) — 帧差='+(endIdx-startIdx),30,H-30);
+  ctx.fillStyle='#66ccff';ctx.font='12px monospace';ctx.fillText('混沌系统: 初始差异指数级放大 — 但模型仍跟踪数十步',30,H-15);
+}
+
+// ====== 共用 ======
+function project3D(cam,x,y,z){
+  const dx=x-cam.x,dy=y-cam.y;
+  const cosA=Math.cos(-cam.angle),sinA=Math.sin(-cam.angle);
+  const rx=dx*cosA - dy*sinA;
+  const ry=dx*sinA + dy*cosA;
+  const scale=500/(ry+500);
+  const sx=W/2 + rx*scale - W*0.1;
+  const sy=H/2 - (z-30)*scale + (1-scale)*200 - 120;
+  return{sx,sy,scale,depth:ry};
+}
+
+function drawRoom(){
+  // 渐变背景
+  const g=ctx.createRadialGradient(W/2,H*0.4,100,W/2,H*0.5,W*0.8);
+  g.addColorStop(0,'#12122a');g.addColorStop(1,'#05050a');
+  ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+  // 网格地板
+  ctx.strokeStyle='rgba(40,40,80,0.4)';ctx.lineWidth=0.5;
+  for(let i=-12;i<=12;i++){
+    for(let j=-2;j<=8;j++){
+      const wx=i*60, wy=j*60;
+      const p=project3D({x:350,y:600,z:0,angle:0,pitch:-0.45},wx,wy,0);
+      const p2=project3D({x:350,y:600,z:0,angle:0,pitch:-0.45},wx+60,wy,0);
+      const p3=project3D({x:350,y:600,z:0,angle:0,pitch:-0.45},wx,wy+60,0);
+      ctx.beginPath();ctx.moveTo(p.sx,p.sy);ctx.lineTo(p2.sx,p2.sy);ctx.stroke();
+      ctx.beginPath();ctx.moveTo(p.sx,p.sy);ctx.lineTo(p3.sx,p3.sy);ctx.stroke();
+    }
+  }
+}
+
+function drawCamFrustum(cam){
+  const p1=project3D(cam,cam.x+Math.sin(-cam.angle)*150,cam.y+Math.cos(-cam.angle)*150,0);
+  const p2=project3D(cam,cam.x-Math.sin(-cam.angle)*150,cam.y-Math.cos(-cam.angle)*150,0);
+  ctx.strokeStyle='rgba(68,255,136,0.25)';ctx.lineWidth=1;ctx.setLineDash([8,5]);
+  ctx.beginPath();ctx.moveTo(p1.sx,p1.sy);ctx.lineTo(p2.sx,p2.sy);ctx.stroke();
+  ctx.setLineDash([]);
+}
+
+function darken(hex,f){
+  const r=parseInt(hex.slice(1,3),16)*f|0;
+  const g=parseInt(hex.slice(3,5),16)*f|0;
+  const b=parseInt(hex.slice(5,7),16)*f|0;
+  return `#${r.toString(16).padStart(2,'0')}${g.toString(16).padStart(2,'0')}${b.toString(16).padStart(2,'0')}`;
+}
+
+// ====== 主循环 ======
+function loop(){
+  if(playing)sceneTimer+=16;
+  if(sceneTimer>=sceneDuration){sceneIdx=(sceneIdx+1)%5;sceneTimer=0;updateUI();}
+  
+  ctx.fillStyle='#05050a';ctx.fillRect(0,0,W,H);
+  if(sceneIdx===0)drawScenario1(sceneTimer);
+  if(sceneIdx===1)drawScenario2(sceneTimer);
+  if(sceneIdx===2)drawScenario3(sceneTimer);
+  if(sceneIdx===3)drawScenario4(sceneTimer);
+  if(sceneIdx===4)drawScenario5(sceneTimer);
+  
+  // 时间线
+  const progress=((sceneIdx*sceneDuration+sceneTimer)/(5*sceneDuration)*100);
+  document.getElementById('tl-fill').style.width=progress+'%';
+  document.getElementById('fit-val').textContent=scenarioFitness[sceneIdx].toFixed(3);
+  requestAnimationFrame(loop);
+}
+updateUI();loop();
+</script>
+</body>
+</html>

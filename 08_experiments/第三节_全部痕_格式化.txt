@@ -1,0 +1,365 @@
+第三节 · 全部痕（16 个）
+
+════════════════════════════════════════════════════════════════
+痕文件 1: body_trace.jsonl
+════════════════════════════════════════════════════════════════
+路径：  /mnt/data/catpaw/home/workspace/洛神赋1.1/body_trace.jsonl
+行数：  260
+大小：  214582
+改期：  2026-09-19 20:27
+
+头行原文:
+{"ts": 1789730689.032649, "wall_clock_utc": "2026-09-18T11:24:49.032649+00:00", "wall_clock_local": "2026-09-18T19:24:49.032649", "tick_count": 1, "cost_ms": 0.1, "dt_min": 1.0, "real_hour": 19.41, "age_y": 0.5000019, "stage": "survival(0-1)", "sel": "thermal", "served": true, "inputs_consumed": 0, "state": {"thermal": 310.15207, "glucose": 4.995, "social": 0.7996, "exploration": 0.59999, "sexual": 0.5}, "env": {"luminance": 40, "sound": 50, "force": 10, "temperature": 294}, "ref": {"thermal": 8.0, "glucose": 0.0, "social": 0.0, "exploration": 0.0, "sexual": 0.0}, "hormones": {"cortisol": 4.23, "melatonin": 13.88, "growth_hormone": 10.61}, "voice_aperture": 0.0016, "frustration_pool": 0.0, "served_total": {"thermal": 1}}
+
+末行原文:
+{"ts": 1789820860.8440273, "tick_count": 60, "环境": {"ch_01": 50.0, "ch_02": 45.0, "ch_03": 10.0, "ch_04": 295.0, "_狗_ch_02": 16.560000000000002, "_狗_ch_01": 12.88}, "环境输入": [0.098, 0.4, 0.3, 0.4666666666666667], "激活": [0.044413876823885555, 0.09805686086290871, -0.10940527780073656, -0.062244930151188586, 0.03403464096005793, 0.0295164876497926, -0.2036869298939246, -0.14206290896812018, -0.20368538506498576, -0.03622276177981104, -0.0024494195194103502, 0.10503993314675089, 0.054233471251174906, 0.11471703436789299, -0.07082182068701533, 0.08317544539213458, 0.06320425380700986, -0.16981282597833375, 0.11787151288546764, 0.05491735274059995, 0.014994674700342664, 0.09810887059789207, -0.0692650192304724, 0.2013029975154109], "物理": [21.28542977424694, 0.2779173792558032, 9, 2.204920222597788]}
+
+字段结构:
+  行 1-10 (schema A, 18 字段): ts, wall_clock_utc, wall_clock_local, tick_count, cost_ms, dt_min, real_hour, age_y, stage, sel, served, inputs_consumed, state, env, ref, hormones, voice_aperture, frustration_pool, served_total
+  行 11-260 (schema B, 5 字段): ts, tick_count, 环境, 环境输入, 激活, 物理
+
+写者:
+  行 1-10: 守护进程.py (旧 daemon, 推断)
+  行 11-260: 身体稳态.py:120-122
+            with open(痕文件, "a", encoding="utf-8") as 文件:
+            文件.write(json.dumps(记录, ensure_ascii=False) + "\n")
+
+活/死: 活（末次落盘 2026-09-19 20:27）
+
+
+════════════════════════════════════════════════════════════════
+痕文件 2: body_state.json
+════════════════════════════════════════════════════════════════
+路径：  /mnt/data/catpaw/home/workspace/洛神赋1.1/body_state.json
+行数：  56
+大小：  1385
+改期：  2026-09-18 19:29
+
+头行原文:
+{
+  "version": 1,
+  "meta": {
+
+末行原文（末 5 行）:
+    "_social_heat": 0.23324336752734373,
+    "_boredom": 0.14690281153919557
+  }
+}
+
+字段结构:
+  version (int), meta{real_ticks, tick_count, ...}, body{...}
+
+写者: 守护进程.py (旧 daemon, 推断, 与 body_trace.jsonl 行1-10 同引擎)
+
+活/死: 死（末次 2026-09-18 19:29）
+
+
+════════════════════════════════════════════════════════════════
+痕文件 3: coupled_loop_trace.jsonl
+════════════════════════════════════════════════════════════════
+路径：  /mnt/data/catpaw/home/workspace/洛神赋1.1/coupled_loop_trace.jsonl
+行数：  101
+大小：  12462
+改期：  2026-09-18 08:25
+
+头行原文:
+{"step": 0, "i": 0, "m": 0.5845, "a": 0.0039, "delta_m": -0.1161, "delta_a": 0.1161, "ext_m": 0.5845, "ext_a": 0.0039}
+
+末行原文:
+{"step": 50000, "i": 48, "m": 0.6646, "a": 0.3912, "delta_m": 0, "delta_a": 0, "ext_m": 0.4674, "ext_a": 0.006, "_final": true}
+
+字段结构:
+  step, i, m, a, delta_m, delta_a, ext_m, ext_a, _final (仅末行)
+
+写者: coupled_loop.py:204-205
+
+活/死: 死（2026-09-18 08:25）
+
+
+════════════════════════════════════════════════════════════════
+痕文件 4: state_stream.tsv
+════════════════════════════════════════════════════════════════
+路径：  /mnt/data/catpaw/home/workspace/洛神赋1.1/state_stream.tsv
+行数：  43201
+大小：  3954281
+改期：  2026-09-18 18:11
+
+头行原文:
+gt	day	tick_in_day	sel	drv_thermal	drv_exploration	drv_social	drv_glucose	drv_sexual	voice_aperture	social_heat	ref_social	wants_speak	actually_spoke	env_human_act	env_dog_sound	env_dog_force	env_dog_luminance
+
+末行原文:
+43199	29	1439	-	-1.000	0.000	0.000	-1.000	-1.000	0.0000	0.526	54.0	0	0	0.663	16.6	3.2	12.9
+
+字段结构 (18 列):
+  gt, day, tick_in_day, sel, drv_thermal, drv_exploration, drv_social, drv_glucose, drv_sexual, voice_aperture, social_heat, ref_social, wants_speak, actually_spoke, env_human_act, env_dog_sound, env_dog_force, env_dog_luminance
+
+写者: 长跑模拟.py:67, 203
+
+活/死: 死（2026-09-18 18:11）
+
+
+════════════════════════════════════════════════════════════════
+痕文件 5: frustration_trace.tsv
+════════════════════════════════════════════════════════════════
+路径：  /mnt/data/catpaw/home/workspace/洛神赋1.1/frustration_trace.tsv
+行数：  30
+大小：  1044
+改期：  2026-09-18 18:11
+
+头行原文:
+day	want_sum	spoke_sum	frustration	pressure	cumulative_frustration
+
+末行原文:
+28	320	25	38.5889	55.000	1113.3284
+
+字段结构 (6 列):
+  day, want_sum, spoke_sum, frustration, pressure, cumulative_frustration
+
+写者: 长跑模拟.py:117-123
+
+活/死: 死（2026-09-18 18:11）
+
+
+════════════════════════════════════════════════════════════════
+痕文件 6: presence_trace.tsv
+════════════════════════════════════════════════════════════════
+路径：  /mnt/data/catpaw/home/workspace/洛神赋1.1/presence_trace.tsv
+行数：  1001
+大小：  194160
+改期：  2026-09-19 04:17
+
+头行原文:
+round	tick_abs	phase_idx	phase	who_intensity	elapsed_min	age_y	_social_heat	_boredom	voice_aperture	sel_need	sel_drive	state_thermal	state_glucose	state_social	state_exploration	state_sexual	horm_cortisol	horm_melatonin	horm_growth_hormone	env_luminance	env_sound	env_force	env_temperature	ref_thermal	ref_glucose	ref_social	ref_exploration	ref_sexual	driv_thermal	driv_glucose	driv_social	driv_exploration	driv_sexual	served_thermal	served_glucose	served_social	served_exploration	served_sexual
+
+末行原文:
+4	999	4	nobody	0.0	1010.0	0.50001901	0.00067	0.0	0.0	social	0.0	310.20495	8.0	1.0	0.99353	0.99703	14.7611	14.5945	2.1141	40	80.0	50.0	294	0.03	120.0	11.0	-0.73	-0.76	-1	-1	0.0	0.0	0.0	94	6	17	1	1
+
+字段结构 (39 列):
+  round, tick_abs, phase_idx, phase, who_intensity, elapsed_min, age_y, _social_heat, _boredom, voice_aperture, sel_need, sel_drive, state_thermal, state_glucose, state_social, state_exploration, state_sexual, horm_cortisol, horm_melatonin, horm_growth_hormone, env_luminance, env_sound, env_force, env_temperature, ref_thermal, ref_glucose, ref_social, ref_exploration, ref_sexual, driv_thermal, driv_glucose, driv_social, driv_exploration, driv_sexual, served_thermal, served_glucose, served_social, served_exploration, served_sexual
+
+写者: test_presence.py:137-140
+
+活/死: 死（2026-09-19 04:17）
+
+
+════════════════════════════════════════════════════════════════
+痕文件 7: presence_summary.tsv
+════════════════════════════════════════════════════════════════
+路径：  /mnt/data/catpaw/home/workspace/洛神赋1.1/presence_summary.tsv
+行数：  51
+大小：  2225
+改期：  2026-09-19 04:17
+
+头行原文:
+field	nobody_min	nobody_max	nobody_mean	nobody_range	author_min	author_max	author_mean	author_range	stranger_min	stranger_max	stranger_mean	stranger_range
+
+末行原文:
+driv_sexual	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0
+
+字段结构 (12 列):
+  field, nobody_min, nobody_max, nobody_mean, nobody_range, author_min, author_max, author_mean, author_range, stranger_min, stranger_max, stranger_mean, stranger_range
+
+写者: test_presence.py:169-172
+
+活/死: 死（2026-09-19 04:17）
+
+
+════════════════════════════════════════════════════════════════
+痕文件 8: spike_source_trace.tsv
+════════════════════════════════════════════════════════════════
+路径：  /mnt/data/catpaw/home/workspace/洛神赋1.1/spike_source_trace.tsv
+行数：  961
+大小：  121669
+改期：  2026-09-19 05:59
+
+头行原文:
+mode	who	round	tick	heat_at_leave	heat	sel_need	sel_drive	served	voice	ref_thermal	ref_glucose	ref_social	ref_exploration	ref_sexual	state_thermal	state_glucose	state_social	state_exploration	state_sexual
+
+末行原文:
+no_social_serve	stranger	1	79	0.29756	1e-06	social	0.0	skipped	1e-06	7.0	119.0	-0.79	-0.76	11.21	310.1617	7.255	0.98	0.9996	1.0
+
+字段结构 (19 列):
+  mode, who, round, tick, heat_at_leave, heat, sel_need, sel_drive, served, voice, ref_thermal, ref_glucose, ref_social, ref_exploration, ref_sexual, state_thermal, state_glucose, state_social, state_exploration, state_sexual
+
+写者: test_spike_source.py:94-97
+
+活/死: 死（2026-09-19 05:59）
+
+
+════════════════════════════════════════════════════════════════
+痕文件 9: heat_decay_trace.tsv
+════════════════════════════════════════════════════════════════
+路径：  /mnt/data/catpaw/home/workspace/洛神赋1.1/heat_decay_trace.tsv
+行数：  481
+大小：  16635
+改期：  2026-09-19 06:11
+
+头行原文:
+mode	round	who	tick	heat_at_leave	heat
+
+末行原文:
+full	2	stranger	39	0.29036	0.000436
+
+字段结构 (6 列):
+  mode, round, who, tick, heat_at_leave, heat
+
+写者: test_heat_decay.py:77-80
+
+活/死: 死（2026-09-19 06:11）
+
+
+════════════════════════════════════════════════════════════════
+痕文件 10: heat_decay_summary.tsv
+════════════════════════════════════════════════════════════════
+路径：  /mnt/data/catpaw/home/workspace/洛神赋1.1/heat_decay_summary.tsv
+行数：  81
+大小：  4176
+改期：  2026-09-19 05:47
+
+头行原文:
+who_left	decay_tick	n	heat_mean	heat_min	heat_max	ratio_mean	voice_max
+
+末行原文:
+stranger	39	4	0.016883	0.000484	0.037991	0.05699	0.0
+
+字段结构 (8 列):
+  who_left, decay_tick, n, heat_mean, heat_min, heat_max, ratio_mean, voice_max
+
+写者: test_heat_decay.py:82+
+
+活/死: 死（2026-09-19 05:47）
+
+
+════════════════════════════════════════════════════════════════
+痕文件 11: face_recognition_report.tsv
+════════════════════════════════════════════════════════════════
+路径：  /mnt/data/catpaw/home/workspace/洛神赋1.1/face_recognition_report.tsv
+行数：  2
+大小：  176
+改期：  2026-09-18 19:58
+
+头行原文:
+round	mean_sim_to_author	std_sim	s12	s13	s23	s_base_diff	base_social_heat	final_social_heat	n_frames	n_repeats
+
+末行原文:
+all	0.0047	0.0000	0.9991	0.9991	1.0000	0.9987	0.1685	0.0131	58	3
+
+字段结构 (11 列):
+  round, mean_sim_to_author, std_sim, s12, s13, s23, s_base_diff, base_social_heat, final_social_heat, n_frames, n_repeats
+
+写者: test_cross_person.py (推断)
+
+活/死: 死（2026-09-18 19:58）
+
+
+════════════════════════════════════════════════════════════════
+痕文件 12: body_input_queue.tsv
+════════════════════════════════════════════════════════════════
+路径：  /mnt/data/catpaw/home/workspace/洛神赋1.1/body_input_queue.tsv
+行数：  1
+大小：  38
+改期：  2026-09-18 19:42
+
+头行原文（唯一一行）:
+{"type":"text","content":"hi 洛神"}
+
+末行原文（同一行）:
+{"type":"text","content":"hi 洛神"}
+
+字段结构:
+  JSON 行: type, content
+
+写者: 守护进程.py 配套（手动输入）
+
+活/死: 死（2026-09-18 19:42）
+
+
+════════════════════════════════════════════════════════════════
+痕文件 13: body_input_offset.txt
+════════════════════════════════════════════════════════════════
+路径：  /mnt/data/catpaw/home/workspace/洛神赋1.1/body_input_offset.txt
+行数：  1
+大小：  1
+改期：  2026-09-18 19:29
+
+头行原文:
+1
+
+末行原文:
+1
+
+字段结构:
+  单字节整数
+
+写者: 守护进程.py 配套
+
+活/死: 死（2026-09-18 19:29）
+
+
+════════════════════════════════════════════════════════════════
+痕文件 14: 状态流.tsv
+════════════════════════════════════════════════════════════════
+路径：  /mnt/data/catpaw/home/workspace/洛神赋1.1/状态流.tsv
+行数：  1441
+大小：  55451
+改期：  2026-09-19 15:35
+
+头行原文:
+滴	天	天内滴	洛神选	刺体温	刺探索	刺社交	刺葡萄糖
+
+末行原文:
+1439	0	1439	-	0.048	0.097	-0.111	-0.064
+
+字段结构 (8 列, 中文表头):
+  滴, 天, 天内滴, 洛神选, 刺体温, 刺探索, 刺社交, 刺葡萄糖
+
+写者: 长跑模拟.py:63-203 (路径参数 = "状态流.tsv")
+
+活/死: 活（2026-09-19 15:35, 与识脸/诊断器/守护进程同批刷新）
+
+
+════════════════════════════════════════════════════════════════
+痕文件 15: cycle_dump_1000.txt
+════════════════════════════════════════════════════════════════
+路径：  /mnt/data/catpaw/home/workspace/洛神赋1.1/cycle_dump_1000.txt
+行数：  1000
+大小：  55000
+改期：  2026-09-18 08:59
+
+头行原文:
+cycle    0  m=0.3735636554687307  a=0.1131749993601307
+
+末行原文:
+cycle  999  m=0.3735636554450960  a=0.1131749993364959
+
+字段结构:
+  cycle N, m=f64, a=f64
+
+写者: cycle_dump.py:14-23
+
+活/死: 死（2026-09-18 08:59）
+
+
+════════════════════════════════════════════════════════════════
+痕文件 16: desire_log.txt
+════════════════════════════════════════════════════════════════
+路径：  /mnt/data/catpaw/home/workspace/洛神赋1.1/desire_log.txt
+行数：  1000
+大小：  104000
+改期：  2026-09-18 09:15
+
+头行原文:
+cycle    0  chose=V1(inverted      )  strength=0.6715089486  m=0.6264363443643300  a=0.8868250004729299
+
+末行原文:
+cycle  999  chose=V2(brightened    )  strength=0.8318042890  m=0.3758543943800849  a=0.0936623049373462
+
+字段结构:
+  cycle N, chose=Vx(label), strength=f64, m=f64, a=f64
+
+写者: desire_loop.py:83-102
+
+活/死: 死（2026-09-18 09:15）
+
+
+（另有 desire_accum2_log.txt 等约 19 个同类文本与以上 16 个同批一次性产出, schema 均为 cycle+多字段 f64, 不逐列。）

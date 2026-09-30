@@ -1,0 +1,2 @@
+{"seq": 0, "ts": "2026-09-16T12:19:21", "type": "step", "trigger": "user", "payload": {"drive": 0.1, "note": "J4-1", "g": -2.08, "h": -2.08}, "prev": "GENESIS", "hash": "e6013f27ee71169c6add69744633e5175ed64d16064d4e0d3c5936e8cac8437d"}
+{"seq": 1, "ts": "2026-09-16T12:23:51", "type": "desire_switch", "trigger": "user", "payload": {"id": "002", "from": "激活", "to": "搁置"}, "prev": "e6013f27ee71169c6add69744633e5175ed64d16064d4e0d3c5936e8cac8437d", "hash": "e7e75b4a1b5302afb288045d908d584577116cc2b63687cae440ef81b63b954a"}

@@ -1,0 +1,38 @@
+[PATCH] ray.init: retry wrapper (7 attempts + cleanup + wait=180s)
+[PATCH] LLMClient noretry patch failed: AGENTSOCIETY_LLM_API_KEY is required. Please set this environment variable before running AgentSociety2.
+======================================================================
+v24_capability_testbed — 多能力测试床
+测试: 物体恒存+物理推理+空间关系+多步生成+反事实
+======================================================================
+Gen    0    2.8s bf=0.9363 af=0.2127 best=0.9363 n=17
+          obj=0.836 phy=0.973 spa=0.950 mul=0.982 cou=0.979
+Gen   20   39.2s bf=0.9835 af=0.9711 best=0.9861 n=17
+          obj=0.981 phy=0.987 spa=0.973 mul=0.990 cou=0.990
+Gen   40   73.8s bf=0.9849 af=0.9719 best=0.9866 n=17
+          obj=0.971 phy=0.987 spa=0.985 mul=0.993 cou=0.996
+Gen   60  108.2s bf=0.9846 af=0.9757 best=0.9866 n=17
+          obj=0.976 phy=0.987 spa=0.982 mul=0.994 cou=0.989
+Gen   80  143.0s bf=0.9875 af=0.9780 best=0.9882 n=17
+          obj=0.984 phy=0.987 spa=0.989 mul=0.986 cou=0.993
+Gen  100  177.6s bf=0.9877 af=0.9753 best=0.9882 n=17
+          obj=0.982 phy=0.988 spa=0.986 mul=0.994 cou=0.993
+Gen  120  212.2s bf=0.9901 af=0.9800 best=0.9901 n=17
+          obj=0.992 phy=0.989 spa=0.983 mul=0.995 cou=0.995
+Gen  140  246.5s bf=0.9873 af=0.9752 best=0.9908 n=17
+          obj=0.980 phy=0.989 spa=0.989 mul=0.994 cou=0.989
+Gen  160  280.9s bf=0.9860 af=0.9723 best=0.9908 n=17
+          obj=0.975 phy=0.987 spa=0.988 mul=0.994 cou=0.992
+Gen  180  315.3s bf=0.9906 af=0.9775 best=0.9908 n=17
+          obj=0.988 phy=0.988 spa=0.990 mul=0.995 cou=0.995
+Gen  199  348.0s bf=0.9867 af=0.9741 best=0.9908 n=17
+          obj=0.982 phy=0.988 spa=0.986 mul=0.990 cou=0.990
+
+最终最佳: 0.9908
+结构: n=17 lr=0.0230 fold=0.0503 sat_p=0.765
+
+各能力分:
+  object_permanence   : fitness=0.9815 (weight=0.25)
+  physics             : fitness=0.9884 (weight=0.25)
+  spatial_relation    : fitness=0.9861 (weight=0.2)
+  multi_step_gen      : fitness=0.9903 (weight=0.15)
+  counterfactual      : fitness=0.9896 (weight=0.15)

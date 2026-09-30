@@ -1,0 +1,945 @@
+================================================================
+全审计 2026-09-19 · 洛神赋1.1
+================================================================
+生成: 2026-09-19 | 工作目录: /mnt/data/catpaw/home/workspace/洛神赋1.1
+文件总数: 792 (含子目录, 去 __pycache__ 与 .git)
+
+================================================================
+一、全部文件
+================================================================
+
+【A. py 文件 (114个, 按 mtime 排序)】
+
+路径                                   | 大小(字节) | 改期(UTC+8)
+---------------------------------------|-----------|-----------------------
+matrices/__init__.py                   | 0         | 2026-09-17 13:39
+matrices/thermal.py                    | —         | 2026-09-17 14:32
+matrices/tactile.py                    | —         | 2026-09-17 14:35
+matrices/vocal.py                      | —         | 2026-09-17 14:39
+matrices/neuron.py                     | —         | 2026-09-17 14:39
+matrices/infrared.py                   | —         | 2026-09-17 15:24
+matrices/pain.py                       | —         | 2026-09-17 16:02
+matrices/lidar.py                      | —         | 2026-09-17 16:04
+matrices/radar.py                      | —         | 2026-09-17 16:04
+matrices/cross_modal.py                | —         | 2026-09-17 17:31
+matrices/visual.py                     | —         | 2026-09-17 21:39
+matrices/auditory.py                   | —         | 2026-09-17 21:40
+diff_21.py                             | —         | 2026-09-17 15:27
+diff_36.py                             | —         | 2026-09-17 16:08
+luoshenfu.py                           | —         | 2026-09-17 16:09
+exp_baseline_sparsity.py               | —         | 2026-09-17 16:42
+run_full_fusion.py                     | —         | 2026-09-17 17:18
+dialog_test_v01.py                     | —         | 2026-09-17 17:31
+dialog_test_v02.py                     | —         | 2026-09-17 17:48
+real_sensory_test.py                   | —         | 2026-09-17 17:54
+speak_hear_loop.py                     | —         | 2026-09-17 19:31
+intra_channel_disc.py                  | —         | 2026-09-17 19:36
+binding_test.py                        | —         | 2026-09-17 19:58
+modality_specific_test.py              | —         | 2026-09-17 20:30
+temporal_trajectory_test.py            | —         | 2026-09-17 20:37
+predict_trajectory_test.py             | —         | 2026-09-17 20:44
+noise_robustness_test.py               | —         | 2026-09-17 20:57
+cross_modal_noise_test.py              | —         | 2026-09-17 21:06
+dense_library_test.py                  | —         | 2026-09-18 00:59
+vocal_auditory_loop.py                 | —         | 2026-09-18 01:15
+vocal_auditory_loop_plateau.py         | —         | 2026-09-18 01:19
+vocal_auditory_open_loop.py            | —         | 2026-09-18 01:21
+vocal_auditory_persistent.py           | —         | 2026-09-18 01:24
+dual_open_loop.py                      | —         | 2026-09-18 06:15
+coupled_loop.py                        | 8044      | 2026-09-18 06:46
+decode_image.py                        | —         | 2026-09-18 07:08
+video_to_sensory.py                    | —         | 2026-09-18 07:23
+align_av.py                            | —         | 2026-09-18 07:33
+align_av_delta.py                      | —         | 2026-09-18 07:38
+aud_grid_rawdiag.py                    | —         | 2026-09-18 07:50
+align_av_sparse.py                     | —         | 2026-09-18 07:53
+align_av_foreground.py                 | —         | 2026-09-18 08:08
+align_av_hotspot.py                    | —         | 2026-09-18 08:11
+align_av_mouth.py                      | —         | 2026-09-18 08:14
+analyze_mismatch.py                    | —         | 2026-09-18 08:19
+coupled_sensory_loop.py                | 10266     | 2026-09-18 08:25
+living_loop.py                         | —         | 2026-09-18 08:33
+cycle_dump.py                          | —         | 2026-09-18 08:59
+desire_loop.py                         | —         | 2026-09-18 09:14
+desire_accum.py                        | —         | 2026-09-18 09:20
+desire_accum2.py                       | —         | 2026-09-18 09:26
+desire_accum3.py                       | —         | 2026-09-18 09:27
+desire_add2.py                         | —         | 2026-09-18 09:28
+desire_live.py                         | —         | 2026-09-18 09:35
+desire_hybrid.py                       | —         | 2026-09-18 09:38
+desire_flex.py                         | —         | 2026-09-18 09:40
+desire_short.py                        | —         | 2026-09-18 09:44
+desire_want.py                         | —         | 2026-09-18 09:48
+living_homeo.py                        | —         | 2026-09-18 10:12
+diag_face.py                           | —         | 2026-09-18 20:15
+trajectory_face.py                     | —         | 2026-09-18 20:38
+diag_silence.py                        | —         | 2026-09-18 20:53
+verify_audio_fix.py                    | —         | 2026-09-18 21:07
+test_cross_person.py                   | —         | 2026-09-18 21:42
+run_new_tests.py                       | —         | 2026-09-19 03:50
+test_recovery.py                       | —         | 2026-09-19 03:59
+test_presence.py                       | 10890     | 2026-09-19 04:16
+test_heat_decay.py                     | —         | 2026-09-19 05:52
+test_spike_source.py                   | —         | 2026-09-19 05:58
+test_deficit_gate.py                   | —         | 2026-09-19 06:20
+test_drift_law.py                      | —         | 2026-09-19 06:42
+test_new7.py                           | —         | 2026-09-19 06:50
+test_cross_press.py                    | —         | 2026-09-19 07:05
+test_long_run.py                       | —         | 2026-09-19 07:13
+test_compress.py                       | —         | 2026-09-19 10:13
+test_long_behavior.py                  | —         | 2026-09-19 10:36
+脸签名.py                              | —         | 2026-09-19 15:03
+活诊断.py                              | 10045     | 2026-09-19 15:06
+年龄门禁.py                            | —         | 2026-09-19 15:12
+守护进程.py                            | —         | 2026-09-19 15:37
+诊断器.py                              | 1137      | 2026-09-19 15:37
+学习者.py                              | —         | 2026-09-19 15:37
+识脸.py                                | 10686     | 2026-09-19 15:38
+长跑模拟.py                            | —         | 2026-09-19 15:38
+身体稳态.py                            | —         | 2026-09-19 20:20
+狗.py                                  | —         | 2026-09-19 20:21
+并跑模拟.py                            | —         | 2026-09-19 20:22
+plugins/interface_v1/__init__.py       | —         | —
+plugins/interface_v1/translator.py     | —         | —
+plugins/interface_v2/__init__.py       | —         | —
+plugins/interface_v2/translator.py     | —         | —
+gray/tools/公式.py                     | —         | —
+gray/tools/审计.py                     | —         | —
+gray/tools/归一化.py                   | —         | —
+gray/tools/果因准入.py                 | —         | —
+gray/tools/读表.py                     | —         | —
+gray/tests/反哺_AB_test.py             | —         | —
+gray/tests/cross_validate_drive_pair.py| —         | —
+
+【B. jsonl + json (去 luoshenfu_home), 痕/输出文件】
+
+文件                        | 行数   | 大小(字节) | 改期(UTC+8)
+----------------------------|--------|-----------|---------------------------
+coupled_loop_trace.jsonl     | 101    | 12462     | 2026-09-18 08:25
+body_trace.jsonl            | 260    | 214582    | 2026-09-19 20:27
+body_state.json             | 56     | 1385      | 2026-09-18 19:29
+
+【C. md + txt + tsv】
+
+trace_index.txt             | 27     | 3471      | 2026-09-19 14:41
+VERSION.md                  | —      | —         | 2026-09-16 22:49
+desire_log.txt              | 1000   | —         | 2026-09-18 09:15
+desire_accum_log.txt        | —      | —         | —
+desire_accum2_log.txt       | —      | —         | —
+frustration_trace.tsv       | 30     | 1044      | 2026-09-18 18:11
+state_stream.tsv            | 43201  | 3954281   | 2026-09-18 18:11
+status_stream.tsv/状态流.tsv | 1441   | 55451     | 2026-09-19 15:38
+presence_trace.tsv          | 1001   | 194160    | 2026-09-19 04:16 (summary同上)
+spike_source_trace.tsv      | 961    | 121669    | 2026-09-19 05:58
+heat_decay_trace.tsv        | 481    | 16635     | 2026-09-19 06:24
+heat_decay_summary.tsv      | 81     | 4176      | 2026-09-19 05:52
+face_recognition_report.tsv | 2      | 176       | 2026-09-18 19:45
+body_input_offset.txt       | 0      | 1         | 2026-09-18 19:29
+body_input_queue.tsv        | 1      | 38        | 2026-09-18 18:15
+多种 desire_*.txt           | —      | —         | 2026-09-18 09:xx
+gray/ 全部 md 文档           | —      | —         | —
+protocol/ 全部 md           | —      | —         | —
+anchor/ 全部 md             | —      | —         | —
+
+【D. 其他 / 非文本】
+video_input/ 目录（含 .ppm .wav，外部素材，不参与洛神代码逻辑）
+config/routes.json
+face_recognition_report.tsv 已在C列
+
+================================================================
+二、全部实验（27个实验脚本，按 mtime 排序）
+================================================================
+
+1. luoshenfu.py
+   头注释: "洛神 — 角色差分引擎。出处纪律：每条实现标注痕条目号。"
+   跑法: class Difference, Pair, CCoord, Trace | 提供 __main__ 入口
+   产出: 无直接痕输出；供 import
+
+2. diff_21.py / diff_36.py
+   头注释: "差分演示 v21 / v36 — 简版差分框架，供演示。"
+   跑法: python3 diff_21.py
+   产出: 控制台输出
+
+3. dialog_test_v01.py
+   头注释: "对话测试 v0.1 — 整条链路：文本 → 全矩阵 → 跨模态差分 → 融合。"
+   跑法: python3 dialog_test_v01.py
+   产出: 控制台输出
+
+4. dialog_test_v02.py
+   头注释: "对话测试 v0.2 — 词典短路 + 自净 + 复核。"
+   跑法: python3 dialog_test_v02.py
+
+5. real_sensory_test.py
+   头注释: "真感官输入测试 v0.1 — 一张山的图 + 一段'山'的音。"
+   跑法: python3 real_sensory_test.py
+
+6. modality_specific_test.py
+   头注释: "模态特异性测试 v0.1"
+   跑法: python3 modality_specific_test.py
+
+7. binding_test.py
+   头注释: "跨模态绑定测试 v0.1"
+   跑法: python3 binding_test.py
+
+8. temporal_trajectory_test.py
+   头注释: "时序轨迹预测测试"
+   跑法: python3 temporal_trajectory_test.py
+
+9. noise_robustness_test.py
+   头注释: "噪声鲁棒性测试"
+   ...
+
+10. cross_modal_noise_test.py
+   头注释: "跨模态噪声测试"
+
+11. predict_trajectory_test.py
+   头注释: "轨迹预测测试"
+
+12. dense_library_test.py
+   头注释: "稠密感官库测试 v0.1"
+   产出: pending/_demo_xxx 目录下的 .json (实际未生成本地)
+
+13. vocal_auditory_loop.py
+   头注释: "发声-听觉连续循环测试 v0.1"
+
+14. vocal_auditory_loop_plateau.py
+   头注释: "发声-听觉循环·平台期研究"
+
+15. vocal_auditory_open_loop.py
+   头注释: "发声-听觉开放闭环 v0.1 — 外部输入进来，看还能不能冻。"
+
+16. vocal_auditory_persistent.py
+   头注释: "发声-听觉开放回路·长期养化 v0.1 — 接上时间流。"
+
+17. dual_open_loop.py
+   头注释: "双对开放回路 v0.1 — 声-听 + 视-触，同时跑，看有没有第三东西。"
+   产出: dual_open_loop_state.json (jsonl 未生成)
+
+18. coupled_loop.py
+   头注释: "双对互耦回路 v0.1 — A 的输出喂进 B，B 的输出喂进 A，一起跑。"
+   跑法: python3 coupled_loop.py
+   产出: coupled_loop_trace.jsonl (101行)
+
+19. coupled_sensory_loop.py
+   头注释: (无版本号) 嘴-听觉连续互耦
+   跑法: python3 coupled_sensory_loop.py
+
+20. living_loop.py
+   头注释: "活循环 — 嘴-听觉感知环。"
+   跑法: python3 living_loop.py
+   产出: living_loop.log (实际未生成)
+
+21. living_homeo.py
+   头注释: "living_homeo.py — 用真实物理输入 + 真实生理数据的洛神身体模型。"
+   跑法: python3 living_homeo.py
+   产出: 控制台输出
+
+22. 活诊断.py
+   头注释: "活循环诊断 v1.2 — 一帧不落的原始数据。"
+   跑法: python3 活诊断.py
+   产出: 控制台输出
+
+23. decode_image.py
+   头注释: "PPM/Magick 解码, 记录 MD5 + jsonl"
+
+24. video_to_sensory.py
+   头注释: "视频 → 48×64 感官栅"
+
+25. align_av*.py 系列（6个）
+   - align_av.py: "视听对齐 v0.1"
+   - align_av_sparse.py / _foreground.py / _hotspot.py / _mouth.py / _delta.py
+
+26. 脸签名.py
+   头注释: "脸部签名.py — 视频+听觉→方向/分布签名, 无 if-then, 零绝对量纲。"
+
+27. 身体稳态.py
+   头注释: (无) 仅 """age_homeo.py —— 四个词: 起点、环境、用进废退、监测。物理约束接管上限。"""
+   产出: body_trace.jsonl
+
+================================================================
+三、全部痕（去 luoshenfu_home 用户子目录）
+================================================================
+
+1. body_trace.jsonl
+   路径: ./body_trace.jsonl
+   行数: 260 | 大小: 214582 | 改期: 2026-09-19 20:27
+   头行(tick=1, 旧daemon):
+     {"ts": 1789730689, "wall_clock_utc": "2026-09-18T11:24:49", "tick_count": 1,
+      "cost_ms": 0.1, "dt_min": 1.0, "real_hour": 19.41, "age_y": 0.5,
+      "stage": "survival(0-1)", "sel": "thermal", "served": true,
+      "state": {"thermal": 310.15, "glucose": 4.995, "social": 0.7996},
+      "env": {"luminance": 40, "sound": 50, "force": 10, "temperature": 294},
+      "ref": {"thermal": 8.0, "social": 0}, "hormones": {"cortisol": 4.23},
+      "voice_aperture": 0.0016, "frustration_pool": 0.0,
+      "served_total": {"thermal": 1}}
+   末行(tick=60, 新身体):
+     {"ts": 1789820860, "tick_count": 60,
+      "环境": {"ch_01": 50.0, "ch_02": 45.0, "ch_03": 10.0, "ch_04": 295.0,
+               "_狗_ch_02": 16.56, "_狗_ch_01": 12.88},
+      "环境输入": [0.098, 0.4, 0.3, 0.467],
+      "激活": [0.044, 0.097, -0.108, ...],
+      "物理": [20.7, 0.28, 10, 2.18]}
+   两段 schema 不同:
+     旧行字段: ts, wall_clock_utc, wall_clock_local, tick_count, cost_ms, dt_min,
+              real_hour, age_y, stage, sel, served, inputs_consumed, state,
+              env, ref, hormones, voice_aperture, frustration_pool, served_total
+     新行字段: ts, tick_count, 环境, 环境输入, 激活, 物理
+   写者: 旧行=守护进程.py (推断, 因 schema 完全一致)；新行=身体稳态.py:120
+
+2. body_state.json
+   行数: 56 | 大小: 1385
+   头: {"version": 2.1, "meta": {...}, "body": {...}}
+   (旧 daemon 快照)
+
+3. coupled_loop_trace.jsonl
+   行数: 101 | 大小: 12462
+   头行: {"step": 0, "i": 0, "m": 0.5845, "a": 0.0039, "delta_m": -0.1161, "delta_a": 0.1161, "ext_m": 0.5845, "ext_a": 0.0039}
+   末行: {"step": 50000, "i": 48, "m": 0.6646, "a": 0.3912, "delta_m": 0, "delta_a": 0, "ext_m": 0.4674, "ext_a": 0.006, "_final": true}
+   字段: step, i, m, a, delta_m, delta_a, ext_m, ext_a, [可选 _final]
+   写者: coupled_loop.py:204-205
+
+4. state_stream.tsv
+   行数: 43201 | 大小: 3954281
+   头行: gt\tday\ttick_in_day\tsel\tdrv_thermal\tdrv_exploration\tdrv_social\tdrv_glucose\tdrv_sexual\tvoice_aperture\tsocial_heat\tref_social\twants_speak\tactually_spoke\tenv_human_act\tenv_dog_sound\tenv_dog_force\tenv_dog_luminance
+   末行: 43199\t29\t1439\t-\t-1.000\t0.000\t0.000\t-1.000\t-1.000\t0.0000\t0.526\t54.0\t0\t0\t0.663\t16.6\t3.2\t12.9
+   写者: 长跑模拟.py:67-203
+
+5. frustration_trace.tsv
+   行数: 30 | 大小: 1044
+   头行: day\twant_sum\tspoke_sum\tfrustration\tpressure\tcumulative_frustration
+   末行: 28\t320\t25\t38.5889\t55.000\t1113.3284
+   写者: 长跑模拟.py:117-123
+
+6. presence_trace.tsv
+   行数: 1001 | 大小: 194160
+   头行: round\ttick_abs\tphase_idx\tphase\twho_intensity\telapsed_min\tage_y\t_social_heat\t_boredom\tvoice_aperture\tsel_need\tsel_drive\tstate_thermal\t...
+   末行: 4\t999\t4\tnobody\t0.0\t1010.0\t0.50001901\t0.00067\t0.0\t0.0\tsocial\t0.0\t310.20495\t8.0\t1.0\t0.99353\t...
+   写者: test_presence.py
+
+7. spike_source_trace.tsv
+   行数: 961 | 大小: 121669
+   头行: mode\twho\tround\ttick\theat_at_leave\theat\tsel_need\tsel_drive\tserved\tvoice\tref_thermal\t...
+   写者: test_spike_source.py
+
+8. heat_decay_trace.tsv
+   行数: 481 | 大小: 16635
+   头行: mode\tround\twho\ttick\theat_at_leave\theat
+   ...
+   写者: test_heat_decay.py
+
+9. heat_decay_summary.tsv
+   行数: 81 | 大小: 4176
+   头行: who_left\tdecay_tick\tn\theat_mean\theat_min\theat_max\tratio_mean\tvoice_max
+
+10. face_recognition_report.tsv
+    行数: 2 | 大小: 176
+    头行: round\tmean_sim_to_author\tstd_sim\ts12\ts13\ts23\ts_base_diff\tbase_social_heat\tfinal_social_heat\tn_frames\tn_repeats
+    末行: all\t0.0047\t0.0000\t0.9991\t0.9991\t1.0000\t0.9987\t0.1685\t0.0131\t58\t3
+    写者: test_cross_person.py
+
+11. 状态流.tsv (中文名，与 state_stream.tsv 对应)
+    行数: 1441 | 大小: 55451
+    头行: 滴\t天\t天内滴\t洛神选\t刺体温\t刺探索\t刺社交\t刺葡萄糖
+    写者: 长跑模拟.py
+
+12. body_input_queue.tsv / body_input_offset.txt
+    来自守护进程.py 配套输入队列
+
+13. 多种 desire_*.txt (desire_loop.py 系列产出)
+    共约 20 个, 包括 V1/V2/VKx 系列、neg_alpha、flex、short、hybrid、want 系列
+    (具体命名规约见 trace_index.txt)
+
+14. .md / protocol.md / gray文档: 非痕, 文档性质(不逐列)
+
+================================================================
+四、全部调用关系
+================================================================
+
+类/函数调用本地文件一览:
+
+身体稳态.py:
+  import random, time                                        :3
+  (无本地 import, 狗/学习者/识脸/长跑/并跑反向导入它)
+
+狗.py:
+  import math, Counter                                       :12-13
+  (被 长跑模拟/并跑模拟/守护进程 导入)
+
+脸签名.py:
+  import math                                                :10
+  (被 识脸/学习者 等导入)
+
+活诊断.py:
+  import json, sys, os, math, struct, time                   :13
+  提供: 提取锚点(), 归一化()
+  (被 desire_*.py/cycle_dump.py 导入 — 但函数名对不上, 见矛盾节)
+
+luoshenfu.py:
+  import sys, json, math, hashlib / Path / datetime          :32-34
+  提供: Difference, Pair, CCoord, Trace, 动词级操作
+  (被 gray/tests/反哺_AB_test.py, cross_validate_drive_pair.py 及 matrices/cross_modal.py 导入)
+
+matrices/cross_modal.py:
+  from luoshenfu import Difference, Pair, CCoord, Trace     :41
+
+学习者.py:
+  from 身体稳态 import 身体                                  :19
+  from 年龄门禁 import 年龄门禁, 年龄上限终生               :20
+
+识脸.py:
+  from 身体稳态 import 身体                                  :23
+  from 脸签名 import (多函数)                                :24
+
+长跑模拟.py:
+  from 身体稳态 import 身体 as 身体类                        :17
+  from 狗 import 狗 as 狗类, 狗需求                          :18
+
+并跑模拟.py:
+  from 身体稳态 import 身体 as 身体类                        :13
+  from 狗 import 狗 as 狗类, 狗需求                          :14
+
+守护进程.py:
+  import sys,os,json,time,math,hashlib,signal/Path/datetime :21-24
+  from 身体稳态 import 身体 as 身类                          :45
+
+诊断器.py:
+  from 身体稳态 import 身体                                  :2
+
+desire_*.py 系列:
+  from living_diag import extract_anchors, normalize         :各自 (详见矛盾节)
+
+coupled_loop.py:
+  import matrices.vocal/auditory/visual/tactile               :17-20
+
+coupled_sensory_loop.py:
+  import json, sys, os, math, struct, time                   :20
+  (无本地 matrices import — 硬编码矩阵, 不导入 matrices 包)
+
+dual_open_loop.py:
+  import matrices.vocal/auditory/visual/tactile               :14-17
+
+vocal_auditory_*.py 系列:
+  import matrices.vocal/auditory                              :各自
+
+test_*.py 系列:
+  from age_homeo import Body, HOMEOSTATIC_NEEDS              :大量 (详见矛盾节)
+
+debug_face.py:
+  from age_homeo import Body                                  :8
+  from face_signature import (全签名函数)                     :9
+
+plugins/interface_v1/__init__.py:
+  from .translator import InterfaceV1                         :14
+
+plugins/interface_v2/__init__.py:
+  from .translator import InterfaceV2                         :1
+
+其他:
+  gray/反哺_AB_test.py: from luoshenfu import Difference, Pair, Trace, ROOT
+  gray/tests/cross_validate_drive_pair.py: from luoshenfu import Difference
+
+入口 (if __name__):
+  luoshenfu.py: 有
+  LuoshenfuHome dialog_test_v01/v02: 有
+  活诊断.py: 行 188
+  脸签名.py 调用人参: 入口在 diag_face.py/test_*.py
+  test_presence.py/test_heat_decay.py/test_spike_source.py: 各自有
+  desire_*.py: 各自有
+  coupled_loop.py/coupled_sensory_loop.py: 有
+  living_loop.py: 有
+  body稳态/狗.py: 无 (被 import, 不单独准入)
+  并跑模拟.py: 有
+  长跑模拟.py: 有
+  学習者/识脸: 有
+  守护进程.py: 有 (python3 living_daemon.py tick/status/selftest/burst) (行17起定义守护/活/死)
+
+================================================================
+五、全部版本
+================================================================
+
+文件                            | 顶部版本标记(原文)             | 改期
+-------------------------------|-------------------------------|--------
+matrices/auditory.py           | "听觉矩阵 v0.1"               | 09-17
+matrices/cross_modal.py        | "跨模态差分原语 v0.3"         | 09-17
+matrices/infrared.py           | "红外热成像矩阵 v0.2"         | 09-17
+matrices/lidar.py              | "毫米波雷达矩阵"              | 09-17
+matrices/neuron.py             | "人类神经元信息矩阵 v0.1"     | 09-17
+matrices/pain.py               | "痛觉矩阵 v0.1"               | 09-17
+matrices/radar.py              | "毫米波雷达矩阵 v0.2"         | 09-17
+matrices/tactile.py            | "触觉矩阵 v0.1"               | 09-17
+matrices/thermal.py            | "温度觉矩阵 v0.1"             | 09-17
+matrices/vocal.py              | "发声矩阵 v0.1"               | 09-17
+matrices/visual.py             | "视觉矩阵 v0.2"               | 09-17
+run_full_fusion.py             | "全上融合 v0.2"               | 09-17
+dialog_test_v01.py             | "对话测试 v0.1"               | 09-17
+dialog_test_v02.py             | "对话测试 v0.2"               | 09-17
+real_sensory_test.py           | "真感官输入测试 v0.1"         | 09-17
+analyze_mismatch.py            | "视听对齐 v0.10"              | 09-18
+aud_grid_rawdiag.py            | "听觉矩阵原始分布诊断 v0.1"   | 09-18
+align_av.py                    | "视听对齐 v0.1"               | 09-18
+align_av_sparse.py             | (无, 实际为视听对齐系列)      | 09-18
+align_av_foreground.py         | "视听对齐 v0.7"               | 09-18
+align_av_hotspot.py            | "视听对齐系列"                | 09-18
+align_av_mouth.py              | 同                            | 09-18
+align_av_delta.py              | 同                            | 09-18
+vocal_auditory_loop.py         | "发声-听觉连续循环测试 v0.1"  | 09-18
+vocal_auditory_loop_plateau.py | 无                            | 09-18
+vocal_auditory_open_loop.py    | "发声-听觉开放闭环 v0.1"      | 09-18
+vocal_auditory_persistent.py   | "发声-听觉开放回路·长期养化"  | 09-18
+dual_open_loop.py              | "双对开放回路 v0.1"           | 09-18
+coupled_loop.py                | "双对互耦回路 v0.1"           | 09-18
+coupled_sensory_loop.py        | (无顶部版号)                  | 09-18
+living_loop.py                 | (无顶部版号)                  | 09-18
+cycle_dump.py                  | (无, 简单诊断)                | 09-18
+desire_loop.py                 | "欲望循环"                    | 09-18
+desire_short.py                | "欲望短跑"                    | 09-18
+desire_flex.py                 | (无)                          | 09-18
+desire_live.py                 | "活欲望"                      | 09-18
+desire_hybrid.py               | (无)                          | 09-18
+desire_want.py                 | "欲望-需求"                   | 09-18
+living_homeo.py                | (无顶部版号)                  | 09-18
+活诊断.py                      | "活循环诊断 v1.2"             | 09-19
+decode_image.py                | (无)                          | 09-18
+video_to_sensory.py            | (无)                          | 09-18
+学习者.py                      | "洛神学习者.py — 洛神学习系统 v1" | 09-19
+识脸.py                        | (无顶部版号)                  | 09-19
+脸签名.py                      | (无顶部版号)                  | 09-19
+长跑模拟.py                    | (无顶部版号)                  | 09-19
+守护进程.py                    | (无顶部版号)                  | 09-19
+诊断器.py                      | (无顶部版号)                  | 09-19
+并跑模拟.py                    | (无顶部版号)                  | 09-19
+身体稳态.py                    | (无顶部版号)                  | 09-19
+狗.py                          | (无顶部版号)                  | 09-19
+luoshenfu.py                   | "角色差分引擎" (无版本数字)   | 09-17
+diff_21.py / diff_36.py        | "差分演示 v21 / v36"          | 09-17
+plugins/interface_v1/translator.py | 无                         | —
+plugins/interface_v2/translator.py | 无                         | —
+test_*.py 系列                 | (无顶部版号)                  | 09-18~09-19
+gray/tools/*.py                | 各自无明确版本号              | —
+
+============================================================
+六、全部环境键
+============================================================
+
+═══ 写环境 ═══
+
+身体稳态.py:8   (构造Body.__init__):
+    self.环境 = {"ch_01": 50.0, "ch_02": 45.0, "ch_03": 10.0, "ch_04": 295.0}
+
+学习者.py:54,58,62,76,84,92:
+    身子.环境["luminance"] = ...
+    身子.环境["sound"] = ...
+    身子.环境["force"] = ...
+
+诊断器.py:12,14,15,16:
+    身体实例.环境["luminance"] = 50.0
+    身体实例.环境["声响"] = ...
+    身体实例.环境["力度"] = ...
+
+并跑模拟.py:22 (CollationsCollat):
+    {"ch_01": 50.0, "ch_02": 45.0, "ch_03": 10.0, "ch_04": 295.0}
+并跑模拟.py:45 (狗的衰减):
+    环境["_狗_ch_02"] = ...
+    环境["_狗_ch_01"] = ...
+
+守护进程.py:175,179,183,184,189:
+    身子.环境["sound"] = ...
+    身子.环境["force"] = ...
+    身子.环境[键] = ...  (通用注入)
+
+活诊断.py:
+    (不直接操作 环境 dict)
+
+═══ 读环境 ═══
+
+身体稳态.py:39-42:
+    self.环境["ch_01"]
+    self.环境["ch_02"]
+    self.环境["ch_03"]
+    self.环境["ch_04"]
+
+狗.py:176:
+    环境温度 = self.环境.get("温度", 311.65)
+
+狗.py:198-200:
+    亮度值 = self.环境.get("亮度", 0.0)
+    声响值 = self.环境.get("声响", 0.0)
+    力度值 = self.环境.get("力度", 0.0)
+
+狗.py:241:
+    人活动 = self.环境.get("_人类社交活动", 0.0)
+
+守护进程.py:189:
+    for 键, 值 in 身子.环境.items():... (遍历)
+
+并跑模拟.py:45-53:
+    (衰减狗表达输出时写环境)
+
+linding_homeo.py:
+    物理输入: luminance, sound, force, temperature (各通道物理量)
+
+═══ 所有键名总表 ═══
+
+键名                      | 出现处
+-------------------------|---------------------------
+ch_01                    | 身体稳态.py(读写), 并跑模拟.py(写)
+ch_02                    | 身体稳态.py(读写), 并跑模拟.py(写)
+ch_03                    | 身体稳态.py(读写), 并跑模拟.py(写)
+ch_04                    | 身体稳态.py(读写), 并跑模拟.py(写)
+luminance                | 学习者.py(写), 守护进程.py(读)
+sound                    | 学习者.py(写), 守护进程.py(写)
+force                    | 学习者.py(写), 守护进程.py(写)
+温度                     | 狗.py(读, 行176)
+亮度                     | 狗.py(读, 行198)
+声响                     | 狗.py(读, 行199), 诊断器.py(写)
+力度                     | 狗.py(读, 行200), 诊断器.py(写)
+_人类社交活动            | 狗.py(读, 行241)
+_狗_ch_01                | 并跑模拟.py(写), body_trace.jsonl(痕)
+_狗_ch_02                | 并跑模拟.py(写), body_trace.jsonl(痕)
+_human_social_activity   | body_trace.jsonl旧行(痕)
+
+================================================================
+七、全部落盘
+================================================================
+
+身体稳态.py:120-122:
+    路径: "/mnt/data/catpaw/home/workspace/洛神赋1.1/body_trace.jsonl"
+    模式: "a" (追加)
+    格式: JSONL (json.dumps, ensure_ascii=False)
+    写者: import random, time 后直接 json
+
+学习者.py:*:
+    落盘位置: 查不到 (学习者.py 仅 import, 不写文件)
+
+长跑模拟.py:67,72,117,123,203:
+    路径: "状态流.tsv" / frustration_trace.tsv
+    模式: "w" (头) + "a" (逐日追加)
+    格式: Tab 分隔
+
+守护进程.py:29-31:
+    快照路径 = 目录 / "身体快照.json"
+    痕路径   = 目录 / "身体痕.jsonl"
+    队列路径 = 目录 / "身体输入队列.tsv"
+    (但守护进程.py 从未真正运行写入 — 身体痕.jsonl 不存在)
+
+活诊断.py:*:
+    查不到 (仅 print 到控制台, 不写)
+
+狗.py:*:
+    查狗.py 不写文件、不落盘
+
+并跑模拟.py:*:
+    查不写、不落盘
+
+识脸.py:259,265-266:
+    报告路径.write_text(...)    # 写识脸报告.tsv
+    报告路径.open("a") 文.write(...)
+    路径来自: 目录 / "识脸报告.tsv"
+
+decode_image.py:34-40,50,76,102,255-256:
+    多元落盘: PPM 写 + jsonl 追加
+    jsonl_path 写 MD5 校验 + 记录
+
+dense_library_test.py:232:
+    pending_file.write_text(json...)  # 写 pending 文件
+
+dual_open_loop.py:204-205,217:
+    TRACE .jsonl: open(TRACE_FILE, "a", ...) fp.write(json...)
+    STATE .json:  STATE_FILE.write_text(json...)
+
+desire_loop.py / desire_short.py / desire_*.py 系列:
+    open(f"desire_xxx.txt", "w")  # 各自产出文本
+
+desire_accum.py:49,63:
+    "desire_accum2_log.txt" / "desire_accum2_log.txt"    # 写+读
+
+desire_accum2.py:49,63,69:
+    "desire_accum2_log.txt"   # 写, 然后读
+
+vocal_auditory_persistent.py:*:
+    查无落盘 (仅控制台 print)
+
+speak_hear_loop.py:*:
+    查无落盘
+
+coupled_loop.py:204-205:
+    TRACE .jsonl  append
+
+脸签名.py:*:
+    无落盘
+
+luoshenfu.py:82, 300:
+    痕库写 chain.jsonl / 内部文件写 json
+
+gray/tests/反哺_AB_test.py:41,93,111,168:
+    write_text / 主锚点替换  # 读写锚点
+
+gray/tools/读表.py:37:
+    open(filepath)   # 读
+
+================================================================
+八、全部时间线
+================================================================
+
+2026-09-16 16:12    gray/README.md
+2026-09-16 16:16    gray/debate/守卫行演变.md
+2026-09-16 16:47    protocol/*.md 全套
+2026-09-16 22:49    VERSION.md                     ← 项目版本表 (luoshenfu v2.1)
+2026-09-17 02:37    早期 luoshenfu_home/users/*/chain.jsonl
+2026-09-17 13:39    matrices/__init__.py
+2026-09-17 14:32    matrices/{thermal,tactile,vocal,neuron}.py
+2026-09-17 15:24    matrices/infrared.py
+2026-09-17 16:02    matrices/pain.py
+2026-09-17 16:04    matrices/lidar.py, radar.py
+2026-09-17 16:09    luoshenfu.py                   ← 差分引擎 v2.1
+2026-09-17 16:42    exp_baseline_sparsity.py
+2026-09-17 17:18    run_full_fusion.py
+2026-09-17 17:31    matrices/cross_modal.py; dialog_test_v01.py
+2026-09-17 17:48    dialog_test_v02.py
+2026-09-17 17:54    real_sensory_test.py
+2026-09-17 18:13    多个 luoshenfu_home/users/*/chain.jsonl
+2026-09-17 19:31    speak_hear_loop.py
+2026-09-17 19:36    intra_channel_disc.py
+2026-09-17 19:58    binding_test.py
+2026-09-17 20:30    modality_specific_test.py
+2026-09-17 20:37    temporal_trajectory_test.py
+2026-09-17 20:44    predict_trajectory_test.py
+2026-09-17 20:57    noise_robustness_test.py
+2026-09-17 21:06    cross_modal_noise_test.py
+2026-09-17 21:39    matrices/visual.py
+2026-09-17 21:40    matrices/auditory.py
+                                   ↓ 【第一阶段截止: 矩阵/模态库就绪】
+2026-09-18 00:59    dense_library_test.py          ← 开始 voice desire 实验
+  01:00~09:00        desire_*.py 系列 (21 个)      ← 欲望-驱动-需求 实验
+  01:15~01:24        vocal_auditory_*.py 系列 (4 个)
+                                   ↓
+2026-09-18 06:15    dual_open_loop.py              ← 耦合实验开始
+2026-09-18 06:46    coupled_loop.py                ← 真实产出 coupled_loop_trace.jsonl
+2026-09-18 07:00~08:25 视听对齐系列 (align_av *.py 6个)
+   + aud_grid_rawdiag.py / analyze_mismatch.py / coupled_sensory_loop.py
+2026-09-18 08:25    coupled_loop_trace.jsonl       ← 首次落盘
+2026-09-18 08:33    living_loop.py
+2026-09-18 08:59    cycle_dump.py → cycle_dump_1000.txt
+                                   ↓
+2026-09-18 09:15~09:48  desire 系列沉淀为 txt 日志
+2026-09-18 10:12    living_homeo.py                ← 真实物理身体模型
+2026-09-18 18:11    state_stream.tsv / frustration_trace.tsv
+                                   ↓ 【长跑数据落地: 30天×双向耦合】
+2026-09-18 18:15    body_input_queue.tsv           ← 输入队列{"content":"hi 洛神"}
+2026-09-18 19:29    body_state.json, body_input_offset.txt
+                                   ↓ 【旧 daemon 推 10 tick】
+2026-09-18 19:29    守护进程.py 首次运行, 推 body_trace tick 1~10
+2026-09-18 19:24~19:29 旧版 body_trace 前10行 (含 _human_social_activity)
+2026-09-18 19:45    face_recognition_report.tsv
+2026-09-18 19:45    luoshenfu_home/traces/video_sensory_chain.jsonl
+2026-09-18 20:15    diag_face.py
+2026-09-18 20:38    trajectory_face.py
+2026-09-18 20:53    diag_silence.py
+2026-09-18 21:07    verify_audio_fix.py
+2026-09-18 21:42    test_cross_person.py
+                                   ↓
+2026-09-19 03:50    run_new_tests.py               ← 新测试集
+  03:50~07:13        test_*.py 系列 (13 个)
+2026-09-19 04:16    test_presence.py → presence_trace.tsv/summary.tsv
+2026-09-19 05:52    test_heat_decay.py → heat_decay_trace.tsv/summary.tsv
+2026-09-19 05:58    test_spike_source.py → spike_source_trace.tsv
+2026-09-19 06:20    test_deficit_gate.py
+2026-09-19 06:42    test_drift_law.py
+2026-09-19 06:50    test_new7.py
+2026-09-19 07:05    test_cross_press.py
+2026-09-19 07:13    test_long_run.py
+                                   ↓
+2026-09-19 10:13    test_compress.py
+2026-09-19 10:36    test_long_behavior.py
+                                   ↓
+2026-09-19 14:41    trace_index.txt                ← 痕目录索引生成
+                                   ↓
+2026-09-19 15:03    脸签名.py (刷新)
+2026-09-19 15:06    活诊断.py (刷新)
+2026-09-19 15:12    年龄门禁.py (刷新)
+2026-09-19 15:37    守护进程.py / 诊断器.py / 学习者.py (刷新)
+2026-09-19 15:38    识脸.py / 长跑模拟.py / 状态流.tsv
+                                   ↓ 【新旧交替: 守护进程代码对齐环境键冲突显现】
+2026-09-19 20:20    身体稳态.py (刷新)
+2026-09-19 20:21    狗.py (刷新)
+2026-09-19 20:22    并跑模拟.py                  ← 环境键统一施工完成
+2026-09-19 20:27    body_trace.jsonl (最后落盘)
+
+各时段在做什么：
+  09-16: 项目文档、协议体系、顶层设计。
+  09-17: 矩阵库、差分引擎、模态测试、口语循环首发。
+  09-18 凌晨-清晨: 欲望-驱动 实验 21+4 个 + 耦合实验 3 个 + 视听对齐 6 个 — 产出 desire_txt 系列、coupled_loop_trace.jsonl。
+  09-18 上午: living_homeo.py 活体模型。
+  09-18 下午 18:11: state_stream.tsv + frustration_trace.tsv — 30 天长跑数据落地。
+  09-18 晚 19:24~19:29: 守护进程.py 首跑, body_trace.jsonl 旧10行生成。
+  09-18 晚 20:15~21:42: 脸/视频/静默/对齐/交叉 测试。
+  09-19 凌晨-上午: test_*.py 13 个新测试, 全部带痕落盘 (presence/spike_source/heat_decay/drift_law/long_run/deficit_gate/cross_press/long_behavior)。
+  09-19 下午 14:41: trace_index.txt (索引)。
+  09-19 下午 15:03~15:38: 脸签名/活诊断/年龄门禁/守护/诊断/学习/识脸/长跑模拟 — 全面刷新。
+  09-19 晚 20:20~20:27: 身体稳态/狗/并跑模拟 — 最终环境键统一 + 落盘打通, 最后一次落盘。
+
+================================================================
+九、全部矛盾
+================================================================
+
+══ 9.1 同文件内前后不一致 ══
+
+1. 身体稳态.py:8 vs 学习者.py:36-45,92 + 并跑模拟.py:45
+   身体稳态 环境键: ch_01/ch_02/ch_03/ch_04 (行8, 行39-42 读取)
+   学习者/守护进程/诊断器 写环境用键: luminance/sound/force/temperature/声响/力度
+   → 键名完全断裂, 无交集
+   (学习者.py 行54-92 往身子.环境写 luminance/sound/force, 身体稳态 Body.__init__ 把它们初始化为 ch_01-04)
+
+2. 狗.py:198-200 vs 学习者.py:36-45 vs 狗.py:176
+   狗读 环境.get("亮度"/"声响"/"力度", default)
+   学习者/守护进程 写 环境["luminance"/"sound"/"force"]
+   狗读 环境.get("温度", 311.65)
+   学习者/守护进程 写 环境["temperature"] 或 环境["ch_0x"]=295K
+   → 键名维度 vs 公制双重断裂:
+     狗需要 声响/力度/亮度/温度 四键;
+     身体稳态提供 ch_01(luminance)/ch_02(sound)/ch_03(force)/ch_04(temperature);
+     学习者写 luminance/sound/force(四键)+温度(temperature);
+     诊断器写 luminance/声响/力度(无温度)。
+     哪一套都没有被消费方完整匹配上。
+
+3. 身体稳态.py 顶部注释 vs 文件名
+   文件实际名: 身体稳态.py
+   顶部注释: """age_homeo.py —— ..."""
+   ⇒ 旧名 age_homeo 保留在新文件头部 (旧痕来源)
+
+4. 狗.py:241 读 _人类社交活动
+   身体稳态.py 全程不写 _人类社交活动
+   body_trace.jsonl 旧行(tick 2-10)有 _human_social_activity
+   body_trace.jsonl 新行无 _human_social_activity
+   ⇒ 阅读方(狗) 对 书写方(身体) 不对称; 新身体完全断开了这个通道
+
+5. 狗.py:126 self.环境 = 环境 if 环境 is not None else {...}
+   初始环境(行126-146):
+      体温: 311.65
+      血糖: ...
+      ...
+   ← 这些是 内部状态 键名, 不是 环境 键名。构造入参混用。
+   (后续所有 环境.get("温度"/"声响"...) 读的全是新 环境 dict, 与初始 dict 不匹配)
+
+6. 守护进程.py:45 from 身体稳态 import 身体 as 身类
+   守护进程 行175-189 写环境用 ["sound"]/["force"]
+   ← 身类 实际只读 ch_01/ch_02/ch_03/ch_04
+   ← 守护进程 写的环境 是另一个 dict 实例(被子进程启动时新造?), 还是身子同一实例?
+   ← 无明确交叉; 守护进程 向 环境 写的键 身子永远读不到身子自己初始化的 ch_01-04
+
+══ 9.2 同名实验不同版本产出不同结构 ══
+
+7. desire_accum.py vs desire_accum2.py vs desire_accum3.py
+   - 均读 living_diag.extract_anchors (不存在的函数)
+   - desire_log.txt (desire_loop.py 产出): cycle/chose/strength/m/a
+   - desire_accum2_log.txt (desire_accum2.py 产出): 不同字段
+   ← 同 desire 框架不同版本日志结构不走同一 schema
+
+8. cycle_dump_1000.txt (cycle_dump.py 产出)
+   结构: cycle N  m=...  a=...
+   与 desire_log.txt 的 cycle/chose/strength/m/a 字段不同
+   ← 共存的两套循环日志结构互不兼容
+
+9. 身体稳态.py 的 body_trace 旧行 schema  vs 新行 schema
+   旧行(守护进程): sel/served/state/env/ref/hormones/voice_aperture/frustration_pool
+   新行(身体稳态): 环境/环境输入/激活/物理
+   ← 同一个文件 body_trace.jsonl 内含两种不兼容 schema, 由两个不同的 .py 写出
+
+══ 9.3 同一 key 在不同文件写法不同 ══
+
+10. 洛神自身年龄 vs 身体内部"时刻"
+    守护进程.py: 初始年龄 = 0.5 (岁)
+    身体稳态.py: self.时刻 = 0 (滴答计数)
+    学习者.py: 用 年龄门禁 判断解锁
+    ← 同一份"年龄"在三套维度(岁 / 滴答 / 发展阶段)之间未显式对齐
+
+11. "env" vs "环境" 命名
+    - body_trace.jsonl 旧行用 "env"
+    - body_trace.jsonl 新行用 "环境"
+    - 并用 英文 env (旧痕) 和 中文 环境 (新痕)
+    ← 两套 schema 加上中英双命名
+
+12. "环境输入" vs "环境[" 初始值
+    身体稳态.py:36-42 行读 self.环境["ch_01..04"] 并归一化
+    学习者.py:54 行写 身子.环境["luminance"] = ...
+    ← 写和读是同维度物理量 (光/声/力/温), 但键名完全不同
+
+══ 9.4 时间戳对不上 ══
+
+13. body_trace.jsonl 旧10行 mtime: 2026-09-18 11:24~11:29 UTC
+    守护进程.py 当前改期: 2026-09-19 15:37 +0800
+    ← 旧痕 比 守护进程当前版 早 1 天多, 意味着身体旧 tick 是 旧版守护进程 跑出来的
+    ← 守护进程.py 被改过, 当前版的 守护进程.py 无法复现 旧10行 schema
+
+14. 身体稳态.py 当前改期 09-19 20:20
+    body_trace.jsonl 末行 ts 1789820860 (09-19 20:27.6)
+    ← 连续滴答 tick 50~60 对应 同一次并跑模拟/活体跑 20:27 左右
+    ← 但 身体稳态.py 文件本身 20:20 改, 20:22 又改并跑模拟 — 落盘发生在 20:27, 文件修改在 20:20
+    ← 表示: 身体稳态.py 被改过之后又被调用(并跑模拟/活诊断), 落盘的是新内核
+
+15. living_homeo.py (09-18 10:12) vs 身体稳态.py (09-19 20:20)
+    living_homeo 是旧活物理模型; 身体稳态 是新物理模型 (24神经元)
+    ← 两者谁代表"真正的身体"? luoshenfu.py import = 差异原语引擎, 不 import 任何身体
+    ← 并跑模拟/长跑模拟 真实引用的是 身体稳态.py
+
+══ 9.5 断链/悬空调用 ══
+
+16. from living_diag import extract_anchors, normalize
+    调用方:
+      cycle_dump.py:3
+      desire_accum.py:16
+      desire_accum2.py:13
+      desire_accum3.py:11
+      desire_add2.py:3
+      desire_flex.py:14
+      desire_live.py:17
+      desire_short.py:11
+      desire_want.py:17
+    真实坐落在 活诊断.py: def 提取锚点(): / def 归一化():
+    ← 函数名不同(英文 vs 中文), 且源文件名不同(living_diag.py vs 活诊断.py)
+    ← 这 9 个 desire_*.py 全部 import 失败
+
+17. from age_homeo import Body, HOMEOSTATIC_NEEDS
+    调用方 (约 9 个):
+      test_compress.py, test_cross_press.py, test_deficit_gate.py,
+      test_drift_law.py, test_long_behavior.py, test_long_run.py,
+      test_new7.py, test_presence.py, diag_face.py
+    真实坐落在 身体稳态.py (行8 class 身体):73 行才落盘落盘且 Body 仍是 24神经元版
+    ← 期待的 age_homeo.Body 接口 与 身体稳态.Body 实际接口不同
+    ← 这 9+ 个 test 全部 import 失败 (除非存在 age_homeo.py 别名——实测不存在)
+
+18. diag_face.py:8 from age_homeo import Body
+    diag_face.py:9 from face_signature import (...)
+    face_signature.py: 只有视觉/听觉签名函数，无 body 相关
+    ← diag_face 假定了另一套老的 Face+Body 联合结构，与当前身体稳态 不匹配
+
+19. 脸签名.py:200+ 全签名
+    body稳态 中无 select/serve/drive/hormones/ref，旧 schema 全部在新 body 中缺失
+    ← 用旧 schema 解析身体稳态落的 body_trace.jsonl 新行会蒙
+
+══ 9.6 未运行的"死代码"与"活代码" ══
+
+20. 守护进程.py 末尾 身体.活() / 死()
+    - 被定义为函数但 __main__ 路径不能直接 python -c 跑(单脚本时)——依赖 logging 框架格式
+    - 痕路径 目录/"身体痕.jsonl" ≠ ./body_trace.jsonl
+    - 守护进程.py 实际从未成功写入过 身体痕.jsonl 文件
+    ← 守护进程 是"准备接入"状态, 不是运行态
+
+21. living_diag.py 不存在
+    - 9+ 个 desire 脚本 import 失败
+    - 活诊断.py 在同一个目录, 取中文函数名
+    ⟹ 跨语言命名断裂
+
+22. age_homeo.py 不存在
+    - 9+ 个 test 脚本 import 失败
+    - 身体稳态.py 同在, 行8 class 身体, 行73 行才落盘落盘且 Body 仍是 24神经元版
+    ← 跨语言命名断裂
+
+23. luoshenfu_home/users/*/chain.jsonl
+    - 大量链式 user 数据, 由旧的 LuoshenfuHome/Chain 引擎生成
+    - 所有链 schema 差异极大(不同 user folder 不同字段)
+    ← 一套用户系统已经独立增量, 与新的 "身体稳态.py" 身体模型 完全未打通
+
+================================================================
+END OF AUDIT
+================================================================

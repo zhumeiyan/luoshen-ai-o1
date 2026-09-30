@@ -1,0 +1,16 @@
+[PATCH] ray.init: retry wrapper (7 attempts + cleanup + wait=180s)
+[PATCH] LLMClient noretry patch failed: AGENTSOCIETY_LLM_API_KEY is required. Please set this environment variable before running AgentSociety2.
+============================================================
+yinyang_evo_v20 — 容量测试: n=20-60, Leaky-tanh
+架构: 双通路+蛋白折叠(转置修正)+Verifier, 可激活leak
+============================================================
+
+[快速随机测试]
+  随机org 0: n=60, fitness=0.0000
+  随机org 1: n=48, fitness=0.0000
+  随机org 2: n=26, fitness=0.0000
+  随机org 3: n=23, fitness=0.0001
+  随机org 4: n=45, fitness=0.0000
+
+开始演化...
+Gen    0   15.9s fit=0.0001/0.0000 best=0.0001 n=21

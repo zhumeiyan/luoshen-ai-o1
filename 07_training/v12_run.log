@@ -1,0 +1,50 @@
+[PATCH] ray.init: retry wrapper (7 attempts + cleanup + wait=180s)
+[PATCH] LLMClient noretry patch failed: AGENTSOCIETY_LLM_API_KEY is required. Please set this environment variable before running AgentSociety2.
+
+======================================================================
+Evolution v12 — Information Foraging Environment
+n_orgs=30 steps/gen=400 regions=9
+======================================================================
+
+GEN    0 | alive=30/30 | fit=0.6861/0.6727 | pred=0.4761 | INFO=13.8871 | INTRIN=1.097 boredom=0.000
+GEN    5 | alive=30/30 | fit=0.6656/0.6590 | pred=0.5364 | INFO=13.9672 | INTRIN=1.105 boredom=0.000
+GEN   10 | alive=30/30 | fit=0.7037/0.6995 | pred=0.3522 | INFO=16.0644 | INTRIN=1.303 boredom=0.000
+GEN   15 | alive=30/30 | fit=0.6988/0.6946 | pred=0.3776 | INFO=12.1661 | INTRIN=0.871 boredom=0.000
+GEN   20 | alive=30/30 | fit=0.6783/0.6721 | pred=0.4684 | INFO=11.9817 | INTRIN=0.777 boredom=0.000
+GEN   25 | alive=30/30 | fit=0.6676/0.6587 | pred=0.5468 | INFO=10.4594 | INTRIN=0.482 boredom=0.000
+GEN   30 | alive=30/30 | fit=0.6832/0.6790 | pred=0.4393 | INFO=12.1026 | INTRIN=1.056 boredom=0.000
+GEN   35 | alive=30/30 | fit=0.6539/0.6476 | pred=0.6052 | INFO=11.4748 | INTRIN=0.967 boredom=0.000
+GEN   40 | alive=30/30 | fit=0.7182/0.7039 | pred=0.3459 | INFO=11.9163 | INTRIN=0.705 boredom=0.000
+GEN   45 | alive=30/30 | fit=0.7225/0.7178 | pred=0.2965 | INFO=14.2797 | INTRIN=1.115 boredom=0.000
+GEN   50 | alive=30/30 | fit=0.6786/0.6730 | pred=0.4655 | INFO=13.0461 | INTRIN=1.023 boredom=0.000
+GEN   55 | alive=30/30 | fit=0.6787/0.6729 | pred=0.4645 | INFO=12.1645 | INTRIN=0.749 boredom=0.000
+GEN   60 | alive=30/30 | fit=0.6826/0.6779 | pred=0.4372 | INFO=14.7499 | INTRIN=1.316 boredom=0.000
+GEN   65 | alive=30/30 | fit=0.7100/0.7021 | pred=0.3465 | INFO=14.8907 | INTRIN=1.072 boredom=0.000
+GEN   70 | alive=30/30 | fit=0.7042/0.6999 | pred=0.3495 | INFO=14.8191 | INTRIN=1.133 boredom=0.000
+GEN   75 | alive=30/30 | fit=0.7066/0.7010 | pred=0.3569 | INFO=13.7204 | INTRIN=0.672 boredom=0.000
+GEN   80 | alive=30/30 | fit=0.7099/0.7000 | pred=0.3586 | INFO=12.1532 | INTRIN=0.521 boredom=0.000
+GEN   85 | alive=30/30 | fit=0.6935/0.6878 | pred=0.3985 | INFO=11.1961 | INTRIN=0.635 boredom=0.000
+GEN   90 | alive=30/30 | fit=0.7053/0.6975 | pred=0.3644 | INFO=13.7614 | INTRIN=0.894 boredom=0.000
+GEN   95 | alive=30/30 | fit=0.6731/0.6643 | pred=0.5124 | INFO=15.8386 | INTRIN=1.421 boredom=0.000
+GEN  100 | alive=30/30 | fit=0.6875/0.6812 | pred=0.4336 | INFO=13.3459 | INTRIN=0.997 boredom=0.000
+GEN  105 | alive=30/30 | fit=0.6919/0.6840 | pred=0.4206 | INFO=12.5220 | INTRIN=0.767 boredom=0.000
+GEN  110 | alive=30/30 | fit=0.7117/0.7030 | pred=0.3442 | INFO=12.7081 | INTRIN=0.862 boredom=0.000
+GEN  115 | alive=30/30 | fit=0.6944/0.6833 | pred=0.4171 | INFO=15.8423 | INTRIN=0.989 boredom=0.000
+GEN  120 | alive=30/30 | fit=0.6886/0.6832 | pred=0.4257 | INFO=13.8775 | INTRIN=1.110 boredom=0.000
+GEN  125 | alive=30/30 | fit=0.6660/0.6553 | pred=0.5668 | INFO=8.9870 | INTRIN=0.436 boredom=0.000
+GEN  130 | alive=30/30 | fit=0.6995/0.6932 | pred=0.3756 | INFO=15.9094 | INTRIN=1.190 boredom=0.000
+GEN  135 | alive=30/30 | fit=0.6796/0.6716 | pred=0.4674 | INFO=15.6738 | INTRIN=1.270 boredom=0.000
+GEN  140 | alive=30/30 | fit=0.7210/0.7133 | pred=0.3147 | INFO=16.1574 | INTRIN=1.167 boredom=0.000
+GEN  145 | alive=30/30 | fit=0.6835/0.6776 | pred=0.4473 | INFO=11.4732 | INTRIN=0.664 boredom=0.000
+GEN  150 | alive=30/30 | fit=0.7010/0.6960 | pred=0.3644 | INFO=13.2173 | INTRIN=0.876 boredom=0.000
+GEN  155 | alive=30/30 | fit=0.6802/0.6747 | pred=0.4639 | INFO=13.8145 | INTRIN=1.133 boredom=0.000
+GEN  160 | alive=30/30 | fit=0.7007/0.6926 | pred=0.3929 | INFO=11.8743 | INTRIN=0.848 boredom=0.000
+GEN  165 | alive=30/30 | fit=0.6885/0.6824 | pred=0.4263 | INFO=13.0166 | INTRIN=0.710 boredom=0.000
+GEN  170 | alive=30/30 | fit=0.6868/0.6807 | pred=0.4353 | INFO=11.1892 | INTRIN=0.569 boredom=0.000
+GEN  175 | alive=30/30 | fit=0.6596/0.6547 | pred=0.5558 | INFO=8.1813 | INTRIN=0.484 boredom=0.000
+GEN  180 | alive=30/30 | fit=0.6813/0.6723 | pred=0.4700 | INFO=8.9557 | INTRIN=0.520 boredom=0.000
+GEN  185 | alive=30/30 | fit=0.6900/0.6851 | pred=0.4187 | INFO=12.9066 | INTRIN=1.003 boredom=0.000
+GEN  190 | alive=30/30 | fit=0.6777/0.6697 | pred=0.4943 | INFO=12.3093 | INTRIN=1.018 boredom=0.000
+GEN  195 | alive=30/30 | fit=0.6656/0.6607 | pred=0.5246 | INFO=12.4289 | INTRIN=1.108 boredom=0.000
+
+保存到 evolution_log_v12.json

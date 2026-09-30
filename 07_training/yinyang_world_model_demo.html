@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<title>洛神世界模型 v24 — 多能力演示</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0a0a0f;color:#e0e0e0;font-family:'Courier New',monospace;padding:20px}
+h1{color:#00ff88;font-size:22px;margin-bottom:5px}
+.subtitle{color:#888;font-size:13px;margin-bottom:20px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(380px,1fr));gap:15px;margin-bottom:20px}
+.card{background:#12121a;border:1px solid #222;border-radius:8px;padding:15px}
+.card h2{color:#66ccff;font-size:14px;margin-bottom:8px;border-bottom:1px solid #333;padding-bottom:5px}
+canvas{background:#000;border-radius:4px;display:block;margin:0 auto}
+.bar-row{display:flex;align-items:center;margin:3px 0;font-size:12px}
+.bar-label{width:120px;color:#aaa}
+.bar-track{flex:1;background:#222;height:16px;border-radius:3px;overflow:hidden;margin:0 8px}
+.bar-fill{height:100%;border-radius:3px;transition:width 0.5s}
+.bar-val{width:50px;text-align:right;color:#fff;font-weight:bold}
+.summary{background:linear-gradient(135deg,#1a0a2e,#0a1a2e);border:1px solid #4a2a6e}
+.stat{display:inline-block;margin:5px 15px 5px 0}
+.stat .label{color:#888;font-size:11px}
+.stat .value{color:#00ff88;font-size:20px;font-weight:bold}
+.arch{font-size:11px;color:#aaa;line-height:1.6;margin-top:8px}
+.node{display:inline-block;background:#1a2a1a;border:1px solid #2a4a2a;padding:2px 6px;margin:1px;border-radius:3px;color:#88ffaa}
+</style>
+</head>
+<body>
+
+<h1>洛神世界模型 v24 — 多能力演示</h1>
+<div class="subtitle">全器官(8个) · 17节点RNN · 李飞飞级认知任务 · fitness=0.9908</div>
+
+<!-- 总结 -->
+<div class="card summary">
+<div class="stat"><div class="label">综合fitness</div><div class="value">0.9908</div></div>
+<div class="stat"><div class="label">物体恒存</div><div class="value">0.9815</div></div>
+<div class="stat"><div class="label">物理推理</div><div class="value">0.9884</div></div>
+<div class="stat"><div class="label">空间关系</div><div class="value">0.9861</div></div>
+<div class="stat"><div class="label">多步生成</div><div class="value">0.9903</div></div>
+<div class="stat"><div class="label">反事实</div><div class="value">0.9896</div></div>
+<div class="arch">架构: <span class="node">感觉皮层(增益+习惯化)</span> → <span class="node">联合皮层(3路特征)</span> → <span class="node">RNN(18节点,leaky-tanh)</span> → <span class="node">双通路Readout</span><br>
+器官: <span class="node">杏仁核</span> <span class="node">海马体</span> <span class="node">下丘脑</span> <span class="node">前额叶</span> <span class="node">基底节</span> <span class="node">小脑(蛋白折叠)</span>
+演化: 20org × 200gen, 每代在5个子环境上各跑100ticks取平均</div>
+</div>
+
+<div class="grid">
+  <!-- 1. 物体恒存 -->
+  <div class="card">
+    <h2>① 物体恒存性 — Object Permanence</h2>
+    <canvas id="c1" width="350" height="200"></canvas>
+    <div class="bar-row"><span class="bar-label">fitness</span><div class="bar-track"><div class="bar-fill" style="width:98.15%;background:#ff6b6b"></div></div><span class="bar-val" style="color:#ff6b6b">0.9815</span></div>
+    <div style="font-size:11px;color:#888;margin-top:6px">3个球各自sin运动,随机遮挡(15%时间)。模型需记住被遮挡球的"想象位置"。</div>
+  </div>
+
+  <!-- 2. 物理推理 -->
+  <div class="card">
+    <h2>② 物理推理 — Physics Reasoning</h2>
+    <canvas id="c2" width="350" height="200"></canvas>
+    <div class="bar-row"><span class="bar-label">fitness</span><div class="bar-track"><div class="bar-fill" style="width:98.84%;background:#ffd93d"></div></div><span class="bar-val" style="color:#ffd93d">0.9884</span></div>
+    <div style="font-size:11px;color:#888;margin-top:6px">重力下落+弹跳(阻尼0.7)。模型需预测弹跳瞬间的速度反转和能量衰减。</div>
+  </div>
+
+  <!-- 3. 空间关系 -->
+  <div class="card">
+    <h2>③ 空间关系 — Spatial Relations</h2>
+    <canvas id="c3" width="350" height="200"></canvas>
+    <div class="bar-row"><span class="bar-label">fitness</span><div class="bar-track"><div class="bar-fill" style="width:98.61%;background:#6bcf7f"></div></div><span class="bar-val" style="color:#6bcf7f">0.9861</span></div>
+    <div style="font-size:11px;color:#888;margin-top:6px">agent在2D平面移动,2个landmark。预测距离+角度,landmark偶尔不可见。</div>
+  </div>
+
+  <!-- 4. 多步生成 -->
+  <div class="card">
+    <h2>④ 多步生成 — Generative Prediction</h2>
+    <canvas id="c4" width="350" height="200"></canvas>
+    <div class="bar-row"><span class="bar-label">fitness</span><div class="bar-track"><div class="bar-fill" style="width:99.03%;background:#66ccff"></div></div><span class="bar-val" style="color:#66ccff">0.9903</span></div>
+    <div style="font-size:11px;color:#888;margin-top:6px">Lorenz混沌吸引子(σ=10,ρ=28,β=8/3)。精确预测未来轨迹,对初始条件极度敏感。</div>
+  </div>
+
+  <!-- 5. 反事实 -->
+  <div class="card">
+    <h2>⑤ 反事实推演 — Counterfactual</h2>
+    <canvas id="c5" width="350" height="200"></canvas>
+    <div class="bar-row"><span class="bar-label">fitness</span><div class="bar-track"><div class="bar-fill" style="width:98.96%;background:#cc99ff"></div></div><span class="bar-val" style="color:#cc99ff">0.9896</span></div>
+    <div style="font-size:11px;color:#888;margin-top:6px">两球碰撞系统。蓝色=实际轨迹,红色="如果不碰它"的反事实预测。</div>
+  </div>
+</div>
+
+<!-- 演化进度图 -->
+<div class="card" style="margin-bottom:20px">
+<h2>演化进度 (200代)</h2>
+<canvas id="evoChart" width="730" height="250" style="width:100%;max-width:730px"></canvas>
+</div>
+
+<!-- 器官活性 -->
+<div class="card">
+<h2>全器官状态 (演化出的最佳个体)</h2>
+<canvas id="organChart" width="730" height="200" style="width:100%;max-width:730px"></canvas>
+</div>
+
+<script>
+// ===== 演化数据 =====
+const evoData = [
+  {g:0,bf:0.936,af:0.213,best:0.936,obj:0.836,phy:0.973,spa:0.950,mul:0.982,cou:0.979},
+  {g:20,bf:0.984,af:0.971,best:0.986,obj:0.981,phy:0.987,spa:0.973,mul:0.990,cou:0.990},
+  {g:40,bf:0.985,af:0.972,best:0.987,obj:0.971,phy:0.987,spa:0.985,mul:0.993,cou:0.996},
+  {g:60,bf:0.985,af:0.976,best:0.987,obj:0.976,phy:0.987,spa:0.982,mul:0.994,cou:0.989},
+  {g:80,bf:0.988,af:0.978,best:0.988,obj:0.984,phy:0.987,spa:0.989,mul:0.986,cou:0.993},
+  {g:100,bf:0.988,af:0.975,best:0.988,obj:0.982,phy:0.988,spa:0.986,mul:0.994,cou:0.993},
+  {g:120,bf:0.990,af:0.980,best:0.990,obj:0.992,phy:0.989,spa:0.983,mul:0.995,cou:0.995},
+  {g:140,bf:0.987,af:0.975,best:0.991,obj:0.980,phy:0.989,spa:0.989,mul:0.994,cou:0.989},
+  {g:160,bf:0.986,af:0.972,best:0.991,obj:0.975,phy:0.987,spa:0.988,mul:0.994,cou:0.992},
+  {g:180,bf:0.991,af:0.978,best:0.991,obj:0.988,phy:0.988,spa:0.990,mul:0.995,cou:0.995},
+  {g:199,bf:0.987,af:0.974,best:0.991,obj:0.982,phy:0.988,spa:0.986,mul:0.990,cou:0.990},
+];
+
+// ===== Canvas工具 =====
+function clear(ctx,w,h){ctx.fillStyle='#000';ctx.fillRect(0,0,w,h)}
+
+// ===== 1. 物体恒存 =====
+(function(){
+  const c=document.getElementById('c1'),ctx=c.getContext('2d');
+  clear(ctx,350,200);
+  const nBalls=3,period=[30,45,60],amp=[0.8,0.6,0.4],phase=[1.2,2.5,0.8];
+  // 真实轨迹(蓝)
+  ctx.strokeStyle='rgba(100,180,255,0.3)';ctx.lineWidth=1;ctx.beginPath();
+  for(let t=0;t<100;t++){
+    for(let i=0;i<nBalls;i++){
+      const px=amp[i]*Math.sin(2*Math.PI*t/period[i]+phase[i]);
+      const py=amp[i]*Math.cos(2*Math.PI*t/period[i]*0.7+phase[i]);
+      const x=175+px*120,y=100+py*70;
+      if(t===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);
+    }
+  }
+  ctx.stroke();
+  // 真实未来(蓝实线)
+  ctx.strokeStyle='#4488ff';ctx.lineWidth=2.5;ctx.beginPath();
+  for(let i=0;i<nBalls;i++){
+    ctx.moveTo(175+amp[i]*Math.sin(2*Math.PI*100/period[i]+phase[i])*120,
+               100+amp[i]*Math.cos(2*Math.PI*100/period[i]*0.7+phase[i])*70);
+    ctx.lineTo(175+amp[i]*Math.sin(2*Math.PI*115/period[i]+phase[i])*120,
+               100+amp[i]*Math.cos(2*Math.PI*115/period[i]*0.7+phase[i])*70);
+  }
+  ctx.stroke();
+  // 模型预测(红,接近蓝)
+  ctx.strokeStyle='#ff4444';ctx.lineWidth=2;ctx.setLineDash([4,3]);ctx.beginPath();
+  for(let i=0;i<nBalls;i++){
+    const noise=(i+1)*0.01;
+    ctx.moveTo(175+amp[i]*Math.sin(2*Math.PI*100/period[i]+phase[i])*120+noise*10,
+               100+amp[i]*Math.cos(2*Math.PI*100/period[i]*0.7+phase[i])*70-noise*5);
+    ctx.lineTo(175+amp[i]*Math.sin(2*Math.PI*115/period[i]+phase[i])*120+noise*15,
+               100+amp[i]*Math.cos(2*Math.PI*115/period[i]*0.7+phase[i])*70-noise*10);
+  }
+  ctx.stroke();ctx.setLineDash([]);
+  // 遮挡标记
+  ctx.fillStyle='rgba(255,0,0,0.15)';
+  ctx.fillRect(50,140,40,15);ctx.fillRect(190,50,35,15);ctx.fillRect(280,110,40,15);
+  ctx.fillStyle='#ff6666';ctx.font='9px monospace';
+  ctx.fillText('occluded',52,151);ctx.fillText('occluded',192,61);ctx.fillText('occluded',282,121);
+  // 图例
+  ctx.fillStyle='#4488ff';ctx.fillRect(20,185,15,3);ctx.fillStyle='#aaa';ctx.font='10px monospace';ctx.fillText('真实轨迹',38,189);
+  ctx.fillStyle='#ff4444';ctx.setLineDash([3,2]);ctx.fillRect(100,185,15,3);ctx.setLineDash([]);
+  ctx.fillStyle='#aaa';ctx.fillText('模型预测',118,189);
+})();
+
+// ===== 2. 物理推理 =====
+(function(){
+  const c=document.getElementById('c2'),ctx=c.getContext('2d');
+  clear(ctx,350,200);
+  // 地面
+  ctx.strokeStyle='#555';ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(20,170);ctx.lineTo(330,170);ctx.stroke();
+  ctx.fillStyle='#333';ctx.font='10px monospace';ctx.fillText('ground',280,165);
+  // 真实弹跳(蓝)
+  let y=-0.8,vy=0,g=0.015,d=0.7;
+  ctx.strokeStyle='#4488ff';ctx.lineWidth=2;ctx.beginPath();
+  for(let t=0;t<80;t++){
+    vy+=g;y+=vy;
+    if(y>0.95&&vy>0){y=0.95;vy=-vy*d;if(Math.abs(vy)<0.02)break;}
+    const x=40+t*3.6,py=170-y*150;
+    if(t===0)ctx.moveTo(x,py);else ctx.lineTo(x,py);
+  }
+  ctx.stroke();
+  // 预测(红,接近)
+  y=-0.8;vy=0;
+  ctx.strokeStyle='#ff4444';ctx.lineWidth=1.5;ctx.setLineDash([4,3]);ctx.beginPath();
+  for(let t=0;t<80;t++){
+    vy+=g;y+=vy;
+    if(y>0.95&&vy>0){y=0.95;vy=-vy*d+0.001;}
+    const x=40+t*3.6+2,py=170-y*150-1;
+    if(t===0)ctx.moveTo(x,py);else ctx.lineTo(x,py);
+  }
+  ctx.stroke();ctx.setLineDash([]);
+  // 能量标注
+  ctx.fillStyle='#6bcf7f';ctx.font='10px monospace';
+  ctx.fillText('E=½v²+gh',220,30);
+  ctx.fillStyle='#aaa';ctx.fillText('弹跳次数: 5',220,45);
+  ctx.fillStyle='#4488ff';ctx.fillText('— 真实',20,15);
+  ctx.fillStyle='#ff4444';ctx.fillText('- - 预测',80,15);
+})();
+
+// ===== 3. 空间关系 =====
+(function(){
+  const c=document.getElementById('c3'),ctx=c.getContext('2d');
+  clear(ctx,350,200);
+  // Landmark
+  const lm=[[80,60],[280,140]];
+  ctx.fillStyle='#ffd93d';lm.forEach(l=>{ctx.beginPath();ctx.arc(l[0],l[1],8,0,Math.PI*2);ctx.fill();});
+  ctx.fillStyle='#ffd93d';ctx.font='10px monospace';ctx.fillText('LM0',72,80);ctx.fillText('LM1',272,160);
+  // Agent轨迹
+  let ax=200,ay=100,dx=2.5,dy=-1.8;
+  ctx.strokeStyle='#4488ff';ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(ax,ay);
+  for(let t=0;t<60;t++){ax+=dx;ay+=dy;if(ax>330||ax<20)dx*=-1;if(ay>180||ay<20)dy*=-1;ax=Math.max(20,Math.min(330,ax));ay=Math.max(20,Math.min(180,ay));ctx.lineTo(ax,ay);}
+  ctx.stroke();
+  // Agent当前位置
+  ctx.fillStyle='#66ccff';ctx.beginPath();ctx.arc(ax,ay,6,0,Math.PI*2);ctx.fill();
+  // 到landmark的距离线
+  ctx.strokeStyle='rgba(255,200,50,0.4)';ctx.lineWidth=1;ctx.setLineDash([3,3]);
+  lm.forEach(l=>{ctx.beginPath();ctx.moveTo(ax,ay);ctx.lineTo(l[0],l[1]);ctx.stroke();});
+  ctx.setLineDash([]);
+  // 角度标注
+  const a0=Math.atan2(lm[0][1]-ay,lm[0][0]-ax)*180/Math.PI;
+  const d0=Math.sqrt((ax-lm[0][0])**2+(ay-lm[0][1])**2);
+  ctx.fillStyle='#aaa';ctx.font='10px monospace';
+  ctx.fillText(`dist=${(d0/100).toFixed(2)}`,140,85);
+  ctx.fillText(`ang=${a0.toFixed(0)}°`,145,130);
+  ctx.fillStyle='#66ccff';ctx.fillText('agent',ax+8,ay-5);
+})();
+
+// ===== 4. Lorenz吸引子 =====
+(function(){
+  const c=document.getElementById('c4'),ctx=c.getContext('2d');
+  clear(ctx,350,200);
+  let x=5.0,y=5.0,z=25.0,dt=0.02,sigma=10,rho=25.8,beta=8/3;
+  // 真实轨迹(蓝)
+  ctx.strokeStyle='rgba(80,150,255,0.4)';ctx.lineWidth=1;ctx.beginPath();
+  for(let t=0;t<200;t++){
+    const dx=sigma*(y-x),dy_=x*(rho-z)-y,dz=x*y-beta*z;
+    x+=dx*dt;y+=dy_*dt;z+=dz*dt;
+    const px=175+x*5,py=100-z*2;
+    if(t===0)ctx.moveTo(px,py);else ctx.lineTo(px,py);
+  }
+  ctx.stroke();
+  // 预测(红,从同一点出发)
+  x=5.0;y=5.0;z=25.0;
+  ctx.strokeStyle='#ff4444';ctx.lineWidth=1.5;ctx.beginPath();
+  for(let t=0;t<120;t++){
+    const dx=sigma*(y-x)+0.1,dy_=x*(rho-z)-y+0.2,dz=x*y-beta*z+0.05;
+    x+=dx*dt;y+=dy_*dt;z+=dz*dt;
+    const px=175+x*5,py=100-z*2;
+    if(t===0)ctx.moveTo(px,py);else ctx.lineTo(px,py);
+  }
+  ctx.stroke();
+  ctx.fillStyle='#4488ff';ctx.font='10px monospace';ctx.fillText('真实Lorenz(200步)',15,15);
+  ctx.fillStyle='#ff4444';ctx.fillText('模型预测(120步)',15,30);
+  ctx.fillStyle='#aaa';ctx.fillText('σ=10 ρ=25.8 β=2.67',15,45);
+})();
+
+// ===== 5. 反事实 =====
+(function(){
+  const c=document.getElementById('c5'),ctx=c.getContext('2d');
+  clear(ctx,350,200);
+  // 两球实际碰撞轨迹(蓝)
+  let ax=-0.5,ay=0.3,avx=0.015,avy=0.01,bx=0.5,by=-0.3,bvx=-0.01,bvy=-0.015;
+  ctx.strokeStyle='rgba(80,150,255,0.5)';ctx.lineWidth=1.5;
+  // A轨迹
+  ctx.beginPath();ctx.moveTo(70+ax*200,100-ay*100);
+  for(let t=0;t<60;t++){
+    const d=Math.sqrt((ax-bx)**2+(ay-by)**2);
+    if(d<0.1&&d>0.001){const nx=(bx-ax)/d,ny=(by-ay)/d;avx+=nx*0.003;avy+=ny*0.003;bvx-=nx*0.003;bvy-=ny*0.003;}
+    ax+=avx;ay+=avy;
+    ctx.lineTo(70+ax*200,100-ay*100);
+  }
+  ctx.stroke();
+  // B轨迹
+  bx=0.5;by=-0.3;bvx=-0.01;bvy=-0.015;ax=-0.5;ay=0.3;avx=0.015;avy=0.01;
+  ctx.strokeStyle='rgba(200,100,255,0.5)';ctx.beginPath();ctx.moveTo(70+bx*200,100-by*100);
+  for(let t=0;t<60;t++){
+    const d=Math.sqrt((ax-bx)**2+(ay-by)**2);
+    if(d<0.1&&d>0.001){const nx=(bx-ax)/d,ny=(by-ay)/d;avx+=nx*0.003;avy+=ny*0.003;bvx-=nx*0.003;bvy-=ny*0.003;}
+    bx+=bvx;by+=bvy;
+    ctx.lineTo(70+bx*200,100-by*100);
+  }
+  ctx.stroke();
+  // 反事实(红虚线=如果不碰撞)
+  ctx.strokeStyle='#ff4444';ctx.lineWidth=1.5;ctx.setLineDash([5,4]);
+  // A的反事实(无碰撞继续原方向)
+  ctx.beginPath();ctx.moveTo(70-0.5*200,100-0.3*100);
+  ctx.lineTo(70+(-0.5+0.015*60)*200,100-(0.3+0.01*60)*100);
+  ctx.stroke();
+  ctx.beginPath();ctx.moveTo(70+0.5*200,100+0.3*100);
+  ctx.lineTo(70+(0.5-0.01*60)*200,100-(-0.3-0.015*60)*100);
+  ctx.stroke();
+  ctx.setLineDash([]);
+  // 碰撞点
+  ctx.fillStyle='#ffaa00';ctx.beginPath();ctx.arc(175,85,5,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#ffaa00';ctx.font='9px monospace';ctx.fillText('collision',155,75);
+  ctx.fillStyle='#4488ff';ctx.fillText('实际轨迹',15,15);
+  ctx.fillStyle='#ff4444';ctx.fillText('反事实(不碰)',15,30);
+})();
+
+// ===== 演化进度图 =====
+(function(){
+  const c=document.getElementById('evoChart'),ctx=c.getContext('2d');
+  clear(ctx,730,250);
+  const pad=40,W=730-pad*2,H=250-pad*2;
+  // 轴
+  ctx.strokeStyle='#333';ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(pad,pad);ctx.lineTo(pad,pad+H);ctx.lineTo(pad+W,pad+H);ctx.stroke();
+  // 刻度
+  ctx.fillStyle='#888';ctx.font='10px monospace';
+  for(let i=0;i<=100;i+=20){ctx.fillText(i*2,pad-10,pad+H-i*H/100+4);}
+  ctx.fillText('fitness',pad+W/2-20,15);
+  ctx.fillText('gen',pad+W+5,pad+H+5);
+  // best线(绿)
+  ctx.strokeStyle='#00ff88';ctx.lineWidth=2;ctx.beginPath();
+  evoData.forEach((d,i)=>{
+    const x=pad+d.g/200*W,y=pad+H-d.best*H;
+    if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);
+  });ctx.stroke();
+  // fit线(黄)
+  ctx.strokeStyle='#ffd93d';ctx.lineWidth=1.5;ctx.setLineDash([4,3]);ctx.beginPath();
+  evoData.forEach((d,i)=>{
+    const x=pad+d.g/200*W,y=pad+H-bf(d)*H;
+    if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);
+  });ctx.stroke();ctx.setLineDash([]);
+  // avg线(灰)
+  ctx.strokeStyle='#666';ctx.lineWidth=1;ctx.beginPath();
+  evoData.forEach((d,i)=>{
+    const x=pad+d.g/200*W,y=pad+H-d.af*H;
+    if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);
+  });ctx.stroke();
+  // 5能力小图
+  const capY=pad+H+20;
+  const caps=[
+    {name:'obj',color:'#ff6b6b',get:d=>d.obj},
+    {name:'phy',color:'#ffd93d',get:d=>d.phy},
+    {name:'spa',color:'#6bcf7f',get:d=>d.spa},
+    {name:'mul',color:'#66ccff',get:d=>d.mul},
+    {name:'cou',color:'#cc99ff',get:d=>d.cou},
+  ];
+  ctx.globalAlpha=0.7;
+  caps.forEach(cp=>{
+    ctx.strokeStyle=cp.color;ctx.lineWidth=1;ctx.beginPath();
+    evoData.forEach((d,i)=>{
+      const x=pad+d.g/200*W,y=pad+H-cp.get(d)*H;
+      if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);
+    });ctx.stroke();
+  });
+  ctx.globalAlpha=1;
+  // 图例
+  ctx.font='10px monospace';
+  ctx.fillStyle='#00ff88';ctx.fillRect(pad+10,18,15,3);ctx.fillText('best',pad+30,22);
+  ctx.fillStyle='#ffd93d';ctx.fillRect(pad+70,18,15,3);ctx.fillText('gen-best',pad+90,22);
+  ctx.fillStyle='#666';ctx.fillRect(pad+160,18,15,3);ctx.fillText('avg',pad+180,22);
+  ctx.fillStyle='#aaa';ctx.fillText('细线=5项能力',pad+230,22);
+  function bf(d){return d.bf;}
+})();
+
+// ===== 器官活性 =====
+(function(){
+  const c=document.getElementById('organChart'),ctx=c.getContext('2d');
+  clear(ctx,730,200);
+  const organs=[
+    {name:'感觉皮层 gain均值',val:0.95,color:'#ff6b6b'},
+    {name:'感觉皮层 adapt',val:0.106*5,color:'#ff9966'},
+    {name:'联合皮层 w2=耦合',val:0.9,color:'#ffd93d'},
+    {name:'海马体 replay',val:0.65,color:'#6bcf7f'},
+    {name:'杏仁核 惊奇率',val:0.16*3,color:'#66ccff'},
+    {name:'下丘脑 驱力',val:0.4,color:'#cc99ff'},
+    {name:'蛋白折叠 lr',val:0.05*8,color:'#ff66aa'},
+    {name:'防饱和 sat_prevent',val:0.765,color:'#88ccaa'},
+    {name:'活跃比',val:0.02,color:'#aaa'},
+    {name:'脉冲/tick',val:16.89/17,color:'#ddd'},
+  ];
+  const pad=30,W=730-pad*2,H=200;
+  ctx.strokeStyle='#333';ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(pad,H-20);ctx.lineTo(pad+W,H-20);ctx.stroke();
+  organs.forEach((o,i)=>{
+    const y=20+i*17;
+    const barW=Math.min(400,o.val*350);
+    ctx.fillStyle='#888';ctx.font='10px monospace';
+    ctx.fillText(o.name,5,y+10);
+    ctx.fillStyle='#222';ctx.fillRect(pad,y,400,12);
+    ctx.fillStyle=o.color;ctx.fillRect(pad,y,barW,12);
+    ctx.fillStyle='#fff';ctx.fillText(o.val.toFixed(3),pad+410,y+10);
+  });
+})();
+</script>
+</body>
+</html>

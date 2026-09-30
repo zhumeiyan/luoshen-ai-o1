@@ -1,0 +1,561 @@
+{
+  "id": "2026-09-18T00-59-41-dense_library",
+  "ts": "2026-09-18T00:59:41",
+  "source": "dense_library_test.py",
+  "title": "库加密测试 (V/A 独立种子, 不标对错, 只摆原始值)",
+  "mark": "[待核]",
+  "config": {
+    "library_size": 20,
+    "prefix_len": 2,
+    "noise_levels": [
+      0.0,
+      0.05,
+      0.15,
+      0.3
+    ],
+    "n_trials": 10,
+    "N_frames": 12,
+    "offsets": [
+      18,
+      22,
+      26,
+      30,
+      34,
+      38,
+      42,
+      46
+    ],
+    "vis_amp": 6000,
+    "aud_amp": 2800,
+    "seed_v_formula": "trial*2+1000",
+    "seed_a_formula": "trial*2+2000"
+  },
+  "raw_diffs": [
+    [
+      "seed_intersection",
+      {
+        "v_only_first3": [
+          1000,
+          1002,
+          1004
+        ],
+        "a_only_first3": [
+          2000,
+          2002,
+          2004
+        ],
+        "both_count": 0
+      }
+    ]
+  ],
+  "results": [
+    {
+      "noise": 0.0,
+      "total": 10,
+      "trials": [
+        {
+          "trial": 0,
+          "noise": 0.0,
+          "seed_v": 1000,
+          "seed_a": 2000,
+          "target": "thin_to_off18",
+          "v_name": "thin_to_off18",
+          "v_dist": 0.0,
+          "a_name": "thin_to_off18",
+          "a_dist": 0.0,
+          "mark": "[待核]"
+        },
+        {
+          "trial": 1,
+          "noise": 0.0,
+          "seed_v": 1002,
+          "seed_a": 2002,
+          "target": "thin_to_off22",
+          "v_name": "thin_to_off22",
+          "v_dist": 0.0,
+          "a_name": "thin_to_off22",
+          "a_dist": 0.0,
+          "mark": "[待核]"
+        },
+        {
+          "trial": 2,
+          "noise": 0.0,
+          "seed_v": 1004,
+          "seed_a": 2004,
+          "target": "thin_to_off26",
+          "v_name": "thin_to_off26",
+          "v_dist": 0.0,
+          "a_name": "thin_to_off26",
+          "a_dist": 0.0,
+          "mark": "[待核]"
+        },
+        {
+          "trial": 3,
+          "noise": 0.0,
+          "seed_v": 1006,
+          "seed_a": 2006,
+          "target": "thin_to_off30",
+          "v_name": "thin_to_off30",
+          "v_dist": 0.0,
+          "a_name": "thin_to_off30",
+          "a_dist": 0.0,
+          "mark": "[待核]"
+        },
+        {
+          "trial": 4,
+          "noise": 0.0,
+          "seed_v": 1008,
+          "seed_a": 2008,
+          "target": "thin_to_off34",
+          "v_name": "thin_to_off34",
+          "v_dist": 0.0,
+          "a_name": "thin_to_off34",
+          "a_dist": 0.0,
+          "mark": "[待核]"
+        },
+        {
+          "trial": 5,
+          "noise": 0.0,
+          "seed_v": 1010,
+          "seed_a": 2010,
+          "target": "thin_to_off38",
+          "v_name": "thin_to_off38",
+          "v_dist": 0.0,
+          "a_name": "thin_to_off38",
+          "a_dist": 0.0,
+          "mark": "[待核]"
+        },
+        {
+          "trial": 6,
+          "noise": 0.0,
+          "seed_v": 1012,
+          "seed_a": 2012,
+          "target": "thin_to_off42",
+          "v_name": "thin_to_off42",
+          "v_dist": 0.0,
+          "a_name": "thin_to_off42",
+          "a_dist": 0.0,
+          "mark": "[待核]"
+        },
+        {
+          "trial": 7,
+          "noise": 0.0,
+          "seed_v": 1014,
+          "seed_a": 2014,
+          "target": "thin_to_off46",
+          "v_name": "thin_to_off46",
+          "v_dist": 0.0,
+          "a_name": "thin_to_off46",
+          "a_dist": 0.0,
+          "mark": "[待核]"
+        },
+        {
+          "trial": 8,
+          "noise": 0.0,
+          "seed_v": 1016,
+          "seed_a": 2016,
+          "target": "off18_to_double",
+          "v_name": "off18_to_double",
+          "v_dist": 0.0,
+          "a_name": "off18_to_double",
+          "a_dist": 0.0,
+          "mark": "[待核]"
+        },
+        {
+          "trial": 9,
+          "noise": 0.0,
+          "seed_v": 1018,
+          "seed_a": 2018,
+          "target": "off22_to_double",
+          "v_name": "off22_to_double",
+          "v_dist": 0.0,
+          "a_name": "off22_to_double",
+          "a_dist": 0.0,
+          "mark": "[待核]"
+        }
+      ],
+      "mark": "[待核]"
+    },
+    {
+      "noise": 0.05,
+      "total": 10,
+      "trials": [
+        {
+          "trial": 0,
+          "noise": 0.05,
+          "seed_v": 1000,
+          "seed_a": 2000,
+          "target": "thin_to_off18",
+          "v_name": "thin_to_off18",
+          "v_dist": 0.089577,
+          "a_name": "thin_to_off18",
+          "a_dist": 0.025891,
+          "mark": "[待核]"
+        },
+        {
+          "trial": 1,
+          "noise": 0.05,
+          "seed_v": 1002,
+          "seed_a": 2002,
+          "target": "thin_to_off22",
+          "v_name": "thin_to_off22",
+          "v_dist": 0.109718,
+          "a_name": "off30_to_double",
+          "a_dist": 0.026214,
+          "mark": "[待核]"
+        },
+        {
+          "trial": 2,
+          "noise": 0.05,
+          "seed_v": 1004,
+          "seed_a": 2004,
+          "target": "thin_to_off26",
+          "v_name": "thin_to_off26",
+          "v_dist": 0.086318,
+          "a_name": "off34_to_double",
+          "a_dist": 0.024775,
+          "mark": "[待核]"
+        },
+        {
+          "trial": 3,
+          "noise": 0.05,
+          "seed_v": 1006,
+          "seed_a": 2006,
+          "target": "thin_to_off30",
+          "v_name": "thin_to_off34",
+          "v_dist": 0.096756,
+          "a_name": "off30_to_double",
+          "a_dist": 0.024131,
+          "mark": "[待核]"
+        },
+        {
+          "trial": 4,
+          "noise": 0.05,
+          "seed_v": 1008,
+          "seed_a": 2008,
+          "target": "thin_to_off34",
+          "v_name": "thin_to_off38",
+          "v_dist": 0.105102,
+          "a_name": "off34_to_double",
+          "a_dist": 0.022874,
+          "mark": "[待核]"
+        },
+        {
+          "trial": 5,
+          "noise": 0.05,
+          "seed_v": 1010,
+          "seed_a": 2010,
+          "target": "thin_to_off38",
+          "v_name": "thin_to_off38",
+          "v_dist": 0.075924,
+          "a_name": "off26_to_double",
+          "a_dist": 0.028143,
+          "mark": "[待核]"
+        },
+        {
+          "trial": 6,
+          "noise": 0.05,
+          "seed_v": 1012,
+          "seed_a": 2012,
+          "target": "thin_to_off42",
+          "v_name": "thin_to_off42",
+          "v_dist": 0.099958,
+          "a_name": "thin_to_off46",
+          "a_dist": 0.028636,
+          "mark": "[待核]"
+        },
+        {
+          "trial": 7,
+          "noise": 0.05,
+          "seed_v": 1014,
+          "seed_a": 2014,
+          "target": "thin_to_off46",
+          "v_name": "thin_to_off46",
+          "v_dist": 0.105005,
+          "a_name": "off26_to_double",
+          "a_dist": 0.025018,
+          "mark": "[待核]"
+        },
+        {
+          "trial": 8,
+          "noise": 0.05,
+          "seed_v": 1016,
+          "seed_a": 2016,
+          "target": "off18_to_double",
+          "v_name": "off18_to_double",
+          "v_dist": 0.107094,
+          "a_name": "off22_to_double",
+          "a_dist": 0.02058,
+          "mark": "[待核]"
+        },
+        {
+          "trial": 9,
+          "noise": 0.05,
+          "seed_v": 1018,
+          "seed_a": 2018,
+          "target": "off22_to_double",
+          "v_name": "off22_to_double",
+          "v_dist": 0.099633,
+          "a_name": "off26_to_double",
+          "a_dist": 0.027043,
+          "mark": "[待核]"
+        }
+      ],
+      "mark": "[待核]"
+    },
+    {
+      "noise": 0.15,
+      "total": 10,
+      "trials": [
+        {
+          "trial": 0,
+          "noise": 0.15,
+          "seed_v": 1000,
+          "seed_a": 2000,
+          "target": "thin_to_off18",
+          "v_name": "thin_to_off18",
+          "v_dist": 0.273336,
+          "a_name": "off26_to_double",
+          "a_dist": 0.076523,
+          "mark": "[待核]"
+        },
+        {
+          "trial": 1,
+          "noise": 0.15,
+          "seed_v": 1002,
+          "seed_a": 2002,
+          "target": "thin_to_off22",
+          "v_name": "classic_wide_to_double",
+          "v_dist": 0.321392,
+          "a_name": "off26_to_double",
+          "a_dist": 0.077831,
+          "mark": "[待核]"
+        },
+        {
+          "trial": 2,
+          "noise": 0.15,
+          "seed_v": 1004,
+          "seed_a": 2004,
+          "target": "thin_to_off26",
+          "v_name": "thin_to_off26",
+          "v_dist": 0.254073,
+          "a_name": "off42_to_double",
+          "a_dist": 0.073047,
+          "mark": "[待核]"
+        },
+        {
+          "trial": 3,
+          "noise": 0.15,
+          "seed_v": 1006,
+          "seed_a": 2006,
+          "target": "thin_to_off30",
+          "v_name": "thin_to_off38",
+          "v_dist": 0.290316,
+          "a_name": "off30_to_double",
+          "a_dist": 0.072817,
+          "mark": "[待核]"
+        },
+        {
+          "trial": 4,
+          "noise": 0.15,
+          "seed_v": 1008,
+          "seed_a": 2008,
+          "target": "thin_to_off34",
+          "v_name": "thin_to_off42",
+          "v_dist": 0.308841,
+          "a_name": "off42_to_double",
+          "a_dist": 0.068809,
+          "mark": "[待核]"
+        },
+        {
+          "trial": 5,
+          "noise": 0.15,
+          "seed_v": 1010,
+          "seed_a": 2010,
+          "target": "thin_to_off38",
+          "v_name": "thin_to_off30",
+          "v_dist": 0.215259,
+          "a_name": "off18_to_double",
+          "a_dist": 0.082641,
+          "mark": "[待核]"
+        },
+        {
+          "trial": 6,
+          "noise": 0.15,
+          "seed_v": 1012,
+          "seed_a": 2012,
+          "target": "thin_to_off42",
+          "v_name": "thin_to_off42",
+          "v_dist": 0.287738,
+          "a_name": "off34_to_double",
+          "a_dist": 0.086101,
+          "mark": "[待核]"
+        },
+        {
+          "trial": 7,
+          "noise": 0.15,
+          "seed_v": 1014,
+          "seed_a": 2014,
+          "target": "thin_to_off46",
+          "v_name": "thin_to_off46",
+          "v_dist": 0.313093,
+          "a_name": "off18_to_double",
+          "a_dist": 0.074993,
+          "mark": "[待核]"
+        },
+        {
+          "trial": 8,
+          "noise": 0.15,
+          "seed_v": 1016,
+          "seed_a": 2016,
+          "target": "off18_to_double",
+          "v_name": "off18_to_double",
+          "v_dist": 0.323574,
+          "a_name": "off26_to_double",
+          "a_dist": 0.06186,
+          "mark": "[待核]"
+        },
+        {
+          "trial": 9,
+          "noise": 0.15,
+          "seed_v": 1018,
+          "seed_a": 2018,
+          "target": "off22_to_double",
+          "v_name": "off22_to_double",
+          "v_dist": 0.306001,
+          "a_name": "off30_to_double",
+          "a_dist": 0.079836,
+          "mark": "[待核]"
+        }
+      ],
+      "mark": "[待核]"
+    },
+    {
+      "noise": 0.3,
+      "total": 10,
+      "trials": [
+        {
+          "trial": 0,
+          "noise": 0.3,
+          "seed_v": 1000,
+          "seed_a": 2000,
+          "target": "thin_to_off18",
+          "v_name": "classic_wide_to_double",
+          "v_dist": 0.548154,
+          "a_name": "off26_to_double",
+          "a_dist": 0.149685,
+          "mark": "[待核]"
+        },
+        {
+          "trial": 1,
+          "noise": 0.3,
+          "seed_v": 1002,
+          "seed_a": 2002,
+          "target": "thin_to_off22",
+          "v_name": "classic_wide_to_double",
+          "v_dist": 0.646852,
+          "a_name": "off26_to_double",
+          "a_dist": 0.152102,
+          "mark": "[待核]"
+        },
+        {
+          "trial": 2,
+          "noise": 0.3,
+          "seed_v": 1004,
+          "seed_a": 2004,
+          "target": "thin_to_off26",
+          "v_name": "thin_to_off26",
+          "v_dist": 0.489723,
+          "a_name": "off46_to_double",
+          "a_dist": 0.145609,
+          "mark": "[待核]"
+        },
+        {
+          "trial": 3,
+          "noise": 0.3,
+          "seed_v": 1006,
+          "seed_a": 2006,
+          "target": "thin_to_off30",
+          "v_name": "off34_to_double",
+          "v_dist": 0.571812,
+          "a_name": "off30_to_double",
+          "a_dist": 0.14573,
+          "mark": "[待核]"
+        },
+        {
+          "trial": 4,
+          "noise": 0.3,
+          "seed_v": 1008,
+          "seed_a": 2008,
+          "target": "thin_to_off34",
+          "v_name": "thin_to_off46",
+          "v_dist": 0.623212,
+          "a_name": "off46_to_double",
+          "a_dist": 0.140475,
+          "mark": "[待核]"
+        },
+        {
+          "trial": 5,
+          "noise": 0.3,
+          "seed_v": 1010,
+          "seed_a": 2010,
+          "target": "thin_to_off38",
+          "v_name": "thin_to_off30",
+          "v_dist": 0.411242,
+          "a_name": "off18_to_double",
+          "a_dist": 0.163321,
+          "mark": "[待核]"
+        },
+        {
+          "trial": 6,
+          "noise": 0.3,
+          "seed_v": 1012,
+          "seed_a": 2012,
+          "target": "thin_to_off42",
+          "v_name": "thin_to_off42",
+          "v_dist": 0.537364,
+          "a_name": "off42_to_double",
+          "a_dist": 0.172939,
+          "mark": "[待核]"
+        },
+        {
+          "trial": 7,
+          "noise": 0.3,
+          "seed_v": 1014,
+          "seed_a": 2014,
+          "target": "thin_to_off46",
+          "v_name": "thin_to_off46",
+          "v_dist": 0.611952,
+          "a_name": "off18_to_double",
+          "a_dist": 0.152661,
+          "mark": "[待核]"
+        },
+        {
+          "trial": 8,
+          "noise": 0.3,
+          "seed_v": 1016,
+          "seed_a": 2016,
+          "target": "off18_to_double",
+          "v_name": "off18_to_double",
+          "v_dist": 0.643224,
+          "a_name": "thin_to_off46",
+          "a_dist": 0.12481,
+          "mark": "[待核]"
+        },
+        {
+          "trial": 9,
+          "noise": 0.3,
+          "seed_v": 1018,
+          "seed_a": 2018,
+          "target": "off22_to_double",
+          "v_name": "off22_to_double",
+          "v_dist": 0.625324,
+          "a_name": "off34_to_double",
+          "a_dist": 0.157141,
+          "mark": "[待核]"
+        }
+      ],
+      "mark": "[待核]"
+    }
+  ]
+}

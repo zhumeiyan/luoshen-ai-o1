@@ -1,0 +1,11 @@
+{
+  "id": "20260917-163104-644",
+  "ts": "2026-09-17T16:31:04",
+  "user": "_selftest_13",
+  "source": "test_eval2",
+  "content": "月球表面有水",
+  "status": "[待确认]",
+  "eval_at": "2026-09-17T16:31:04",
+  "eval_result": "无反例",
+  "counterexamples": []
+}

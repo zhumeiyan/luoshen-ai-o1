@@ -1,0 +1,32 @@
+07:33:20 - LiteLLM:WARNING: get_model_cost_map.py:454 - LiteLLM: Failed to fetch remote model cost map from https://raw.githubusercontent.com/BerriAI/litellm/main/model_prices_and_context_window.json: The read operation timed out. Falling back to local backup.
+[PATCH] ray.init: retry wrapper (7 attempts + cleanup + wait=180s)
+[PATCH] LLMClient noretry patch failed: AGENTSOCIETY_LLM_API_KEY is required. Please set this environment variable before running AgentSociety2.
+======================================================================
+v21_fullorg — 20org x 300gen x 350ticks
+器官: 感觉皮层+联合皮层+海马体+杏仁核+前额叶+基底节+下丘脑+小脑
+======================================================================
+Gen    0    1.6s fit=0.0007/0.0001 best=0.0007 n=18 hip=0.0033 amy=0.071
+Gen   25   34.5s fit=0.6956/0.3546 best=0.9258 n=18 hip=0.0042 amy=0.150
+Gen   50   67.3s fit=0.9004/0.5664 best=0.9391 n=18 hip=0.0005 amy=0.197
+Gen   75   99.5s fit=0.8927/0.7637 best=0.9944 n=18 hip=0.0194 amy=0.279
+Gen  100  131.9s fit=0.8737/0.6989 best=0.9944 n=18 hip=0.0194 amy=0.279
+Gen  125  164.2s fit=0.8554/0.6753 best=0.9944 n=18 hip=0.0194 amy=0.279
+Gen  150  196.8s fit=0.8928/0.6021 best=0.9944 n=18 hip=0.0194 amy=0.279
+Gen  175  229.7s fit=0.9207/0.5925 best=0.9944 n=18 hip=0.0194 amy=0.279
+Gen  200  262.3s fit=0.8950/0.7265 best=0.9944 n=18 hip=0.0194 amy=0.279
+Gen  225  294.9s fit=0.8585/0.6932 best=0.9944 n=18 hip=0.0194 amy=0.279
+Gen  250  327.8s fit=0.9374/0.7824 best=0.9944 n=18 hip=0.0194 amy=0.279
+Gen  275  360.6s fit=0.8706/0.5678 best=0.9944 n=18 hip=0.0194 amy=0.279
+Gen  299  392.0s fit=0.7699/0.3260 best=0.9944 n=18 hip=0.0194 amy=0.279
+
+最终: 0.9944  (v20b基线: 0.9445)
+>>> v21 > v20b — 器官参数带来增益!
+结构: n=18 lr=0.0200 fold=0.0050
+感觉: gain=['1.81', '0.79', '0.68', '0.70', '1.67', '0.61', '1.07', '1.05'] adapt=0.106
+联合: w=['0.54', '1.02', '1.35'] thr=0.291
+海马: lr=0.0194 replay_n=1
+杏仁: thr=0.2786
+前额: thr=0.0786 lr=0.0834
+基节: explore=0.0236
+下丘: drive=['0.12', '0.38', '0.27', '0.51']
+小脑: fold_threshold=0.0525

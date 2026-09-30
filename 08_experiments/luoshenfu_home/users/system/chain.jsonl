@@ -1,0 +1,1 @@
+{"seq": 0, "ts": "2026-09-17T11:42:50", "type": "self_check", "trigger": "system", "payload": {"result": "OK", "n_passed": 27}, "prev": "GENESIS", "hash": "5cb83e26591c31a6f7202cb70f0e312de324d2d00edddd71ef615ff0d55269fb"}

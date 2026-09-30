@@ -1,0 +1,24 @@
+[PATCH] ray.init: retry wrapper (7 attempts + cleanup + wait=180s)
+[PATCH] LLMClient noretry patch failed: AGENTSOCIETY_LLM_API_KEY is required. Please set this environment variable before running AgentSociety2.
+v20b — 加密演化: 25org x 800gen x 350ticks, n=12-40, leaky-tanh, low mutate=0.03
+Gen    0    2.3s fit=0.0005/0.0001 best=0.0005 n=14 leak=0.0271
+Gen   50   81.7s fit=0.8261/0.2273 best=0.8770 n=18 leak=0.0242
+Gen  100  159.3s fit=0.1065/0.0182 best=0.8770 n=18 leak=0.0242
+Gen  150  236.5s fit=0.7220/0.4233 best=0.8770 n=18 leak=0.0242
+Gen  200  313.9s fit=0.8196/0.5912 best=0.8770 n=18 leak=0.0242
+Gen  250  391.1s fit=0.8320/0.6890 best=0.8965 n=18 leak=0.0133
+Gen  300  468.2s fit=0.8811/0.6815 best=0.9080 n=18 leak=0.0139
+Gen  350  545.7s fit=0.8755/0.7498 best=0.9184 n=18 leak=0.0135
+Gen  400  622.9s fit=0.8748/0.7726 best=0.9278 n=18 leak=0.0135
+Gen  450  699.8s fit=0.8845/0.7522 best=0.9278 n=18 leak=0.0135
+Gen  500  776.7s fit=0.8752/0.7649 best=0.9278 n=18 leak=0.0135
+Gen  550  853.7s fit=0.8832/0.7567 best=0.9445 n=18 leak=0.0093
+Gen  600  931.0s fit=0.8607/0.7002 best=0.9445 n=18 leak=0.0093
+Gen  650 1008.3s fit=0.8595/0.7446 best=0.9445 n=18 leak=0.0093
+Gen  700 1085.5s fit=0.8924/0.7903 best=0.9445 n=18 leak=0.0093
+Gen  750 1162.9s fit=0.8674/0.7302 best=0.9445 n=18 leak=0.0093
+Gen  799 1239.0s fit=0.8899/0.7605 best=0.9445 n=18 leak=0.0093
+
+最终: 0.9445  (v17o: 0.9361)
+>>> 突破!
+n=18 lr=0.0200 fold=0.0092

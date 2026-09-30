@@ -1,0 +1,771 @@
+================================================================
+核对第一批 · 第三节 / 第六节 / 第九节
+================================================================
+生成: 2026-09-19
+
+================================================================
+第三节 · 全部痕
+================================================================
+
+共 16 个痕文件。
+
+────────────────────────────────────────
+痕 1: body_trace.jsonl
+────────────────────────────────────────
+路径:     /mnt/data/catpaw/home/workspace/洛神赋1.1/body_trace.jsonl
+行数:     260 行
+大小:     214582 字节
+改期:     2026-09-19 20:27
+
+头行原文（第 1 行，一字不改）:
+{"ts": 1789730689.032649, "wall_clock_utc": "2026-09-18T11:24:49.032649+00:00", "wall_clock_local": "2026-09-18T19:24:49.032649", "tick_count": 1, "cost_ms": 0.1, "dt_min": 1.0, "real_hour": 19.41, "age_y": 0.5000019, "stage": "survival(0-1)", "sel": "thermal", "served": true, "inputs_consumed": 0, "state": {"thermal": 310.15207, "glucose": 4.995, "social": 0.7996, "exploration": 0.59999, "sexual": 0.5}, "env": {"luminance": 40, "sound": 50, "force": 10, "temperature": 294}, "ref": {"thermal": 8.0, "glucose": 0.0, "social": 0.0, "exploration": 0.0, "sexual": 0.0}, "hormones": {"cortisol": 4.23, "melatonin": 13.88, "growth_hormone": 10.61}, "voice_aperture": 0.0016, "frustration_pool": 0.0, "served_total": {"thermal": 1}}
+
+末行原文（第 260 行，一字不改）:
+{"ts": 1789820860.8440273, "tick_count": 60, "环境": {"ch_01": 50.0, "ch_02": 45.0, "ch_03": 10.0, "ch_04": 295.0, "_狗_ch_02": 16.560000000000002, "_狗_ch_01": 12.88}, "环境输入": [0.098, 0.4, 0.3, 0.4666666666666667], "激活": [0.044413876823885555, 0.09805686086290871, -0.10940527780073656, -0.062244930151188586, 0.03403464096005793, 0.0295164876497926, -0.2036869298939246, -0.14206290896812018, -0.20368538506498576, -0.03622276177981104, -0.0024494195194103502, 0.10503993314675089, 0.054233471251174906, 0.11471703436789299, -0.07082182068701533, 0.08317544539213458, 0.06320425380700986, -0.16981282597833375, 0.11787151288546764, 0.05491735274059995, 0.014994674700342664, 0.09810887059789207, -0.0692650192304724, 0.2013029975154109], "物理": [21.28542977424694, 0.2779173792558032, 9, 2.204920222597788]}
+
+字段结构:
+  第 1-10 行 schema A: ts, wall_clock_utc, wall_clock_local, tick_count, cost_ms, dt_min, real_hour, age_y, stage, sel, served, inputs_consumed, state{thermal,glucose,social,exploration,sexual}, env{luminance,sound,force,temperature,_human_social_activity}, ref{thermal,glucose,social,exploration,sexual}, hormones{cortisol,melatonin,growth_hormone}, voice_aperture, frustration_pool, served_total{thermal,social,exploration,sexual}
+  第 11-260 行 schema B: ts, tick_count, 环境{ch_01,ch_02,ch_03,ch_04,_狗_ch_02,_狗_ch_01}, 环境输入[4], 激活[24], 物理[4]
+
+写者:
+  第 1-10 行: 守护进程.py (旧 daemon, 2026-09-18 19:24~19:29)
+  第 11-260 行: 身体稳态.py:120-122
+            with open(痕文件, "a", encoding="utf-8") as 文件:
+            文件.write(json.dumps(记录, ensure_ascii=False) + "\n")
+
+活/死: 活（最近一次落盘 2026-09-19 20:27）
+
+────────────────────────────────────────
+痕 2: body_state.json
+────────────────────────────────────────
+路径:     /mnt/data/catpaw/home/workspace/洛神赋1.1/body_state.json
+行数:     56
+大小:     1385 字节
+改期:     2026-09-18 19:29
+
+头行原文:
+{
+  "version": 1,
+  "meta": {
+
+末行（末 5 行附近）原文:
+    "_social_heat": 0.23324336752734373,
+    "_boredom": 0.14690281153919557
+  }
+}
+
+字段结构:
+  version, meta{real_ticks, tick_count, ...}, body{...}
+
+写者:     守护进程.py (旧 daemon, 推断, 与 body_trace.jsonl 第 1-10 行同引擎)
+           守护进程.py:28 定义 "快照路径 = 目录 / '身体快照.json'"
+           实际文件名 body_state.json 与代码中的 '身体快照.json' 名不一致(推断改期时被外部写入)
+
+活/死: 死（末次 2026-09-18 19:29, 距今超 24h 未覆写）
+
+────────────────────────────────────────
+痕 3: coupled_loop_trace.jsonl
+────────────────────────────────────────
+路径:     /mnt/data/catpaw/home/workspace/洛神赋1.1/coupled_loop_trace.jsonl
+行数:     101
+大小:     12462 字节
+改期:     2026-09-18 08:25
+
+头行原文:
+{"step": 0, "i": 0, "m": 0.5845, "a": 0.0039, "delta_m": -0.1161, "delta_a": 0.1161, "ext_m": 0.5845, "ext_a": 0.0039}
+
+末行原文:
+{"step": 50000, "i": 48, "m": 0.6646, "a": 0.3912, "delta_m": 0, "delta_a": 0, "ext_m": 0.4674, "ext_a": 0.006, "_final": true}
+
+字段结构:
+  step, i, m, a, delta_m, delta_a, ext_m, ext_a, (_final: true only on last row)
+
+写者:     coupled_loop.py:204-205
+
+活/死: 死（2026-09-18 08:25, 一次性产出）
+
+────────────────────────────────────────
+痕 4: state_stream.tsv
+────────────────────────────────────────
+路径:     /mnt/data/catpaw/home/workspace/洛神赋1.1/state_stream.tsv
+行数:     43201
+大小:     3954281 字节
+改期:     2026-09-18 18:11
+
+头行原文:
+gt	day	tick_in_day	sel	drv_thermal	drv_exploration	drv_social	drv_glucose	drv_sexual	voice_aperture	social_heat	ref_social	wants_speak	actually_spoke	env_human_act	env_dog_sound	env_dog_force	env_dog_luminance
+
+末行原文:
+43199	29	1439	-	-1.000	0.000	0.000	-1.000	-1.000	0.0000	0.526	54.0	0	0	0.663	16.6	3.2	12.9
+
+字段结构:
+  gt, day, tick_in_day, sel, drv_thermal, drv_exploration, drv_social, drv_glucose, drv_sexual, voice_aperture, social_heat, ref_social, wants_speak, actually_spoke, env_human_act, env_dog_sound, env_dog_force, env_dog_luminance
+  (共 18 列)
+
+写者:     长跑模拟.py:63-203 (路径为 "状态流.tsv" 但落盘到 /mnt/.../state_stream.tsv; 见下 Lines 67/203)
+           注: 长跑模拟.py 同时产出 状态流.tsv (中文路径), 此处 state_stream.tsv 为落盘实际文件名
+
+活/死: 死（2026-09-18 18:11, 一次性产出 30 天长跑）
+
+────────────────────────────────────────
+痕 5: frustration_trace.tsv
+────────────────────────────────────────
+路径:     /mnt/data/catpaw/home/workspace/洛神赋1.1/frustration_trace.tsv
+行数:     30
+大小:     1044 字节
+改期:     2026-09-18 18:11
+
+头行原文:
+day	want_sum	spoke_sum	frustration	pressure	cumulative_frustration
+
+末行原文:
+28	320	25	38.5889	55.000	1113.3284
+
+字段结构:
+  day, want_sum, spoke_sum, frustration, pressure, cumulative_frustration
+  (共 6 列)
+
+写者:     长跑模拟.py:117-123 (落盘到 "未遂痕.tsv", 实际文件为 frustration_trace.tsv)
+
+活/死: 死（2026-09-18 18:11, 与 state_stream 同次运行产出）
+
+────────────────────────────────────────
+痕 6: presence_trace.tsv
+────────────────────────────────────────
+路径:     /mnt/data/catpaw/home/workspace/洛神赋1.1/presence_trace.tsv
+行数:     1001
+大小:     194160 字节
+改期:     2026-09-19 04:17
+
+头行原文:
+round	tick_abs	phase_idx	phase	who_intensity	elapsed_min	age_y	_social_heat	_boredom	voice_aperture	sel_need	sel_drive	state_thermal	state_glucose	state_social	state_exploration	state_sexual	horm_cortisol	horm_melatonin	horm_growth_hormone	env_luminance	env_sound	env_force	env_temperature	ref_thermal	ref_glucose	ref_social	ref_exploration	ref_sexual	driv_thermal	driv_glucose	driv_social	driv_exploration	driv_sexual	served_thermal	served_glucose	served_social	served_exploration	served_sexual
+
+末行原文:
+4	999	4	nobody	0.0	1010.0	0.50001901	0.00067	0.0	0.0	social	0.0	310.20495	8.0	1.0	0.99353	0.99703	14.7611	14.5945	2.1141	40	80.0	50.0	294	0.03	120.0	11.0	-0.73	-0.76	-1	-1	0.0	0.0	0.0	94	6	17	1	1
+
+字段结构:
+  round, tick_abs, phase_idx, phase, who_intensity, elapsed_min, age_y, _social_heat, _boredom, voice_aperture, sel_need, sel_drive, state_thermal, state_glucose, state_social, state_exploration, state_sexual, horm_cortisol, horm_melatonin, horm_growth_hormone, env_luminance, env_sound, env_force, env_temperature, ref_thermal, ref_glucose, ref_social, ref_exploration, ref_sexual, driv_thermal, driv_glucose, driv_social, driv_exploration, driv_sexual, served_thermal, served_glucose, served_social, served_exploration, served_sexual
+  (共 39 列)
+
+写者:     test_presence.py:137-140
+
+活/死: 死（2026-09-19 04:17, 一次性产出）
+
+────────────────────────────────────────
+痕 7: presence_summary.tsv
+────────────────────────────────────────
+路径:     /mnt/data/catpaw/home/workspace/洛神赋1.1/presence_summary.tsv
+行数:     51 (含头)
+大小:     2225 字节
+改期:     2026-09-19 04:17
+
+头行原文:
+field	nobody_min	nobody_max	nobody_mean	nobody_range	author_min	author_max	author_mean	author_range	stranger_min	stranger_max	stranger_mean	stranger_range
+
+末行原文:
+driv_sexual	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0
+
+字段结构:
+  field, nobody_min, nobody_max, nobody_mean, nobody_range, author_min, author_max, author_mean, author_range, stranger_min, stranger_max, stranger_mean, stranger_range
+  (共 12 列)
+
+写者:     test_presence.py:169-172
+
+活/死: 死（2026-09-19 04:17, 一次性产出）
+
+────────────────────────────────────────
+痕 8: spike_source_trace.tsv
+────────────────────────────────────────
+路径:     /mnt/data/catpaw/home/workspace/洛神赋1.1/spike_source_trace.tsv
+行数:     961
+大小:     121669 字节
+改期:     2026-09-19 05:59
+
+头行原文:
+mode	who	round	tick	heat_at_leave	heat	sel_need	sel_drive	served	voice	ref_thermal	ref_glucose	ref_social	ref_exploration	ref_sexual	state_thermal	state_glucose	state_social	state_exploration	state_sexual
+
+末行原文:
+no_social_serve	stranger	1	79	0.29756	1e-06	social	0.0	skipped	1e-06	7.0	119.0	-0.79	-0.76	11.21	310.1617	7.255	0.98	0.9996	1.0
+
+字段结构:
+  mode, who, round, tick, heat_at_leave, heat, sel_need, sel_drive, served, voice, ref_thermal, ref_glucose, ref_social, ref_exploration, ref_sexual, state_thermal, state_glucose, state_social, state_exploration, state_sexual
+  (共 19 列)
+
+写者:     test_spike_source.py:94-97
+
+活/死: 死（2026-09-19 05:59, 一次性产出）
+
+────────────────────────────────────────
+痕 9: heat_decay_trace.tsv
+────────────────────────────────────────
+路径:     /mnt/data/catpaw/home/workspace/洛神赋1.1/heat_decay_trace.tsv
+行数:     481
+大小:     16635 字节
+改期:     2026-09-19 06:11
+
+头行原文:
+mode	round	who	tick	heat_at_leave	heat
+
+末行原文:
+full	2	stranger	39	0.29036	0.000436
+
+字段结构:
+  mode, round, who, tick, heat_at_leave, heat
+  (共 6 列)
+
+写者:     test_heat_decay.py:77-80
+
+活/死: 死（2026-09-19 06:11, 一次性产出）
+
+────────────────────────────────────────
+痕 10: heat_decay_summary.tsv
+────────────────────────────────────────
+路径:     /mnt/data/catpaw/home/workspace/洛神赋1.1/heat_decay_summary.tsv
+行数:     81
+大小:     4176 字节
+改期:     2026-09-19 05:47
+
+头行原文:
+who_left	decay_tick	n	heat_mean	heat_min	heat_max	ratio_mean	voice_max
+
+末行原文:
+stranger	39	4	0.016883	0.000484	0.037991	0.05699	0.0
+
+字段结构:
+  who_left, decay_tick, n, heat_mean, heat_min, heat_max, ratio_mean, voice_max
+  (共 8 列)
+
+写者:     test_heat_decay.py:82+ (summary 段)
+
+活/死: 死（2026-09-19 05:47, 一次性产出）
+
+────────────────────────────────────────
+痕 11: face_recognition_report.tsv
+────────────────────────────────────────
+路径:     /mnt/data/catpaw/home/workspace/洛神赋1.1/face_recognition_report.tsv
+行数:     2
+大小:     176 字节
+改期:     2026-09-18 19:58
+
+头行原文:
+round	mean_sim_to_author	std_sim	s12	s13	s23	s_base_diff	base_social_heat	final_social_heat	n_frames	n_repeats
+
+末行原文:
+all	0.0047	0.0000	0.9991	0.9991	1.0000	0.9987	0.1685	0.0131	58	3
+
+字段结构:
+  round, mean_sim_to_author, std_sim, s12, s13, s23, s_base_diff, base_social_heat, final_social_heat, n_frames, n_repeats
+  (共 11 列)
+
+写者:     test_cross_person.py (推断, 仅此产出匹配 schema)
+
+活/死: 死（2026-09-18 19:58, 一次性产出）
+
+────────────────────────────────────────
+痕 12: body_input_queue.tsv
+────────────────────────────────────────
+路径:     /mnt/data/catpaw/home/workspace/洛神赋1.1/body_input_queue.tsv
+行数:     1
+大小:     38 字节
+改期:     2026-09-18 19:29
+
+唯一一行原文:
+{"type":"text","content":"hi 洛神"}
+
+字段结构:
+  单行 JSON: type, content
+
+写者:     守护进程.py 配套 (手动/外部填入)
+
+活/死: 死（2026-09-18 19:29, 单条目, 未再更新）
+
+────────────────────────────────────────
+痕 13: body_input_offset.txt
+────────────────────────────────────────
+路径:     /mnt/data/catpaw/home/workspace/洛神赋1.1/body_input_offset.txt
+行数:     1
+大小:     1 字节
+改期:     2026-09-18 19:29
+
+唯一一行原文:
+1
+
+字段结构:
+  单字节整数偏移
+
+写者:     守护进程.py 配套
+
+活/死: 死（2026-09-18 19:29）
+
+────────────────────────────────────────
+痕 14: 状态流.tsv
+────────────────────────────────────────
+路径:     /mnt/data/catpaw/home/workspace/洛神赋1.1/状态流.tsv
+行数:     1441
+大小:     55451 字节
+改期:     2026-09-19 15:35
+
+头行原文:
+滴	天	天内滴	洛神选	刺体温	刺探索	刺社交	刺葡萄糖
+
+末行原文:
+1439	0	1439	-	0.048	0.097	-0.111	-0.064
+
+字段结构:
+  滴, 天, 天内滴, 洛神选, 刺体温, 刺探索, 刺社交, 刺葡萄糖
+  (共 8 列, 中文表头)
+
+写者:     长跑模拟.py:63-72 (流文件路径为 "状态流.tsv")
+
+活/死: 活（2026-09-19 15:35 新近落盘）
+
+────────────────────────────────────────
+痕 15: cycle_dump_1000.txt
+────────────────────────────────────────
+路径:     /mnt/data/catpaw/home/workspace/洛神赋1.1/cycle_dump_1000.txt
+行数:     1000
+大小:     55000 字节
+改期:     2026-09-18 08:59
+
+头行原文:
+cycle    0  m=0.3735636554687307  a=0.1131749993601307
+
+末行原文:
+cycle  999  m=0.3735636554450960  a=0.1131749993364959
+
+字段结构:
+  cycle N, m=f64, a=f64
+
+写者:     cycle_dump.py:14-23
+
+活/死: 死（2026-09-18 08:59, 一次性产出）
+
+────────────────────────────────────────
+痕 16: desire_log.txt
+────────────────────────────────────────
+路径:     /mnt/data/catpaw/home/workspace/洛神赋1.1/desire_log.txt
+行数:     1000
+大小:     104000 字节
+改期:     2026-09-18 09:15
+
+头行原文:
+cycle    0  chose=V1(inverted      )  strength=0.6715089486  m=0.6264363443643300  a=0.8868250004729299
+
+末行原文:
+cycle  999  chose=V2(brightened    )  strength=0.8318042890  m=0.3758543943800849  a=0.0936623049373462
+
+字段结构:
+  cycle N, chose=Vx(...), strength=f64, m=f64, a=f64
+
+写者:     desire_loop.py:83-102
+
+活/死: 死（2026-09-18 09:15, 一次性产出）
+
+（另有 desire_accum2_log.txt 等约 19 个同类文本, 格式同 desire_*.txt 系列, 均由各自 desire_*.py 一次性产出, 此处不逐列。）
+
+
+================================================================
+第六节 · 全部环境键
+================================================================
+
+═══ A. 写环境 ═══
+
+文件: 身体稳态.py
+  行 8:  self.环境 = {"ch_01": 50.0, "ch_02": 45.0, "ch_03": 10.0, "ch_04": 295.0}
+
+文件: 学习者.py
+  行 54: 身子.环境["luminance"] = ...
+  行 58: 身子.环境["sound"] = ...
+  行 62: 身子.环境["force"] = ...
+  行 76: 身子.环境["luminance"] = ...
+  行 84: 身子.环境["sound"] = ...
+  行 92: 身子.环境["force"] = ...
+
+文件: 诊断器.py
+  行 12: 身体实例.环境["luminance"] = 50.0
+  行 14: 身体实例.环境["luminance"] += 150
+  行 15: 身体实例.环境["声响"] = 身体实例.环境.get("声响", 45.0) + 12
+  行 16: 身体实例.环境["力度"] = 身体实例.环境.get("力度", 10.0) + 7
+
+文件: 守护进程.py
+  行 175: 身子.环境["sound"] = min(90.0, 身子.环境.get("sound", 45) + 8)
+  行 179: 身子.环境["force"] = min(60.0, 身子.环境.get("force", 10) + 强)
+  行 183: 身子.环境["sound"] = min(80.0, 身子.环境.get("sound", 45) + 強 * 15)
+  行 184: 身子.环境["force"] = min(50.0, 身子.环境.get("force", 10) + 強 * 5)
+  行 189: 身子.环境[键] = float(值)
+
+文件: 并跑模拟.py
+  行 22: 环境 = {"ch_01": 50.0, "ch_02": 45.0, "ch_03": 10.0, "ch_04": 295.0}
+  行 45: 环境["_狗_ch_02"] = ...
+  行 45: 环境["_狗_ch_01"] = ...
+
+文件: 脸签名.py / 活诊断.py / 狗.py / luoshenfu.py
+  查不到直接 self.环境[...] = ... 赋值（狗.py 不写环境, 仅读）
+
+
+═══ B. 读环境 ═══
+
+文件: 身体稳态.py
+  行 39:  self.环境["ch_01"]
+  行 40:  self.环境["ch_02"]
+  行 41:  self.环境["ch_03"]
+  行 42:  self.环境["ch_04"]
+
+文件: 狗.py
+  行 176: 环境温度 = self.环境.get("温度", 311.65)
+  行 198: 亮度值 = self.环境.get("亮度", 0.0)
+  行 199: 声响值 = self.环境.get("声响", 0.0)
+  行 200: 力度值 = self.环境.get("力度", 0.0)
+  行 241: 人活动 = self.环境.get("_人类社交活动", 0.0)
+
+文件: 守护进程.py
+  行 189: 身子.环境[键] = ... (迭代)
+
+文件: living_homeo.py (真实物理身体模型, 被 import 但未在 6 个主系统直连)
+  (读物理输入 luminance / 声压 dB / 力 kPa / 温度 K)
+
+
+═══ C. 键名跨文件对照表 ═══
+
+键名                   | 谁写                         | 谁读
+-----------------------|------------------------------|---------------------------
+ch_01                  | 身体稳态.py:8, 并跑模拟.py:22 | 身体稳态.py:39
+ch_02                  | 身体稳态.py:8, 并跑模拟.py:22 | 身体稳态.py:40
+ch_03                  | 身体稳态.py:8, 并跑模拟.py:22 | 身体稳态.py:41
+ch_04                  | 身体稳态.py:8, 并跑模拟.py:22 | 身体稳态.py:42
+luminance              | 学习者.py:54/76, 诊断器.py:12 | (无活的身体读取端对应 luminance)
+sound                  | 学习者.py:58/84, 守护进程.py:175/183 | (同上)
+force                  | 学习者.py:62/92, 守护进程.py:179/184 | (同上)
+声响                   | 诊断器.py:15                   | (同上)
+力度                   | 诊断器.py:16                   | (同上)
+温度                   | (无)                         | 狗.py:176
+亮度                   | (无)                         | 狗.py:198
+声响                   | (无)                         | 狗.py:199
+力度                   | (无)                         | 狗.py:200
+_人类社交活动          | (无)                         | 狗.py:241
+_狗_ch_01              | 并跑模拟.py:45               | (无活读)
+_狗_ch_02              | 并跑模拟.py:45               | (无活读)
+_human_social_activity | body_trace.jsonl 旧行(痕)    | (推, 非代码)
+
+物理量对照表 (4 通道):
+  身体稳态.py 名   | 物理含义     | 狗.py 读键   | 学习者.py 写键
+  ch_01           | 亮度/光      | 亮度         | luminance
+  ch_02           | 声响/声      | 声响         | sound
+  ch_03           | 力度/力      | 力度         | force
+  ch_04           | 温度/温      | 温度         | (未出现)
+
+═══ D. 频道名差异 ═══
+
+  学习者.py:36-45: "亮度"(luminance) 对应 "视觉输入"
+  学习者.py:   : "声响"(sound) 对应 "听觉输入"
+  狗.py:75-90:   需求中 ["亮度", "声响"] 是 玩耍/依恋 的关联输入
+  活诊断.py:    用 luminance / 声压 作为外部信号
+
+
+================================================================
+第九节 · 全部矛盾
+================================================================
+（共 23 条。每条只贴事实: 两边各是什么值、在哪一行。）
+
+────────────────────────────────────────────────────────
+事实 1
+────────────────────────────────────────────────────────
+类: 同名键不同写法 — 写方与读方键名不重合
+
+A 端 (身体稳态.py):
+  行 8:  self.环境 = {"ch_01": 50.0, "ch_02": 45.0, "ch_03": 10.0, "ch_04": 295.0}
+  行 39-42 读: self.环境["ch_01"]..["ch_04"]
+
+B 端 (学习者.py):
+  行 54: 身子.环境["luminance"] = ...
+  行 58: 身子.环境["sound"] = ...
+  行 62: 身子.环境["force"] = ...
+
+C 端 (守护进程.py):
+  行 175: 身子.环境["sound"] = ...
+  行 179: 身子.环境["force"] = ...
+
+D 端 (诊断器.py):
+  行 12: 身体实例.环境["luminance"] = ...
+  行 14: 身体实例.环境["luminance"] += 150
+  行 15: 身体实例.环境["声响"] = ...
+  行 16: 身体实例.环境["力度"] = ...
+
+E 端 (狗.py):
+  行 176: self.环境.get("温度", 311.65)
+  行 198: self.环境.get("亮度", 0.0)
+  行 199: self.环境.get("声响", 0.0)
+  行 200: self.环境.get("力度", 0.0)
+  行 241: self.环境.get("_人类社交活动", 0.0)
+
+────────────────────────────────────────────────────────
+事实 2
+────────────────────────────────────────────────────────
+类: 同名键不同写法 — body 初始环境 vs. 狗读环境
+
+A: 身体稳态.py:8 初始 ch_01..ch_04 + 并跑模拟.py:45 写 _狗_ch_02/_狗_ch_01
+B: 狗.py:198-200 读 亮度/声响/力度, 行 176 读 温度, 行 241 读 _人类社交活动
+=> body 不产出这些键; 狗读到的是初始环境 dict 以外的不存在键, 全部回退 default
+
+────────────────────────────────────────────────────────
+事实 3
+────────────────────────────────────────────────────────
+类: 同名实验不同版本产出不同结构
+
+A: body_trace.jsonl 第 1-10 行字段:
+   tick_count, cost_ms, dt_min, real_hour, age_y, stage, sel,
+   served, inputs_consumed, state{5}, env{4or5}, ref{5}, hormones{3},
+   voice_aperture, frustration_pool, served_total{...}
+
+B: body_trace.jsonl 第 11-260 行字段:
+   tick_count, 环境{4or6}, 环境输入[4], 激活[24], 物理[4]
+
+────────────────────────────────────────────────────────
+事实 4
+────────────────────────────────────────────────────────
+类: 同名实验不同版本产出不同结构
+
+A: cycle_dump_1000.txt 字段: cycle N, m, a
+B: desire_log.txt 字段: cycle N, chose=Vx(...), strength, m, a
+
+（同属 desire_*.py 家族, 字段命名和字段数不同）
+
+────────────────────────────────────────────────────────
+事实 5
+────────────────────────────────────────────────────────
+类: 同文件内前后不一致 — 注释 vs. 实际文件名
+
+A: 身体稳态.py 顶部 行 1: """age_homeo.py —— 四个词: ..."""
+B: 文件名: 身体稳态.py
+
+────────────────────────────────────────────────────────
+事实 6
+────────────────────────────────────────────────────────
+类: 同文件内前后不一致 import 路径
+
+A: test_*.py 系列 9+ 个文件 import:
+   from age_homeo import Body, HOMEOSTATIC_NEEDS
+   (test_compress.py:10, test_cross_press.py:17, test_deficit_gate.py:6,
+    test_drift_law.py:8, test_long_behavior.py:17, test_long_run.py:11,
+    test_new7.py:7, test_presence.py:25)
+
+B: workspace 中无 age_homeo.py 文件
+   (存在 身体稳态.py, 其 行8 为 class 身体, 无 HOMEOSTATIC_NEEDS 标记)
+
+────────────────────────────────────────────────────────
+事实 7
+────────────────────────────────────────────────────────
+类: 同文件内前后不一致 import 路径
+
+A: 9 个 desire_*.py + cycle_dump.py 各自 import:
+   from living_diag import extract_anchors, normalize
+   (cycle_dump.py:3, desire_accum.py:16, desire_accum2.py:13,
+    desire_accum3.py:11, desire_add2.py:3, desire_flex.py:14,
+    desire_live.py:17, desire_short.py:11, desire_want.py:17)
+
+B: workspace 中无 living_diag.py 文件
+   (存在 活诊断.py, 其函数名为 提取锚点 / 归一化)
+
+────────────────────────────────────────────────────────
+事实 8
+────────────────────────────────────────────────────────
+类: 同文件内前后不一致 — 身体稳态 接口 vs. 学习者/识脸/守护进程 调用方式
+
+A: 学习者.py:19: from 身体稳态 import 身体
+   行 36-45: 把 luminance/sound/force 写入 身子.环境
+   (身体稳态.Body 不提供这些键)
+
+B: 识脸.py:23: from 身体稳态 import 身体
+   (类似 C 差)
+
+C: 守护进程.py:45: from 身体稳态 import 身体 as 身类
+   注释行 44: "# 注: 当前 身体 架构与守护进程有接口差 — 交叉验证阶段统一"
+
+────────────────────────────────────────────────────────
+事实 9
+────────────────────────────────────────────────────────
+类: 同名键不同写法 — 守护进程 写的键 vs 身子初始环境
+
+A: 守护进程.py:175 写 身子.环境["sound"]
+   (身类.__init__ 行8 初始环境有 ch_01..ch_04, 无 sound 键)
+
+B: 身子初始环境 (身体稳态.py:8): {"ch_01":50, "ch_02":45, "ch_03":10, "ch_04":295}
+
+=> 守护进程 写了一个身子没初始化的 key; 身子推进()时不会读 sound
+
+────────────────────────────────────────────────────────
+事实 10
+────────────────────────────────────────────────────────
+类: 断链/悬空 — 狗的需求(依恋/玩耍)信号通道
+
+A: 狗.py:241: 人活动 = self.环境.get("_人类社交活动", 0.0)
+   (若无此键, 读回 0.0)
+
+B: 身体稳态.py 全程搜索 self.环境["_人类_social_activity"] 或无此赋值
+   (不在 ch_01..ch_04 内)
+
+C: body_trace.jsonl 旧行 tick 2-10 每行 env 有 "_human_social_activity": 1.0
+D: body_trace.jsonl 新行无此键
+
+=> 旧 daemon 曾产出, 新身体稳态 不再产出
+
+────────────────────────────────────────────────────────
+事实 11
+────────────────────────────────────────────────────────
+类: 同名实验不同版本产出不同结构
+
+A: state_stream.tsv 字段 (18 列):
+   gt, day, tick_in_day, sel, drv_*, env_human_act, env_dog_*
+B: 状态流.tsv 字段 (8 列):
+   滴, 天, 天内滴, 洛神选, 刺体温, 刺探索, 刺社交, 刺葡萄糖
+
+(两者同由 长跑模拟.py 产出, 写两次: 行63 状态流.tsv,
+ 行75 未遂痕.tsv (实为 frustration_trace.tsv);
+ 另 state_stream.tsv 为长跑模拟.py 初期版本或第二次运行产物)
+
+────────────────────────────────────────────────────────
+事实 12
+────────────────────────────────────────────────────────
+类: 同文件内前后不一致 — 守护进程 推进vs快照路径
+
+A: 守护进程.py:28: 快照路径 = 目录 / "身体快照.json"
+   (行 6 注释: "身体快照.json")
+
+B: workspace 中实际存在的文件: body_state.json (非 "身体快照.json")
+
+────────────────────────────────────────────────────────
+事实 13
+────────────────────────────────────────────────────────
+类: 时间戳对不上 — 守护进程 改期 vs body_trace 旧行产出
+
+A: 守护进程.py mtime: 2026-09-19 15:37 +08:00
+B: body_trace.jsonl 第 1-10 行 ts: 2026-09-18 11:24~11:29 UTC (19:24~19:29 +08)
+   => 旧行 早 于 当前守护进程.py 改期 超 1 天
+
+────────────────────────────────────────────────────────
+事实 14
+────────────────────────────────────────────────────────
+类: 时间戳对不上 — body_state.json vs 守护进程.py
+
+A: body_state.json mtime: 2026-09-18 19:29
+B: 守护进程.py mtime:      2026-09-19 15:37
+   => body_state.json 早于当前守护进程.py 改期 超 20 小时
+
+────────────────────────────────────────────────────────
+事实 15
+────────────────────────────────────────────────────────
+类: 同文件内前后不一致 — 守护进程.守护() 调用 身类.推进() 无 sel/serve/drive
+
+A: 守护进程.py 注释 行37-43 定义 "活()" 调用 身体.推进()
+   (身子 无推进(社交) 分支)
+
+B: 并跑模拟.py 注释 行14:
+   "双向耦合 (洛神 推进(社交) → _人类社交活动 → 狗 依恋/玩耍 ↑）"
+
+=> 身体稳态.Body.推进() 不接受参数; 无法选择"社交"; 与注释中的 "推进(语义)" 不符
+
+────────────────────────────────────────────────────────
+事实 16
+────────────────────────────────────────────────────────
+类: 同名键不同写法 — 身体熵输出 schema_label
+
+A: 并跑模拟.py 注释 行14 提到 洛神 推进(社交)
+B: 身体稳态.py 无 select/serve/drive 概念
+   (身体熵 由 24 维激活向量表示, 无任何需求名/选择标号)
+
+────────────────────────────────────────────────────────
+事实 17
+────────────────────────────────────────────────────────
+类: 断链/悬空 — 并跑模拟 三组对照 前向=双向
+
+A: 并跑模拟.py 行 71-73: 对照组 / 前向/ 双向, 各 180 滴答
+   ∩ 前向=双向差异=0
+
+B: 原因: 身体稳态.py 不产出 _人类社交活动; 狗._人类耦合() 读 0.0
+   => 无论是否"双向", 读到的永远是 0 => 前向与双向产出相同
+
+────────────────────────────────────────────────────────
+事实 18
+────────────────────────────────────────────────────────
+类: 同名键不同写法 — 脸签名.py 函数 与 识脸.py 使用方式
+
+A: 脸签名.py:104 脸部视觉签名(视觉矩阵) 返回 6 向量
+   脸签名.py:165 脸部听觉签名(听觉矩阵) 返回 7 向量
+   脸签名.py:200 全签名(帧) 返回 13 向量
+
+B: 识脸.py:24-27 从 脸签名 import: aud_grid, full_signature, face_visual_signature, face_auditory_signature, signature_similarity
+   (使用路径与函数名一致, 接口匹配)
+
+C: 学习者.py:19-20 接 身体稳态.身体 + 年龄门禁
+   (与 脸签名/diag_face.py 产生接口交叉)
+
+(注: 脸签名/识脸 与 身体稳态 之间的对接层
+   body稳态只提供 身体.推进()/身体.连接()/身体.日志/身体.激活/身体.环境;
+   不提供 select/serve/drive/ref/hormones/voice_aperture;
+   与 body_trace.jsonl 旧 schema 不兼容)
+
+────────────────────────────────────────────────────────
+事实 19
+────────────────────────────────────────────────────────
+类: 同文件内前后不一致 — test_long_run.py 倒入路径
+
+A: test_long_run.py:11: from age_homeo import Body, HOMEOSTATIC_NEEDS
+B: workspace 中无 age_homeo.py
+C: test_long_run.py mtime: 2026-09-19 07:13
+
+=> 无法 import (运行时 ModuleNotFoundError)
+
+────────────────────────────────────────────────────────
+事实 20
+────────────────────────────────────────────────────────
+类: 断链/悬空 — LuoshenfuHome vs 新身体系统
+
+A: luoshenfu_home/users/*/chain.jsonl (相当数量, 目录 _align_a/_align_v/_align_t/ 等)
+   由 luoshenfu.py 的 LuoshenfuHome/Chain 引擎落盘
+   schema: {"type":"trace"/"translate"/"step", ...} 多样化
+
+B: 身体稳态.py 系统 (学习者/守护/狗/并跑/长读/识脸) 直接 import 身体稳态.py
+   完全不引用 luoshenfu_home/users/*/chain.jsonl
+
+=> 两套用户链数据存储系统独立, 互相不引用, schema 形态差距大
+
+────────────────────────────────────────────────────────
+事实 21
+────────────────────────────────────────────────────────
+类: 同名键不同写法 — 身体稳态 头注释 vs 学习者/守护写键
+
+A: 身体稳态.py 头注释: """age_homeo.py —— ..."""
+B: 身体稳态.py 行 73: with open(痕文件, "a", ...) as 文件: 文件.write(...)
+C: 身体稳态.py 实际落盘实际路径: body_trace.jsonl
+D: 学习者.py 身子.环境["sound"] / ["force"] / ["luminance"]
+=> 身体稳态头部文章由 age_homeo 时代遗留; 身体稳态 新引擎写/body_trace.jsonl 与 学习者/守护 写键 不一致
+
+────────────────────────────────────────────────────────
+事实 22
+────────────────────────────────────────────────────────
+类: 时间戳对不上 — body_trace.jsonl 末行 vs 身体稳态.py 改期
+
+A: body_trace.jsonl mtime: 2026-09-19 20:27:40
+B: 身体稳态.py mtime:    2026-09-19 20:20:37
+   差: 7 分 03 秒
+
+=> body_trace.jsonl 的最后三次落盘(至第 260 行) 起始于身体稳态.py 改期之后 7 分钟内
+
+────────────────────────────────────────────────────────
+事实 23
+────────────────────────────────────────────────────────
+类: 同名实验不同版本 — state_stream.tsv vs 状态流.tsv
+
+A: state_stream.tsv: mtime 2026-09-18 18:11, 43201 行 (30 天)
+   env_human_act 值 末行 0.663, env_dog_luminance 末行 12.9
+
+B: 状态流.tsv:    mtime 2026-09-19 15:35, 1441 行 (1 天)
+   洛神选 末行 "-", 刺社交 末行 -0.111
+
+=> 长跑模拟.py 两次运行, 第一次跑 30 天 写 state_stream.tsv,
+  第二次跑 1 天 写 状态流.tsv, 字段名与列数完全不同 (中英两套表头)
+
+
+================================================================
+END
+================================================================

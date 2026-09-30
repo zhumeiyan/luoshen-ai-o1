@@ -1,0 +1,21 @@
+[PATCH] ray.init: retry wrapper (7 attempts + cleanup + wait=180s)
+[PATCH] LLMClient noretry patch failed: AGENTSOCIETY_LLM_API_KEY is required. Please set this environment variable before running AgentSociety2.
+======================================================================
+v22_counter — 正推: 修复饱和+适应上限+ch3加强+区域专用
+======================================================================
+Gen    0    2.0s bf=0.0008 af=0.0002 best=0.0008 n=33 sat_p=0.890 adapt_c=0.88 ch3=1.87 hip=0.0065
+Gen   25   62.9s bf=0.8323 af=0.6055 best=0.8323 n=33 sat_p=0.807 adapt_c=0.60 ch3=2.01 hip=0.0074
+Gen   50  124.9s bf=0.8850 af=0.6427 best=0.9192 n=33 sat_p=0.837 adapt_c=0.58 ch3=2.16 hip=0.0024
+Gen   75  188.3s bf=0.8990 af=0.7544 best=0.9568 n=33 sat_p=0.804 adapt_c=0.66 ch3=1.63 hip=0.0008
+Gen  100  250.5s bf=0.9020 af=0.7536 best=0.9568 n=33 sat_p=0.804 adapt_c=0.66 ch3=1.63 hip=0.0008
+Gen  125  312.8s bf=0.8990 af=0.6335 best=0.9588 n=33 sat_p=0.792 adapt_c=0.68 ch3=1.58 hip=0.0028
+Gen  150  374.5s bf=0.9088 af=0.5505 best=0.9675 n=33 sat_p=0.780 adapt_c=0.56 ch3=1.00 hip=0.0178
+Gen  175  436.5s bf=0.9209 af=0.8620 best=0.9753 n=33 sat_p=0.750 adapt_c=0.50 ch3=1.27 hip=0.0079
+Gen  200  498.3s bf=0.9495 af=0.7443 best=0.9788 n=33 sat_p=0.700 adapt_c=0.78 ch3=1.28 hip=0.0215
+Gen  225  560.2s bf=0.9362 af=0.8113 best=0.9788 n=33 sat_p=0.700 adapt_c=0.78 ch3=1.28 hip=0.0215
+Gen  250  621.9s bf=0.9404 af=0.7630 best=0.9788 n=33 sat_p=0.700 adapt_c=0.78 ch3=1.28 hip=0.0215
+Gen  275  683.5s bf=0.9485 af=0.8490 best=0.9790 n=33 sat_p=0.705 adapt_c=0.89 ch3=1.65 hip=0.0106
+Gen  299  742.4s bf=0.9536 af=0.8810 best=0.9790 n=33 sat_p=0.705 adapt_c=0.89 ch3=1.65 hip=0.0106
+
+最终: 0.9790  (v21基线: 0.9945)
+差距: -0.0155

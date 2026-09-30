@@ -1,0 +1,32 @@
+[PATCH] ray.init: retry wrapper (7 attempts + cleanup + wait=180s)
+[PATCH] LLMClient noretry patch failed: AGENTSOCIETY_LLM_API_KEY is required. Please set this environment variable before running AgentSociety2.
+============================================================
+v20_fast — 加速版容量测试: 20org x 300gen x 200ticks, n=15-35
+============================================================
+
+[快速随机测试]
+  随机org 0: n=35, fitness=0.0000
+  随机org 1: n=30, fitness=0.0001
+  随机org 2: n=16, fitness=0.0001
+  随机org 3: n=25, fitness=0.0001
+  随机org 4: n=15, fitness=0.0002
+
+开始演化...
+Gen    0    1.0s fit=0.0002/0.0001 best=0.0002 n=24
+Gen   25   29.0s fit=0.7877/0.3759 best=0.7877 n=27
+Gen   50   57.1s fit=0.7250/0.2660 best=0.8220 n=27
+Gen   75   85.4s fit=0.7958/0.3228 best=0.8533 n=27
+Gen  100  113.4s fit=0.7750/0.3138 best=0.8833 n=27
+Gen  125  141.2s fit=0.8197/0.3473 best=0.8833 n=27
+Gen  150  169.4s fit=0.8152/0.4540 best=0.8833 n=27
+Gen  175  197.4s fit=0.8224/0.4969 best=0.8842 n=27
+Gen  200  225.6s fit=0.8302/0.4952 best=0.8873 n=27
+Gen  225  253.7s fit=0.8547/0.5170 best=0.8873 n=27
+Gen  250  282.0s fit=0.8192/0.5704 best=0.8873 n=27
+Gen  275  309.9s fit=0.8079/0.5586 best=0.8873 n=27
+Gen  299  336.8s fit=0.9066/0.7090 best=0.9066 n=27
+
+最终最佳: 0.9066
+v17o参考: 0.9361
+>>> 差距: 0.0295
+最佳结构: n=27, lr=0.0200, fold=0.0114

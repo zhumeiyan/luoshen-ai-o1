@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scene Canvas</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0a0a0f;color:#e0e0e0;font-family:'Courier New',monospace;overflow:hidden;height:100vh;display:flex;flex-direction:column}
+#canvas-wrap{flex:1;position:relative;overflow:hidden}
+canvas{display:block;width:100%;height:100%}
+#input-bar{height:80px;background:#111118;border-top:1px solid #2a2a35;display:flex;align-items:center;gap:12px;padding:0 20px}
+#scene-input{flex:1;background:#1a1a22;border:1px solid #333;color:#e0e0e0;padding:10px 14px;font-size:15px;font-family:inherit;outline:none;border-radius:4px}
+#scene-input:focus{border-color:#5a7a9a}
+button{background:#2a3a4a;border:1px solid #4a5a6a;color:#ccc;padding:10px 20px;font-family:inherit;cursor:pointer;border-radius:4px;font-size:13px}
+button:hover{background:#3a4a5a;color:#fff}
+#hint{font-size:11px;color:#555;min-width:200px}
+</style>
+</head>
+<body>
+<div id="canvas-wrap"><canvas id="c"></canvas></div>
+<div id="input-bar">
+<input type="text" id="scene-input" placeholder="描述场景，比如：一片星空下的大海，远处有灯塔在闪烁..." />
+<button id="btn-go">画</button>
+<span id="hint">回车确认 · 连续输入可叠加演化</span>
+</div>
+<script>
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+let W, H;
+function resize() {
+  const r = document.getElementById('canvas-wrap');
+  W = canvas.width = r.clientWidth * devicePixelRatio;
+  H = canvas.height = r.clientHeight * devicePixelRatio;
+  canvas.style.width = r.clientWidth + 'px';
+  canvas.style.height = r.clientHeight + 'px';
+  ctx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
+}
+resize();
+window.addEventListener('resize', resize);
+
+// --- World state ---
+const world = {
+  time: 0,
+  bg: { r: 8, g: 10, b: 22 },
+  elements: [],
+  particles: [],
+  weather: { rain: 0, fog: 0, wind: 0, snow: 0 },
+  palette: ['#aab8d4','#5a6a8a','#2a3a5a','#e8d8b8','#7a8a6a','#c4a882'],
+  seed: 42
+};
+
+function rand(s) {
+  world.seed = (s * 1103515245 + 12345) & 0x7fffffff;
+  return (world.seed % 10000) / 10000;
+}
+
+// --- Scene parser ---
+function parseScene(text) {
+  const t = text.toLowerCase();
+  const elems = [];
+
+  // keywords
+  if (t.includes('海') || t.includes('洋') || t.includes('湖') || t.includes('河') || t.includes('水')) elems.push('water');
+  if (t.includes('星') || t.includes('夜空') || t.includes('宇宙') || t.includes('银河')) elems.push('stars');
+  if (t.includes('月')) elems.push('moon');
+  if (t.includes('太阳') || t.includes('日') || t.includes('黄昏') || t.includes('日落')) elems.push('sun');
+  if (t.includes('山') || t.includes('峰') || t.includes('丘')) elems.push('mountains');
+  if (t.includes('树') || t.includes('林') || t.includes('森') || t.includes('木')) elems.push('trees');
+  if (t.includes('火') || t.includes('焰') || t.includes('篝') || t.includes('灯') || t.includes('炬')) elems.push('fire');
+  if (t.includes('灯') || t.includes('塔') || t.includes('屋') || t.includes('房') || t.includes('城') || t.includes('建筑')) elems.push('structure');
+  if (t.includes('雨') || t.includes('湿') || t.includes('溪')) elems.push('rain');
+  if (t.includes('雪') || t.includes('冰') || t.includes('冬') || t.includes('寒')) elems.push('snow');
+  if (t.includes('云') || t.includes('雾') || t.includes('烟')) elems.push('clouds');
+  if (t.includes('花') || t.includes('草')) elems.push('plants');
+  if (t.includes('沙') || t.includes('漠') || t.includes('荒')) elems.push('desert');
+  if (t.includes('夜') || t.includes('晚') || t.includes('暗')) elems.push('night');
+  if (t.includes('晨') || t.includes('早') || t.includes('黎明')) elems.push('dawn');
+  if (t.includes('动') || t.includes('飞') || t.includes('飘') || t.includes('动')) elems.push('animals');
+  if (t.includes('人') || t.includes('影') || t.includes('身')) elems.push('figure');
+
+  // colors / moods
+  let bgShift = null;
+  if (t.includes('蓝')) bgShift = 'blue';
+  else if (t.includes('红') || t.includes('赤') || t.includes('橙')) bgShift = 'red';
+  else if (t.includes('绿')) bgShift = 'green';
+  else if (t.includes('紫')) bgShift = 'purple';
+  else if (t.includes('金') || t.includes('黄')) bgShift = 'gold';
+
+  if (elems.length === 0) elems.push('abstract');
+
+  return { elems, bgShift };
+}
+
+function applyScene(text) {
+  const parsed = parseScene(text);
+  world.elements = parsed.elems;
+  world.particles = JSON.parse(JSON.stringify([]));
+  world.seed = 42;
+
+  // bg color
+  if (parsed.bgShift === 'blue') world.bg = { r: 12, g: 16, b: 35 };
+  else if (parsed.bgShift === 'red') world.bg = { r: 35, g: 14, b: 12 };
+  else if (parsed.bgShift === 'green') world.bg = { r: 10, g: 26, b: 18 };
+  else if (parsed.bgShift === 'purple') world.bg = { r: 24, g: 12, b: 32 };
+  else if (parsed.bgShift === 'gold') world.bg = { r: 30, g: 24, b: 12 };
+  else world.bg = { r: 8, g: 10, b: 22 };
+
+  // night/dawn overrides
+  if (parsed.elems.includes('night')) world.bg = { r: 5, g: 6, b: 18 };
+  if (parsed.elems.includes('dawn')) world.bg = { r: 28, g: 18, b: 14 };
+
+  world.weather = { rain: 0, fog: 0, wind: 0, snow: 0 };
+  if (parsed.elems.includes('rain')) world.weather.rain = 1;
+  if (parsed.elems.includes('snow')) world.weather.snow = 1;
+  if (parsed.elems.includes('clouds')) world.weather.fog = 1;
+
+  // generate particles
+  if (parsed.elems.includes('stars')) {
+    for (let i = 0; i < 200; i++) world.particles.push({ type: 'star', x: rand(i*7), y: rand(i*13), s: rand(i*3)*2+0.5, p: rand(i*5), b: rand(i*9) });
+  }
+  if (parsed.elems.includes('fire')) {
+    for (let i = 0; i < 60; i++) world.particles.push({ type: 'spark', x: 0.5 + (rand(i*11)-0.5)*0.06, y: 0.85 + (rand(i*17)-0.5)*0.02, vx: (rand(i*23)-0.5)*0.002, vy: -rand(i*29)*0.004, life: rand(i*31) });
+  }
+  if (parsed.elems.includes('plants')) {
+    for (let i = 0; i < 40; i++) world.particles.push({ type: 'leaf', x: rand(i*37), y: 0.85+rand(i*41)*0.2, vx: 0, vy: 0, sway: rand(i*43)*6.28 });
+  }
+}
+
+// --- Renderers ---
+function drawSky() {
+  const g = ctx.createLinearGradient(0, 0, 0, H * 0.6);
+  g.addColorStop(0, `rgb(${world.bg.r},${world.bg.g},${world.bg.b})`);
+  world.bg.r = Math.max(0, Math.min(50, world.bg.r));
+  world.bg.g = Math.max(0, Math.min(50, world.bg.g));
+  world.bg.b = Math.max(0, Math.min(40, world.bg.b));
+  g.addColorStop(1, `rgb(${world.bg.r+18},${world.bg.g+18},${world.bg.b+25})`);
+  ctx.fillStyle = g;
+  ctx.fillRect(0, 0, W, H * 0.6);
+}
+
+function drawStars(time) {
+  world.particles.filter(p => p.type === 'star').forEach(p => {
+    const tw = 0.5 + 0.5 * Math.sin(time * 0.002 + p.p * 6.28);
+    ctx.globalAlpha = tw * p.b;
+    ctx.fillStyle = '#ffe';
+    ctx.fillRect(p.x * W, p.y * H * 0.55, p.s, p.s);
+  });
+  ctx.globalAlpha = 1;
+}
+
+function drawMoon(time) {
+  const mx = W * 0.78, my = H * 0.15, r = Math.min(W,H) * 0.05;
+  const glow = ctx.createRadialGradient(mx, my, 0, mx, my, r * 3);
+  glow.addColorStop(0, 'rgba(255,240,200,0.15)');
+  glow.addColorStop(1, 'rgba(255,240,200,0)');
+  ctx.fillStyle = glow;
+  ctx.fillRect(mx - r*3, my - r*3, r*6, r*6);
+  ctx.beginPath();
+  ctx.arc(mx, my, r, 0, 6.28);
+  ctx.fillStyle = '#f0e8c8';
+  ctx.fill();
+  // crater shadow
+  ctx.beginPath();
+  ctx.arc(mx - r*0.25, my - r*0.15, r*0.2, 0, 6.28);
+  ctx.fillStyle = 'rgba(180,170,140,0.4)';
+  ctx.fill();
+}
+
+function drawSun(time) {
+  const sx = W * 0.5, sy = H * 0.92;
+  const r = Math.min(W,H) * 0.04;
+  const pulse = 1 + 0.05 * Math.sin(time * 0.001);
+  const glow = ctx.createRadialGradient(sx, sy, 0, sx, sy, r * 4 * pulse);
+  glow.addColorStop(0, 'rgba(255,200,100,0.3)');
+  glow.addColorStop(1, 'rgba(255,150,50,0)');
+  ctx.fillStyle = glow;
+  ctx.fillRect(sx - r*5, sy - r*5, r*10, r*5);
+  ctx.beginPath();
+  ctx.arc(sx, sy, r, 0, 6.28);
+  ctx.fillStyle = '#ffb84a';
+  ctx.fill();
+}
+
+function drawMountains(time) {
+  const layers = [
+    { color: `rgba(${world.bg.r+20},${world.bg.g+22},${world.bg.b+30},0.9)`, h: 0.45, step: 80 },
+    { color: `rgba(${world.bg.r+35},${world.bg.g+38},${world.bg.b+42},0.95)`, h: 0.55, step: 55 },
+    { color: `rgba(${world.bg.r+50},${world.bg.g+55},${world.bg.b+58},1)`, h: 0.65, step: 35 }
+  ];
+  layers.forEach(li => {
+    ctx.fillStyle = li.color;
+    ctx.beginPath();
+    ctx.moveTo(0, H);
+    for (let x = 0; x <= W; li.step) {
+      const n = Math.sin(x * 0.005 + li.h * 3) * 0.5 + Math.sin(x * 0.013 + li.h * 7) * 0.25 + Math.sin(x * 0.003 + 1.3) * 0.4;
+      ctx.lineTo(x, H * li.h + n * H * 0.08);
+      x += li.step;
+    }
+    ctx.lineTo(W, H);
+    ctx.closePath();
+    ctx.fill();
+  });
+}
+
+function drawWater(time) {
+  const wy = H * 0.65;
+  const g = ctx.createLinearGradient(0, wy, 0, H);
+  g.addColorStop(0, `rgba(${world.bg.r+15},${world.bg.g+20},${world.bg.b+35},0.8)`);
+  g.addColorStop(1, `rgba(${world.bg.r+5},${world.bg.g+8},${world.bg.b+18},0.95)`);
+  ctx.fillStyle = g;
+  ctx.fillRect(0, wy, W, H - wy);
+  // waves
+  for (let i = 0; i < 12; i++) {
+    const yy = wy + (H - wy) * (i / 12);
+    ctx.strokeStyle = `rgba(${world.bg.r+30},${world.bg.g+40},${world.bg.b+50},${0.3 - i*0.02})`;
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    for (let x = 0; x <= W; x += 4) {
+      const yy2 = yy + Math.sin(x * 0.02 + time * 0.002 + i * 0.5) * (3 + i * 0.5);
+      if (x === 0) ctx.moveTo(x, yy2); else ctx.lineTo(x, yy2);
+    }
+    ctx.stroke();
+  }
+}
+
+function drawGround(time) {
+  const gy = H * 0.78;
+  const g = ctx.createLinearGradient(0, gy, 0, H);
+  if (world.elements.includes('desert')) {
+    g.addColorStop(0, '#c4a882'); g.addColorStop(1, '#8a7a5a');
+  } else {
+    g.addColorStop(0, '#1a2a18'); g.addColorStop(1, '#0a1208');
+  }
+  ctx.fillStyle = g;
+  ctx.fillRect(0, gy, W, H - gy);
+  // grains
+  if (world.elements.includes('desert')) {
+    world.particles.filter(p => p.type === 'leaf').forEach(p => {
+      ctx.fillStyle = 'rgba(200,180,140,0.4)';
+      ctx.fillRect(p.x * W, gy + (H-gy)*p.y*0.01, 2, 2);
+    });
+  }
+}
+
+function drawTrees(time) {
+  const base_y = H * 0.78;
+  const positions = [0.08,0.15,0.22,0.35,0.45,0.55,0.7,0.82,0.92];
+  positions.forEach((px, i) => {
+    if (rand(i * 53) < 0.3) return;
+    const scale = 0.8 + rand(i * 19) * 0.5;
+    const tx = px * W + Math.sin(time * 0.001 + i) * 2;
+    const ty = base_y;
+    const th = H * 0.12 * scale;
+    const tw = H * 0.025 * scale;
+    // trunk
+    ctx.fillStyle = '#2a1f15';
+    ctx.fillRect(tx - tw*0.15, ty - th*0.4, tw*0.3, th*0.4);
+    // canopy
+    ctx.fillStyle = world.bg.b < 15 ? '#0a1a0a' : '#1a2a18';
+    ctx.beginPath();
+    ctx.moveTo(tx - tw*0.8, ty - th*0.3);
+    ctx.lineTo(tx + tw*0.8, ty - th*0.3);
+    ctx.lineTo(tx, ty - th);
+    ctx.closePath();
+    ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(tx - tw*0.65, ty - th*0.5);
+    ctx.lineTo(tx + tw*0.65, ty - th*0.5);
+    ctx.lineTo(tx, ty - th*1.15);
+    ctx.closePath();
+    ctx.fill();
+  });
+}
+
+function drawFire(time) {
+  const fx = W * 0.5, fy = H * 0.82;
+  // base
+  ctx.fillStyle = '#1a0800';
+  ctx.fillRect(fx - 30, fy, 60, 10);
+  // flames
+  for (let i = 0; i < 7; i++) {
+    const fl = 25 + Math.sin(time * 0.01 + i) * 15 + rand(i*77+Math.floor(time*0.01))*10;
+    const fx2 = fx + (i - 3) * 6;
+    const g = ctx.createRadialGradient(fx2, fy - fl*0.4, 0, fx2, fy - fl*0.4, fl*0.5);
+    g.addColorStop(0, 'rgba(255,200,50,0.9)');
+    g.addColorStop(0.4, 'rgba(255,120,20,0.7)');
+    g.addColorStop(1, 'rgba(200,30,0,0)');
+    ctx.fillStyle = g;
+    ctx.fillRect(fx2 - fl*0.6, fy - fl*0.5 + fl*0.2, fl*1.2, fl*0.8);
+  }
+  // glow
+  const glow = ctx.createRadialGradient(fx, fy, 0, fx, fy, 100);
+  glow.addColorStop(0, 'rgba(255,150,50,0.15)');
+  glow.addColorStop(1, 'rgba(255,150,50,0)');
+  ctx.fillStyle = glow;
+  ctx.fillRect(fx - 100, fy - 100, 200, 150);
+}
+
+function drawStructure(time) {
+  // simple lighthouse / building
+  const sx = W * 0.75, sy = H * 0.35;
+  const sw = W * 0.04, sh = H * 0.4;
+  // body
+  ctx.fillStyle = '#2a2a32';
+  ctx.fillRect(sx - sw*0.5, sy, sw, sh);
+  // stripes
+  ctx.fillStyle = '#c44';
+  for (let i = 0; i < 4; i++) {
+    if (i % 2 === 0) ctx.fillRect(sx - sw*0.5, sy + sh*0.1*i, sw, sh*0.05);
+  }
+  // lamp
+  ctx.fillStyle = '#444';
+  ctx.fillRect(sx - sw*0.7, sy - sh*0.04, sw*1.4, sh*0.05);
+  // light beam
+  const beam = ctx.createRadialGradient(sx, sy - sh*0.02, 0, sx, sy - sh*0.02, sh*2);
+  beam.addColorStop(0, 'rgba(255,240,200,0.12)');
+  beam.addColorStop(1, 'rgba(255,240,200,0)');
+  ctx.fillStyle = beam;
+  ctx.beginPath();
+  const angle = Math.sin(time * 0.0008) * 0.6;
+  ctx.moveTo(sx, sy - sh*0.02);
+  ctx.lineTo(sx - Math.sin(angle)*sh*2, sy - sh*0.02 - Math.cos(angle)*sh*2);
+  ctx.lineTo(sx + Math.sin(angle)*sh*2, sy - sh*0.02 - Math.cos(angle)*sh*2);
+  ctx.closePath();
+  ctx.fill();
+  // lamp glow
+  ctx.beginPath();
+  ctx.arc(sx, sy - sh*0.02, 5, 0, 6.28);
+  ctx.fillStyle = '#ffc864';
+  ctx.fill();
+}
+
+function drawWeather(time) {
+  if (world.weather.rain) {
+    ctx.strokeStyle = 'rgba(150,170,200,0.3)';
+    ctx.lineWidth = 1;
+    for (let i = 0; i < 80; i++) {
+      const rx = (rand(i*53 + time*0.01) * 1.2 - 0.1) * W;
+      const ry = (rand(i*61 + time*0.02) * 1.0) * H;
+      ctx.beginPath();
+      ctx.moveTo(rx, ry);
+      ctx.lineTo(rx - 2, ry + 8);
+      ctx.stroke();
+    }
+  }
+  if (world.weather.snow) {
+    ctx.fillStyle = 'rgba(220,230,240,0.7)';
+    for (let i = 0; i < 60; i++) {
+      const sx2 = (rand(i*71 + time*0.003) * 1.2 - 0.1) * W;
+      const sy2 = (rand(i*83 + time*0.005) * 1.0 + 0.05) * H;
+      const ss = rand(i*91) * 2 + 1;
+      ctx.fillRect(sx2, sy2, ss, ss);
+    }
+  }
+  if (world.weather.fog) {
+    ctx.fillStyle = 'rgba(200,210,220,0.04)';
+    for (let i = 0; i < 30; i++) {
+      const fx2 = (rand(i*101+1) * 1.0) * W;
+      const fy2 = (rand(i*103+2) * 0.4 + 0.3) * H;
+      ctx.fillRect(fx2, fy2, W*0.2, H*0.02);
+    }
+  }
+}
+
+function drawAbstract(time) {
+  const cx = W * 0.5, cy = H * 0.5;
+  for (let i = 0; i < 20; i++) {
+    const r1 = 50 + i * 20 + Math.sin(time * 0.001 + i * 0.7) * 30;
+    ctx.strokeStyle = `hsl(${(i * 18 + time * 0.02) % 360}, 60%, 50%)`;
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(cx + Math.sin(time * 0.0005 + i) * 30, cy + Math.cos(time * 0.0005 + i * 1.3) * 20, r1, 0, 6.28);
+    ctx.stroke();
+  }
+}
+
+function drawAnimals(time) {
+  // flying birds
+  ctx.fillStyle = 'rgba(30,30,40,0.6)';
+  for (let i = 0; i < 8; i++) {
+    const bx = ((time * 0.03 + i * 0.15) % 1.3 - 0.15) * W;
+    const by = H * 0.25 + Math.sin(time * 0.002 + i) * 20;
+    const wing = Math.sin(time * 0.008 + i) * 5;
+    ctx.beginPath();
+    ctx.moveTo(bx - 8, by + wing);
+    ctx.lineTo(bx, by - wing*0.5);
+    ctx.lineTo(bx + 8, by + wing);
+    ctx.closePath();
+    ctx.fill();
+  }
+}
+
+function drawFigure(time) {
+  // simple human silhouette
+  const x = W * 0.45, y = H * 0.78;
+  ctx.fillStyle = '#0a0a0f';
+  // head
+  ctx.beginPath();
+  ctx.arc(x, y - H*0.06, H*0.012, 0, 6.28);
+  ctx.fill();
+  // body
+  ctx.fillRect(x - H*0.015, y - H*0.045, H*0.03, H*0.05);
+  // legs
+  const sway = Math.sin(time * 0.003) * 2;
+  ctx.fillRect(x - H*0.012 + sway, y + H*0.005, H*0.008, H*0.04);
+  ctx.fillRect(x + H*0.004 - sway, y + H*0.005, H*0.008, H*0.04);
+}
+
+function render(time) {
+  ctx.clearRect(0, 0, W, H);
+  drawSky();
+
+  if (world.elements.includes('night') || world.elements.includes('stars')) drawStars(time);
+  if (world.elements.includes('moon')) drawMoon(time);
+  if (world.elements.includes('sun')) drawSun(time);
+  if (world.elements.includes('mountains')) drawMountains(time);
+  if (world.elements.includes('water')) drawWater(time);
+
+  drawGround(time);
+
+  if (world.elements.includes('trees')) drawTrees(time);
+  if (world.elements.includes('plants')) {
+    for (let i = 0; i < 30; i++) {
+      const gx = (rand(i*127)*0.8 + 0.1) * W;
+      const gy = H * 0.78 + rand(i*131) * H * 0.15;
+      ctx.strokeStyle = `hsl(${rand(i*137)*60+80}, 50%, 40%)`;
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      const sway = Math.sin(time*0.001 + i) * 3;
+      ctx.moveTo(gx, gy);
+      ctx.lineTo(gx + sway, gy - rand(i*139)*15 - 5);
+      ctx.stroke();
+    }
+  }
+  if (world.elements.includes('fire')) drawFire(time);
+  if (world.elements.includes('structure')) drawStructure(time);
+  if (world.elements.includes('animals')) drawAnimals(time);
+  if (world.elements.includes('figure')) drawFigure(time);
+  if (world.elements.length === 1 && world.elements[0] === 'abstract') drawAbstract(time);
+
+  // particles
+  world.particles.forEach(p => {
+    if (p.type === 'spark') {
+      p.x += p.vx; p.y += p.vy; p.life -= 0.003;
+      if (p.life > 0 && p.y > 0) {
+        const g = p.life;
+        ctx.fillStyle = `rgba(255,${Math.floor(200*g)},${Math.floor(80*g)},${g*0.7})`;
+        ctx.fillRect(p.x * W, p.y * H, 3, 3);
+      }
+    }
+  });
+
+  drawWeather(time);
+
+  requestAnimationFrame(render);
+}
+
+// --- Input ---
+const input = document.getElementById('scene-input');
+document.getElementById('btn-go').addEventListener('click', () => applyScene(input.value));
+input.addEventListener('keydown', e => { if (e.key === 'Enter') applyScene(input.value); });
+
+// default scene
+applyScene('夜晚大海星空灯塔');
+requestAnimationFrame(render);
+</script>
+</body>
+</html>

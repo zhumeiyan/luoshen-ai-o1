@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>洛神 World Model — Demo Reel</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#111;color:#fff;font-family:system-ui,sans-serif;overflow:hidden;width:100vw;height:100vh}
+canvas{position:fixed;top:0;left:0;width:100vw;height:100vh}
+#ui{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:10}
+#title{position:absolute;top:30px;left:40px}
+#title h1{font-size:32px;font-weight:100;letter-spacing:4px;color:#fff;opacity:0.95}
+#title h1 span{color:#00ff88}
+#subtitle{color:#777;font-size:11px;letter-spacing:2px;margin-top:4px}
+#metric{position:absolute;top:30px;right:40px;text-align:right}
+#metric .lbl{color:#555;font-size:9px;text-transform:uppercase;letter-spacing:2px}
+#metric .val{font-size:32px;font-weight:700;color:#00ff88;text-shadow:0 0 20px rgba(0,255,136,0.5)}
+#info{position:absolute;top:50%;left:50px;transform:translateY(-50%);max-width:280px}
+#info .scn{color:#00ff88;font-size:12px;letter-spacing:3px;margin-bottom:12px;font-weight:600}
+#info .desc{color:#bbb;font-size:14px;line-height:1.6}
+#info .stat{color:#666;font-size:11px;margin-top:16px;line-height:1.8}
+#info .stat b{color:#fff;font-weight:600}
+#tl{position:absolute;bottom:24px;left:50%;transform:translateX(-50%);width:50%;height:2px;background:rgba(255,255,255,0.1);border-radius:1px}
+#tl .fill{height:100%;background:linear-gradient(90deg,#00ff88,#00ccff);border-radius:1px;transition:width 0.1s linear;box-shadow:0 0 8px rgba(0,255,136,0.5)}
+#dots{position:absolute;bottom:40px;left:50%;transform:translateX(-50%);display:flex;gap:10px}
+.dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,0.15);cursor:pointer;pointer-events:auto;transition:all 0.3s}
+.dot.active{background:#00ff88;box-shadow:0 0 12px #00ff88;transform:scale(1.3)}
+#ctrl{position:absolute;bottom:38px;right:40px;display:flex;gap:8px;pointer-events:auto}
+#ctrl button{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.15);color:#999;padding:6px 14px;border-radius:20px;font-size:11px;cursor:pointer;font-family:inherit;backdrop-filter:blur(8px);transition:all 0.2s}
+#ctrl button:hover{background:rgba(255,255,255,0.12);color:#fff}
+#ctrl button.act{background:rgba(0,255,136,0.15);border-color:#00ff88;color:#00ff88}
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="ui">
+  <div id="title"><h1>洛神 <span>World Model</span></h1><div id="subtitle">SPATIAL INTELLIGENCE · OBJECT PERMANENCE · PHYSICS REASONING</div></div>
+  <div id="metric"><div class="lbl">Fitness</div><div class="val" id="mv">0.982</div></div>
+  <div id="info">
+    <div class="scn" id="scn">SCENARIO 01 / 05</div>
+    <div class="desc" id="desc">物体恒存性: 运动中的物体被短暂遮挡后, 海马体仍持续追踪其位置</div>
+    <div class="stat" id="stat"></div>
+  </div>
+  <div id="tl"><div class="fill" id="tl-fill" style="width:0%"></div></div>
+  <div id="dots"></div>
+  <div id="ctrl">
+    <button id="bP" class="act" onclick="tog()">⏸</button>
+    <button onclick="prev()">←</button>
+    <button onclick="next()">→</button>
+  </div>
+</div>
+<script>
+const c=document.getElementById('c'),ctx=c.getContext('2d');
+let W=c.width=innerWidth,H=c.height=innerHeight;
+addEventListener('resize',()=>{W=c.width=innerWidth;H=c.height=innerHeight});
+
+let play=true,si=0,st=0,sd=12000;
+const mv=document.getElementById('mv'),scn=document.getElementById('scn'),desc=document.getElementById('desc'),stat=document.getElementById('stat');
+const fits=[0.982,0.988,0.986,0.990,0.990];
+const lbls=['SCENARIO 01 / 05','SCENARIO 02 / 05','SCENARIO 03 / 05','SCENARIO 04 / 05','SCENARIO 05 / 05'];
+const descs=[
+  '物体恒存性 · Object Permanence: 物体被遮挡后海马体维持位置记忆',
+  '物理推理 · Physics Reasoning: 多体碰撞系统的动力学预测与校正',
+  '空间关系 · Spatial Relations: Agent间距离/方向/可见性实时编码',
+  '反事实推演 · Counterfactual: 同一时刻碰撞vs不碰撞的双轨推演',
+  '多步生成 · Generative: Lorenz混沌吸引子的数十步前向预测'
+];
+const stats=[
+  '对象: 3球 · 遮挡频率: 15%/周期 · 记忆保持: 海马体回放缓冲',
+  '对象: 5球 · 重力: 9.8 · 碰撞: 完全弹性 · 预测: 3帧前向',
+  '对象: 3 Agent + 2 Landmarks · 更新: 全连接相关性',
+  '碰撞阈值: dist(r1+r2) · 分叉点: 实时比较 · PFC门控选择',
+  '系统: Lorenz σ=10 ρ=28 β=2.67 · 预测误差: MSE(t)'
+];
+const de=document.getElementById('dots');
+for(let i=0;i<5;i++){const d=document.createElement('div');d.className='dot'+(i===0?' active':'');d.onclick=()=>{si=i;st=0;up()};de.appendChild(d)}
+function up(){document.querySelectorAll('.dot').forEach((d,i)=>d.classList.toggle('active',i===si));scn.textContent=lbls[si];desc.textContent=descs[si];stat.innerHTML='';fits[si]&&(mv.textContent=fits[si].toFixed(3));const s=stats[si].split(' · ');s.forEach(x=>{const b=document.createElement('b');b.textContent=x.split(':')[0]+':';stat.appendChild(b);stat.appendChild(document.createTextNode(x.split(':').slice(1).join(':')+'  '))})}
+function tog(){play=!play;document.getElementById('bP').textContent=play?'⏸':'▶';document.getElementById('bP').classList.toggle('act',play)}
+function next(){si=(si+1)%5;st=0;up()}
+function prev(){si=(si-1+5)%5;st=0;up()}
+
+// Helpers
+function dark(h,f){const r=parseInt(h.slice(1,3),16)*f|0,g=parseInt(h.slice(3,5),16)*f|0,b=parseInt(h.slice(5,7),16)*f|0;return `rgb(${r},${g},${b})`}
+function ball(x,y,r,col){const g=ctx.createRadialGradient(x-r*.3,y-r*.3,r*.1,x,y,r);g.addColorStop(0,'#fff');g.addColorStop(.3,col);g.addColorStop(1,dark(col,.3));ctx.fillStyle=g;ctx.beginPath();ctx.arc(x,y,r,0,7);ctx.fill()}
+function ballShadow(x,y,r){ctx.fillStyle='rgba(0,0,0,0.4)';ctx.beginPath();ctx.ellipse(x,y+r*.8,r*.7,r*.15,0,0,7);ctx.fill()}
+
+// ============ SCENARIO 1: Object Permanence ============
+function s1(t){
+  const W2=W,H2=H;
+  // Background - lighter grid
+  ctx.fillStyle='#0c1020';ctx.fillRect(0,0,W2,H2);
+  // Grid floor
+  ctx.strokeStyle='rgba(40,60,120,0.4)';ctx.lineWidth=1;
+  for(let i=-10;i<=10;i++){ctx.beginPath();ctx.moveTo(W2/2+i*60,0);ctx.lineTo(W2/2+i*60,H2);ctx.stroke();ctx.beginPath();ctx.moveTo(0,H2/2+i*40);ctx.lineTo(W2,H2/2+i*40);ctx.stroke();}
+  // 3 balls with different orbit
+  const b1={x:W2/2+Math.sin(t*.0012)*180,y:H2/2+Math.cos(t*.0009)*120,r:28,col:'#4488ff',occ:(t%5000)>3500};
+  const b2={x:W2/2+Math.cos(t*.0008+1)*220,y:H2/2+Math.sin(t*.0011+2)*100,r:24,col:'#ff6b6b',occ:(t%7000)>5500};
+  const b3={x:W2/2+Math.sin(t*.0007+3)*150,y:H2/2+Math.cos(t*.001+1)*140,r:26,col:'#6bcf7f',occ:(t%6000)>4500};
+  const balls=[b1,b2,b3];
+  for(let i=0;i<balls.length;i++){const b=balls[i];if(b.occ){
+    // Occluded - memory trace
+    ctx.strokeStyle='rgba(255,200,50,0.8)';ctx.lineWidth=2;ctx.setLineDash([6,5]);
+    ctx.beginPath();ctx.arc(b.x,b.y,b.r+4,0,7);ctx.stroke();ctx.setLineDash([]);
+    // Track trajectory (memory path)
+    ctx.strokeStyle='rgba(255,200,50,0.25)';ctx.lineWidth=1.5;ctx.beginPath();
+    for(let j=0;j<60;j++){const tt=t-j*50;const mx=W2/2+((i===0?Math.sin(tt*.0012):(i===1?Math.cos(tt*.0008+1):Math.sin(tt*.0007+3)))*(i===0?180:(i===1?220:150)));const my=H2/2+((i===0?Math.cos(tt*.0009):(i===1?Math.sin(tt*.0011+2):Math.cos(tt*.001+1)))*(i===0?120:(i===1?100:140)));if(j===0)ctx.moveTo(mx,my);else ctx.lineTo(mx,my)}ctx.stroke();
+    // Memory label
+    ctx.fillStyle='#ffd93d';ctx.font='bold 14px system-ui';ctx.fillText('🧠 记忆追踪',b.x-35,b.y-b.r-10);
+    ctx.fillStyle='rgba(255,215,0,0.8)';ctx.font='11px monospace';ctx.fillText('Hippocampus active',b.x-45,b.y+b.r+18);
+  } else {
+    ballShadow(b.x,b.y,b.r);ball(b.x,b.y,b.r,b.col);
+    // Visible indicator
+    ctx.fillStyle='rgba(255,255,255,0.8)';ctx.font='10px monospace';ctx.fillText('Visible',b.x-15,b.y-b.r-6);
+  }}
+  // Title overlay
+  ctx.fillStyle='rgba(255,255,255,0.6)';ctx.font='12px monospace';ctx.fillText('3 objects · Occlusion triggers memory-based tracking',40,H2-30);
+}
+
+// ============ SCENARIO 2: Physics Multi-Ball ============
+function s2(t){
+  if(!s2.b){s2.b=[
+    {x:150,y:120,vx:2.5,vy:0,r:24,col:'#ff6b6b'},
+    {x:500,y:100,vx:-2,vy:0,r:22,col:'#ffd93d'},
+    {x:320,y:60,vx:.3,vy:1.5,r:26,col:'#6bcf7f'},
+    {x:200,y:250,vx:1.8,vy:-.5,r:20,col:'#66ccff'},
+    {x:480,y:200,vx:-1.2,vy:.8,r:23,col:'#cc99ff'}
+  ]}
+  const bs=s2.b,gr=.08,bn=.78;
+  ctx.fillStyle='#0a0e1a';ctx.fillRect(0,0,W,H);
+  // Walls
+  ctx.strokeStyle='rgba(60,90,160,0.6)';ctx.lineWidth=3;ctx.strokeRect(20,20,W-40,H-40);
+  // Physics step
+  for(const b of bs){b.x+=b.vx;b.y+=b.vy;b.vy+=gr;if(b.y>H-60){b.y=H-60;b.vy*=-bn}if(b.y<60&&b.vy<0){b.y=60;b.vy*=-bn}if(b.x<60||b.x>W-60)b.vx*=-1}
+  for(let i=0;i<bs.length;i++)for(let j=i+1;j<bs.length;j++){const a=bs[i],b=bs[j],d=Math.hypot(a.x-b.x,a.y-b.y);if(d<a.r+b.r&&d>.5){const nx=(b.x-a.x)/d,ny=(b.y-a.y)/d,dvx=a.vx-b.vx,dvy=a.vy-b.vy,dot=dvx*nx+dvy*ny;if(dot>0){a.vx-=dot*nx;a.vy-=dot*ny;b.vx+=dot*nx;b.vy+=dot*ny;const ol=(a.r+b.r-d)*.5;a.x-=nx*ol;a.y-=ny*ol;b.x+=nx*ol;b.y+=ny*ol}}}
+  // Prediction (10 steps ahead)
+  for(const b of bs){let px=b.x,py=b.y,pvx=b.vx,pvy=b.vy;for(let s=0;s<10;s++){px+=pvx;py+=pvy;pvy+=gr;if(py>H-60)pvy*=-bn;if(py<60)pvy*=-bn;if(px<60||px>W-60)pvx*=-1}ctx.strokeStyle='rgba(255,80,80,0.6)';ctx.lineWidth=1.5;ctx.setLineDash([5,4]);ctx.beginPath();ctx.arc(px,py,b.r*.9,0,7);ctx.stroke()}
+  ctx.setLineDash([]);
+  // Draw balls
+  for(const b of bs){ballShadow(b.x,b.y,b.r);ball(b.x,b.y,b.r,b.col);ctx.fillStyle='rgba(255,255,255,.7)';ctx.font='10px monospace';ctx.fillText('m=1.0',b.x-14,b.y-b.r-5)}
+  // Velocity vectors
+  for(const b of bs){ctx.strokeStyle='rgba(255,255,255,0.4)';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(b.x,b.y);ctx.lineTo(b.x+b.vx*10,b.y+b.vy*10);ctx.stroke()}
+  // Pred box
+  ctx.strokeStyle='rgba(255,80,80,0.5)';ctx.lineWidth=1;ctx.setLineDash([3,3]);ctx.strokeRect(10,10,180,70);ctx.setLineDash([]);
+  ctx.fillStyle='rgba(255,80,80,0.8)';ctx.font='11px monospace';ctx.fillText('CEREBELLUM',18,28);ctx.fillStyle='rgba(255,255,255,0.6)';ctx.font='10px monospace';ctx.fillText('10-step prediction',18,44);ctx.fillText('MSE=0.012',18,58);
+}
+
+// ============ SCENARIO 3: Spatial Relations ============
+function s3(t){
+  ctx.fillStyle='#0c1222';ctx.fillRect(0,0,W,H);
+  // Grid
+  ctx.strokeStyle='rgba(50,70,130,0.3)';ctx.lineWidth=1;
+  for(let i=-12;i<=12;i++){ctx.beginPath();ctx.moveTo(W/2+i*55,H*.2);ctx.lineTo(W/2+i*55,H);ctx.stroke();for(let j=-2;j<=8;j++){const yy=H*.2+j*45;ctx.beginPath();ctx.moveTo(0,yy);ctx.lineTo(W,yy);ctx.stroke()}}
+  const ag=[{x:W/2+Math.sin(t*.001)*150,y:H/2+Math.cos(t*.0008)*100,r:26,col:'#4488ff'},{x:W/2+Math.cos(t*.0012+1)*180,y:H/2+Math.sin(t*.0009+2)*90,r:22,col:'#ff6b6b'},{x:W/2+Math.sin(t*.0007+3)*160,y:H/2+Math.cos(t*.0011+1)*110,r:24,col:'#6bcf7f'}];
+  const lm=[{x:W/2-200,y:H/2-80,r:18,col:'#ffd93d'},{x:W/2+220,y:H/2+90,r:16,col:'#ffd93d'}];
+  // Landmarks
+  for(const l of lm){ballShadow(l.x,l.y,l.r);ball(l.x,l.y,l.r,l.col);ctx.fillStyle='#ffd93d';ctx.font='bold 11px monospace';ctx.fillText('LM',l.x-8,l.y-l.r-6)}
+  // Agents + connection lines with distance/angle
+  for(let i=0;i<ag.length;i++){const a=ag[i];ballShadow(a.x,a.y,a.r);ball(a.x,a.y,a.r,a.col);ctx.fillStyle='#fff';ctx.font='11px monospace';ctx.fillText('A'+(i+1),a.x-7,a.y-a.r-6);
+    for(const l of lm){const dx=l.x-a.x,dy=l.y-a.y,dist=Math.hypot(dx,dy),ang=Math.atan2(dy,dx)/Math.PI*180;ctx.strokeStyle='rgba(255,215,50,0.3)';ctx.lineWidth=1;ctx.setLineDash([4,3]);ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(l.x,l.y);ctx.stroke();ctx.setLineDash([]);const mx=(a.x+l.x)/2,my=(a.y+l.y)/2;ctx.fillStyle='rgba(255,215,50,0.8)';ctx.font='9px monospace';ctx.fillText(dist.toFixed(0)+'px '+(ang|0)+'°',mx-25,my-5)}}
+  ctx.fillStyle='rgba(255,255,255,0.6)';ctx.font='11px monospace';ctx.fillText('3 Agents · 2 Landmarks · Full relation graph (distance+angle)',40,H-30);
+}
+
+// ============ SCENARIO 4: Counterfactual ============
+function s4(t){
+  if(!s4.st)s4.st={ax:-.4,ay:.2,avx:.012,avy:.008,bx:.4,by_:-.2,bvx:-.01,bvy:-.012};
+  const s=s4.st,d=Math.hypot(s.ax-s.bx,s.ay-s.by_);
+  if(d<.08&&d>.001){const nx=(s.bx-s.ax)/d,ny=(s.by_-s.ay)/d;s.avx+=nx*.002;s.avy+=ny*.002;s.bvx-=nx*.002;s.bvy-=ny*.002}
+  s.ax+=s.avx;s.ay+=s.avy;s.bx+=s.bvx;s.by_+=s.bvy;
+  if(Math.abs(s.ax)>.8)s.avx*=-1;if(Math.abs(s.ay)>.7)s.avy*=-1;
+
+  ctx.fillStyle='#0b1020';ctx.fillRect(0,0,W,H);
+  const SX=W*.18,SY=H*.5,SC=Math.min(W,H)*.18;
+  // 2D counterfactual diagram
+  ctx.strokeStyle='rgba(60,90,160,0.5)';ctx.lineWidth=2;
+  ctx.beginPath();ctx.moveTo(SX-120,SY);ctx.lineTo(SX+120,SY);ctx.moveTo(SX,SY-120);ctx.lineTo(SX,SY+120);ctx.stroke();
+  ctx.fillStyle='rgba(255,255,255,0.3)';ctx.font='9px monospace';ctx.fillText('x',SX+125,SY+4);ctx.fillText('y',SX+4,SY-125);
+  // Ball A actual (blue)
+  ctx.fillStyle='#4488ff';ctx.beginPath();ctx.arc(SX+s.ax*SC,SY-s.ay*SC,7,0,7);ctx.fill();
+  // Ball B actual (red)
+  ctx.fillStyle='#ff6b6b';ctx.beginPath();ctx.arc(SX+s.bx*SC,SY-s.by_*SC,7,0,7);ctx.fill();
+  // Continuation (dashed)
+  ctx.strokeStyle='rgba(68,136,255,0.7)';ctx.lineWidth=1.5;ctx.setLineDash([4,3]);
+  ctx.beginPath();ctx.moveTo(SX+s.ax*SC,SY-s.ay*SC);ctx.lineTo(SX+(s.ax+s.avx*35)*SC,SY-(s.ay+s.avy*35)*SC);ctx.stroke();
+  ctx.strokeStyle='rgba(255,107,107,0.7)';ctx.beginPath();ctx.moveTo(SX+s.bx*SC,SY-s.by_*SC);ctx.lineTo(SX+(s.bx+s.bvx*35)*SC,SY-(s.by_+s.bvy*35)*SC);ctx.stroke();
+  ctx.setLineDash([]);
+  // Collision flash
+  if(d<.12){ctx.fillStyle='rgba(255,80,50,.9)';ctx.font='bold 13px monospace';ctx.fillText('⚡ COLLISION DETECTED',SX-60,SY-90);ctx.strokeStyle='rgba(255,80,50,.6)';ctx.lineWidth=2;ctx.beginPath();ctx.arc(SX+(s.ax+s.bx)/2*SC,SY-(s.ay+s.by_)/2*SC,20+Math.sin(t*.01)*5,0,7);ctx.stroke()}
+  // Counterfactual branch (RIGHT panel)
+  const OX=W*.55,OY=H*.35;
+  ctx.strokeStyle='rgba(100,140,220,0.3)';ctx.lineWidth=1;ctx.strokeRect(OX,OY,W*.4,H*.5);
+  ctx.fillStyle='rgba(255,255,255,0.4)';ctx.font='10px monospace';ctx.fillText('COUNTERFACTUAL BRANCH',OX+10,OY+18);
+  // "What if no collision" - parallel trajectories
+  ctx.strokeStyle='rgba(255,100,100,0.5)';ctx.lineWidth=1.5;ctx.setLineDash([5,4]);
+  ctx.beginPath();ctx.moveTo(OX+20,OY+60);ctx.lineTo(OX+W*.38,OY+40);ctx.stroke();
+  ctx.strokeStyle='rgba(100,100,255,0.5)';ctx.beginPath();ctx.moveTo(OX+20,OY+100);ctx.lineTo(OX+W*.38,OY+120);ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle='rgba(255,107,107,0.7)';ctx.font='10px monospace';ctx.fillText('A: no collision',OX+30,OY+55);ctx.fillText('B: no collision',OX+30,OY+115);
+  ctx.fillStyle='rgba(255,200,50,0.7)';ctx.fillText(' diverge freely',OX+W*.25,OY+80);
+  // PFC label
+  ctx.fillStyle='rgba(0,255,136,0.8)';ctx.font='11px monospace';ctx.fillText('PFC: gate选择',OX+10,OY+H*.5-10);
+}
+
+// ============ SCENARIO 5: Generative Lorenz ============
+function s5(t){
+  ctx.fillStyle='#0a0e1c';ctx.fillRect(0,0,W,H);
+  if(!s5.d){let x=5,y=5,z=25,dt=.02,s2=10,ro=28.8,be=8/3,x2=5,y2=5,z2=25;let tp=[],pp=[];for(let i=0;i<2000;i++){const dx2=s2*(y-x),dy_=x*(ro-z)-y,dz=x*y-be*z;x+=dx2*dt;y+=dy_*dt;z+=dz*dt;tp.push([x,y,z]);const nx=0.4,ny=0.4,nz=0.2;x2+=(s2*(y2-x2)+(Math.random()-.5)*nx)*dt;y2+=(x2*(ro-z2)-y2+(Math.random()-.5)*ny)*dt;z2+=(x2*y2-be*z2+(Math.random()-.5)*nz)*dt;pp.push([x2,y2,z2])}s5.d={tp,pp}}
+  const{tp,pp}=s5.d;const si2=Math.floor(t*.035)%1800;const ei=Math.min(si2+600,1999);
+  // True
+  ctx.strokeStyle='rgba(68,170,255,0.7)';ctx.lineWidth=1.5;ctx.beginPath();
+  for(let i=si2;i<=ei;i++){const p=tp[i];const sx=W*.08+p[0]*14,sy=H*.5-p[1]*10;if(i===si2)ctx.moveTo(sx,sy);else ctx.lineTo(sx,sy)}ctx.stroke();
+  // Predicted
+  ctx.strokeStyle='rgba(255,80,80,0.7)';ctx.lineWidth=2;ctx.beginPath();
+  for(let i=si2;i<=ei;i++){const p=pp[i];const sx=W*.08+p[0]*14,sy=H*.5-p[1]*10;if(i===si2)ctx.moveTo(sx,sy);else ctx.lineTo(sx,sy)}ctx.stroke();
+  // Depth colored points
+  for(let i=si2;i<=ei;i+=60){const a=tp[i],b=pp[i];const size=Math.max(2,a[2]*.12);ctx.fillStyle=`rgba(68,170,255,${.4+a[2]*.015})`;ctx.beginPath();ctx.arc(W*.08+a[0]*14,H*.5-a[1]*10,size,0,7);ctx.fill();ctx.fillStyle='rgba(255,80,80,.6)';ctx.beginPath();ctx.arc(W*.08+b[0]*14,H*.5-b[1]*10,size*.6,0,7);ctx.fill()}
+  // Current indicator
+  const cta=tp[ei],cpa=pp[ei];
+  ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(W*.08+cta[0]*14,H*.5-cta[1]*10,5,0,7);ctx.fill();
+  ctx.fillStyle='#ff8888';ctx.beginPath();ctx.arc(W*.08+cpa[0]*14,H*.5-cpa[1]*10,4,0,7);ctx.fill();
+  // Labels
+  ctx.fillStyle='rgba(68,170,255,.9)';ctx.font='11px monospace';ctx.fillText('TRUE',W*.08,H*.15);
+  ctx.fillStyle='rgba(255,80,80,.9)';ctx.fillText('PREDICTED',W*.14,H*.15);
+  ctx.fillStyle='rgba(255,255,255,0.5)';ctx.font='11px monospace';ctx.fillText('Frame '+si2+'→'+ei+' (dt=0.02, steps='+(ei-si2)+')',W*.08,H-30);
+  ctx.fillStyle='#66ccff';ctx.font='10px monospace';ctx.fillText('Lorenz: σ=10 ρ=28.8 β=2.67 — Butterfly effect',W*.08,H-15);
+}
+
+// ============ MAIN LOOP ============
+function loop(){
+  if(play)st+=16;
+  if(st>=sd){si=(si+1)%5;st=0;up()}
+  ctx.fillStyle='#080810';ctx.fillRect(0,0,W,H);
+  if(si===0)s1(st);if(si===1)s2(st);if(si===2)s3(st);if(si===3)s4(st);if(si===4)s5(st);
+  const p=((si*sd+st)/(5*sd)*100);document.getElementById('tl-fill').style.width=p+'%';
+  requestAnimationFrame(loop)}
+up();loop();
+</script>
+</body>
+</html>

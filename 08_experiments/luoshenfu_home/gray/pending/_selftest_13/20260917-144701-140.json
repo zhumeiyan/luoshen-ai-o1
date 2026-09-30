@@ -1,0 +1,17 @@
+{
+  "id": "20260917-144701-140",
+  "ts": "2026-09-17T14:47:01",
+  "user": "_selftest_13",
+  "source": "test_eval",
+  "content": "天气很好",
+  "status": "[待确认]",
+  "eval_at": "2026-09-17T14:47:01",
+  "eval_result": "有反例",
+  "counterexamples": [
+    {
+      "seq": 0,
+      "matched": "天",
+      "type": "confirm"
+    }
+  ]
+}

@@ -1,0 +1,134 @@
+{
+  "regional_prediction": {
+    "0": {
+      "sigma": 0.05,
+      "mse_avg": 0.39381,
+      "mse_final_50": 0.35568
+    },
+    "1": {
+      "sigma": 0.13,
+      "mse_avg": 0.4107,
+      "mse_final_50": 0.375
+    },
+    "2": {
+      "sigma": 0.21,
+      "mse_avg": 0.40776,
+      "mse_final_50": 0.46069
+    },
+    "3": {
+      "sigma": 0.29,
+      "mse_avg": 0.35488,
+      "mse_final_50": 0.3043
+    },
+    "4": {
+      "sigma": 0.37,
+      "mse_avg": 0.40433,
+      "mse_final_50": 0.51097
+    },
+    "5": {
+      "sigma": 0.45,
+      "mse_avg": 0.31538,
+      "mse_final_50": 0.39002
+    },
+    "6": {
+      "sigma": 0.53,
+      "mse_avg": 0.27779,
+      "mse_final_50": 0.34993
+    },
+    "7": {
+      "sigma": 0.61,
+      "mse_avg": 0.40562,
+      "mse_final_50": 0.39527
+    },
+    "8": {
+      "sigma": 0.69,
+      "mse_avg": 0.34681,
+      "mse_final_50": 0.35357
+    }
+  },
+  "multi_step_prediction": {
+    "1": 0.60766,
+    "3": 0.64098,
+    "5": 0.61314,
+    "10": 0.51858,
+    "20": 0.54462,
+    "50": 0.48693
+  },
+  "online_learning": {
+    "mse_on_untrained_region": 0.43708,
+    "n_untrained_regions": 5
+  },
+  "switch_adaptation": {
+    "mse_durng_switch_window": 0.11354,
+    "switch_description": "rid 0 @:100 \u2192 rid 8 @:100-200 \u2192 rid 2 @:200+"
+  },
+  "intrinsic_motivation": {
+    "boredom_final": 0.0,
+    "boredom_trend_first_20": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "boredom_trend_last_20": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.004,
+      0.0041,
+      0.0005,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "region_switches_observed": 53,
+    "region_distribution": {
+      "0": 17,
+      "1": 4,
+      "2": 15,
+      "3": 11,
+      "4": 11,
+      "5": 7,
+      "6": 6,
+      "7": 3,
+      "8": 6
+    },
+    "drive_final": 0.984
+  },
+  "energy": {
+    "final_energy": 20.0,
+    "survived": true,
+    "age": 400
+  },
+  "novel_generalization": {
+    "mse_novel_dynamics": 0.40979,
+    "description": "Frequencies \u00d72.5, phases +1.0 (unseen during evolution)"
+  }
+}

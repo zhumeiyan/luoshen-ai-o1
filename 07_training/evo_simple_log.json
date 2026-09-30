@@ -1,0 +1,505 @@
+{
+  "history": [
+    {
+      "gen": 0,
+      "best_mse": 0.28203,
+      "avg_mse": 0.39869
+    },
+    {
+      "gen": 1,
+      "best_mse": 0.23058,
+      "avg_mse": 0.31502
+    },
+    {
+      "gen": 2,
+      "best_mse": 0.18831,
+      "avg_mse": 0.26697
+    },
+    {
+      "gen": 3,
+      "best_mse": 0.1687,
+      "avg_mse": 0.26509
+    },
+    {
+      "gen": 4,
+      "best_mse": 0.17775,
+      "avg_mse": 0.23763
+    },
+    {
+      "gen": 5,
+      "best_mse": 0.10713,
+      "avg_mse": 0.2141
+    },
+    {
+      "gen": 6,
+      "best_mse": 0.16845,
+      "avg_mse": 0.22298
+    },
+    {
+      "gen": 7,
+      "best_mse": 0.13301,
+      "avg_mse": 0.21872
+    },
+    {
+      "gen": 8,
+      "best_mse": 0.10365,
+      "avg_mse": 0.21227
+    },
+    {
+      "gen": 9,
+      "best_mse": 0.12276,
+      "avg_mse": 0.21663
+    },
+    {
+      "gen": 10,
+      "best_mse": 0.09344,
+      "avg_mse": 0.20246
+    },
+    {
+      "gen": 11,
+      "best_mse": 0.09592,
+      "avg_mse": 0.19835
+    },
+    {
+      "gen": 12,
+      "best_mse": 0.13034,
+      "avg_mse": 0.19639
+    },
+    {
+      "gen": 13,
+      "best_mse": 0.0735,
+      "avg_mse": 0.18992
+    },
+    {
+      "gen": 14,
+      "best_mse": 0.1142,
+      "avg_mse": 0.19765
+    },
+    {
+      "gen": 15,
+      "best_mse": 0.05941,
+      "avg_mse": 0.19526
+    },
+    {
+      "gen": 16,
+      "best_mse": 0.08886,
+      "avg_mse": 0.19077
+    },
+    {
+      "gen": 17,
+      "best_mse": 0.08587,
+      "avg_mse": 0.19144
+    },
+    {
+      "gen": 18,
+      "best_mse": 0.07985,
+      "avg_mse": 0.20175
+    },
+    {
+      "gen": 19,
+      "best_mse": 0.07306,
+      "avg_mse": 0.19206
+    },
+    {
+      "gen": 20,
+      "best_mse": 0.10861,
+      "avg_mse": 0.19923
+    },
+    {
+      "gen": 21,
+      "best_mse": 0.0917,
+      "avg_mse": 0.1841
+    },
+    {
+      "gen": 22,
+      "best_mse": 0.09003,
+      "avg_mse": 0.20357
+    },
+    {
+      "gen": 23,
+      "best_mse": 0.08342,
+      "avg_mse": 0.19641
+    },
+    {
+      "gen": 24,
+      "best_mse": 0.08732,
+      "avg_mse": 0.15818
+    },
+    {
+      "gen": 25,
+      "best_mse": 0.11671,
+      "avg_mse": 0.17296
+    },
+    {
+      "gen": 26,
+      "best_mse": 0.06997,
+      "avg_mse": 0.1621
+    },
+    {
+      "gen": 27,
+      "best_mse": 0.06062,
+      "avg_mse": 0.15667
+    },
+    {
+      "gen": 28,
+      "best_mse": 0.08087,
+      "avg_mse": 0.15992
+    },
+    {
+      "gen": 29,
+      "best_mse": 0.07919,
+      "avg_mse": 0.13259
+    },
+    {
+      "gen": 30,
+      "best_mse": 0.06824,
+      "avg_mse": 0.15583
+    },
+    {
+      "gen": 31,
+      "best_mse": 0.06776,
+      "avg_mse": 0.14803
+    },
+    {
+      "gen": 32,
+      "best_mse": 0.06206,
+      "avg_mse": 0.13534
+    },
+    {
+      "gen": 33,
+      "best_mse": 0.06984,
+      "avg_mse": 0.15155
+    },
+    {
+      "gen": 34,
+      "best_mse": 0.04993,
+      "avg_mse": 0.15405
+    },
+    {
+      "gen": 35,
+      "best_mse": 0.07921,
+      "avg_mse": 0.13485
+    },
+    {
+      "gen": 36,
+      "best_mse": 0.06723,
+      "avg_mse": 0.13778
+    },
+    {
+      "gen": 37,
+      "best_mse": 0.05037,
+      "avg_mse": 0.13595
+    },
+    {
+      "gen": 38,
+      "best_mse": 0.05385,
+      "avg_mse": 0.12789
+    },
+    {
+      "gen": 39,
+      "best_mse": 0.07163,
+      "avg_mse": 0.12472
+    },
+    {
+      "gen": 40,
+      "best_mse": 0.06496,
+      "avg_mse": 0.12457
+    },
+    {
+      "gen": 41,
+      "best_mse": 0.06213,
+      "avg_mse": 0.12659
+    },
+    {
+      "gen": 42,
+      "best_mse": 0.06822,
+      "avg_mse": 0.12823
+    },
+    {
+      "gen": 43,
+      "best_mse": 0.06229,
+      "avg_mse": 0.12746
+    },
+    {
+      "gen": 44,
+      "best_mse": 0.06166,
+      "avg_mse": 0.13495
+    },
+    {
+      "gen": 45,
+      "best_mse": 0.05959,
+      "avg_mse": 0.11879
+    },
+    {
+      "gen": 46,
+      "best_mse": 0.0679,
+      "avg_mse": 0.12625
+    },
+    {
+      "gen": 47,
+      "best_mse": 0.05568,
+      "avg_mse": 0.12014
+    },
+    {
+      "gen": 48,
+      "best_mse": 0.05771,
+      "avg_mse": 0.13585
+    },
+    {
+      "gen": 49,
+      "best_mse": 0.05286,
+      "avg_mse": 0.12318
+    },
+    {
+      "gen": 50,
+      "best_mse": 0.05661,
+      "avg_mse": 0.12704
+    },
+    {
+      "gen": 51,
+      "best_mse": 0.06215,
+      "avg_mse": 0.14245
+    },
+    {
+      "gen": 52,
+      "best_mse": 0.05326,
+      "avg_mse": 0.12853
+    },
+    {
+      "gen": 53,
+      "best_mse": 0.04449,
+      "avg_mse": 0.13314
+    },
+    {
+      "gen": 54,
+      "best_mse": 0.04136,
+      "avg_mse": 0.13015
+    },
+    {
+      "gen": 55,
+      "best_mse": 0.08047,
+      "avg_mse": 0.12497
+    },
+    {
+      "gen": 56,
+      "best_mse": 0.05553,
+      "avg_mse": 0.12825
+    },
+    {
+      "gen": 57,
+      "best_mse": 0.06167,
+      "avg_mse": 0.12479
+    },
+    {
+      "gen": 58,
+      "best_mse": 0.06182,
+      "avg_mse": 0.13171
+    },
+    {
+      "gen": 59,
+      "best_mse": 0.06612,
+      "avg_mse": 0.13067
+    },
+    {
+      "gen": 60,
+      "best_mse": 0.07412,
+      "avg_mse": 0.13248
+    },
+    {
+      "gen": 61,
+      "best_mse": 0.06629,
+      "avg_mse": 0.13256
+    },
+    {
+      "gen": 62,
+      "best_mse": 0.05762,
+      "avg_mse": 0.13019
+    },
+    {
+      "gen": 63,
+      "best_mse": 0.05721,
+      "avg_mse": 0.12526
+    },
+    {
+      "gen": 64,
+      "best_mse": 0.06861,
+      "avg_mse": 0.12256
+    },
+    {
+      "gen": 65,
+      "best_mse": 0.05023,
+      "avg_mse": 0.138
+    },
+    {
+      "gen": 66,
+      "best_mse": 0.06086,
+      "avg_mse": 0.12008
+    },
+    {
+      "gen": 67,
+      "best_mse": 0.06079,
+      "avg_mse": 0.11138
+    },
+    {
+      "gen": 68,
+      "best_mse": 0.07967,
+      "avg_mse": 0.11832
+    },
+    {
+      "gen": 69,
+      "best_mse": 0.05957,
+      "avg_mse": 0.11373
+    },
+    {
+      "gen": 70,
+      "best_mse": 0.06245,
+      "avg_mse": 0.10934
+    },
+    {
+      "gen": 71,
+      "best_mse": 0.0685,
+      "avg_mse": 0.11104
+    },
+    {
+      "gen": 72,
+      "best_mse": 0.05771,
+      "avg_mse": 0.12259
+    },
+    {
+      "gen": 73,
+      "best_mse": 0.04934,
+      "avg_mse": 0.11146
+    },
+    {
+      "gen": 74,
+      "best_mse": 0.06503,
+      "avg_mse": 0.11143
+    },
+    {
+      "gen": 75,
+      "best_mse": 0.05982,
+      "avg_mse": 0.11839
+    },
+    {
+      "gen": 76,
+      "best_mse": 0.05081,
+      "avg_mse": 0.10687
+    },
+    {
+      "gen": 77,
+      "best_mse": 0.05682,
+      "avg_mse": 0.10561
+    },
+    {
+      "gen": 78,
+      "best_mse": 0.06316,
+      "avg_mse": 0.11119
+    },
+    {
+      "gen": 79,
+      "best_mse": 0.06249,
+      "avg_mse": 0.10836
+    },
+    {
+      "gen": 80,
+      "best_mse": 0.04984,
+      "avg_mse": 0.10457
+    },
+    {
+      "gen": 81,
+      "best_mse": 0.06872,
+      "avg_mse": 0.11226
+    },
+    {
+      "gen": 82,
+      "best_mse": 0.05728,
+      "avg_mse": 0.09994
+    },
+    {
+      "gen": 83,
+      "best_mse": 0.05535,
+      "avg_mse": 0.10395
+    },
+    {
+      "gen": 84,
+      "best_mse": 0.06136,
+      "avg_mse": 0.10215
+    },
+    {
+      "gen": 85,
+      "best_mse": 0.05821,
+      "avg_mse": 0.1075
+    },
+    {
+      "gen": 86,
+      "best_mse": 0.06394,
+      "avg_mse": 0.11355
+    },
+    {
+      "gen": 87,
+      "best_mse": 0.06515,
+      "avg_mse": 0.1032
+    },
+    {
+      "gen": 88,
+      "best_mse": 0.04853,
+      "avg_mse": 0.10987
+    },
+    {
+      "gen": 89,
+      "best_mse": 0.06033,
+      "avg_mse": 0.10799
+    },
+    {
+      "gen": 90,
+      "best_mse": 0.04556,
+      "avg_mse": 0.09124
+    },
+    {
+      "gen": 91,
+      "best_mse": 0.05936,
+      "avg_mse": 0.10783
+    },
+    {
+      "gen": 92,
+      "best_mse": 0.06185,
+      "avg_mse": 0.10152
+    },
+    {
+      "gen": 93,
+      "best_mse": 0.04764,
+      "avg_mse": 0.10954
+    },
+    {
+      "gen": 94,
+      "best_mse": 0.054,
+      "avg_mse": 0.11259
+    },
+    {
+      "gen": 95,
+      "best_mse": 0.06841,
+      "avg_mse": 0.10725
+    },
+    {
+      "gen": 96,
+      "best_mse": 0.08004,
+      "avg_mse": 0.12374
+    },
+    {
+      "gen": 97,
+      "best_mse": 0.05886,
+      "avg_mse": 0.11224
+    },
+    {
+      "gen": 98,
+      "best_mse": 0.07089,
+      "avg_mse": 0.1167
+    },
+    {
+      "gen": 99,
+      "best_mse": 0.06817,
+      "avg_mse": 0.12012
+    }
+  ],
+  "final_best_mse": 0.06817
+}
