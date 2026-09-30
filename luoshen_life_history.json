@@ -1,0 +1,2404 @@
+[
+  {
+    "step": 1,
+    "position": [
+      -0.006324340432449393,
+      0.012059884770637744,
+      0.0
+    ],
+    "action": "创造",
+    "goal": "self_improve_0",
+    "perception": {
+      "n_contact": 0,
+      "n_near": 0,
+      "n_far": 2,
+      "total_perceived": 2,
+      "contact_ids": [],
+      "near_ids": []
+    },
+    "body_concepts": [
+      "静止",
+      "运动",
+      "新奇",
+      "熟悉",
+      "孤独"
+    ],
+    "concepts_learned": [
+      "孤独",
+      "静止",
+      "新奇"
+    ],
+    "atp": 0.774,
+    "homeostasis": {
+      "energy": 0.8,
+      "arousal": 0.5,
+      "novelty": 0.6,
+      "social": 0.45,
+      "integrity": 1.0
+    }
+  },
+  {
+    "step": 2,
+    "position": [
+      -0.019961977937964292,
+      0.03463253146717447,
+      0.0
+    ],
+    "action": "社交交互",
+    "goal": "self_improve_0",
+    "perception": {
+      "n_contact": 0,
+      "n_near": 0,
+      "n_far": 3,
+      "total_perceived": 3,
+      "contact_ids": [],
+      "near_ids": []
+    },
+    "body_concepts": [
+      "静止",
+      "运动",
+      "新奇",
+      "熟悉",
+      "孤独"
+    ],
+    "concepts_learned": [
+      "孤独",
+      "静止",
+      "新奇"
+    ],
+    "atp": 0.7630000000000001,
+    "homeostasis": {
+      "energy": 0.77,
+      "arousal": 0.59,
+      "novelty": 0.86,
+      "social": 0.49,
+      "integrity": 1.0
+    }
+  },
+  {
+    "step": 3,
+    "position": [
+      -0.04382197409657934,
+      0.06340374941806584,
+      0.0
+    ],
+    "action": "社交交互",
+    "goal": "self_improve_0",
+    "perception": {
+      "n_contact": 0,
+      "n_near": 0,
+      "n_far": 3,
+      "total_perceived": 3,
+      "contact_ids": [],
+      "near_ids": []
+    },
+    "body_concepts": [
+      "静止",
+      "运动",
+      "熟悉",
+      "新奇",
+      "孤独"
+    ],
+    "concepts_learned": [
+      "孤独",
+      "熟悉",
+      "静止",
+      "新奇"
+    ],
+    "atp": 0.7520000000000002,
+    "homeostasis": {
+      "energy": 0.76,
+      "arousal": 0.66,
+      "novelty": 0.85,
+      "social": 0.66,
+      "integrity": 0.99
+    }
+  },
+  {
+    "step": 4,
+    "position": [
+      -0.10431404329962676,
+      -0.33610934038920115,
+      0.0
+    ],
+    "action": "社交交互",
+    "goal": "self_improve_0",
+    "perception": {
+      "n_contact": 0,
+      "n_near": 2,
+      "n_far": 1,
+      "total_perceived": 3,
+      "contact_ids": [],
+      "near_ids": [
+        "朋友",
+        "水源"
+      ]
+    },
+    "body_concepts": [
+      "运动",
+      "静止",
+      "熟悉",
+      "新奇",
+      "孤独"
+    ],
+    "concepts_learned": [
+      "运动",
+      "静止",
+      "孤独",
+      "新奇",
+      "熟悉"
+    ],
+    "atp": 0.7410000000000002,
+    "homeostasis": {
+      "energy": 0.75,
+      "arousal": 0.75,
+      "novelty": 0.84,
+      "social": 0.86,
+      "integrity": 0.99
+    }
+  },
+  {
+    "step": 5,
+    "position": [
+      -0.2513803120111565,
+      -0.819702310354869,
+      0.0
+    ],
+    "action": "社交交互",
+    "goal": "self_improve_0",
+    "perception": {
+      "n_contact": 0,
+      "n_near": 1,
+      "n_far": 2,
+      "total_perceived": 3,
+      "contact_ids": [],
+      "near_ids": [
+        "水源"
+      ]
+    },
+    "body_concepts": [
+      "运动",
+      "静止",
+      "熟悉",
+      "新奇",
+      "孤独"
+    ],
+    "concepts_learned": [
+      "运动",
+      "静止",
+      "孤独",
+      "新奇",
+      "熟悉"
+    ],
+    "atp": 0.7300000000000003,
+    "homeostasis": {
+      "energy": 0.74,
+      "arousal": 0.84,
+      "novelty": 0.83,
+      "social": 0.98,
+      "integrity": 0.98
+    }
+  },
+  {
+    "step": 6,
+    "position": [
+      -0.4050356665652888,
+      -1.148107819881677,
+      0.0
+    ],
+    "action": "社交交互",
+    "goal": "self_improve_0",
+    "perception": {
+      "n_contact": 0,
+      "n_near": 1,
+      "n_far": 1,
+      "total_perceived": 2,
+      "contact_ids": [],
+      "near_ids": [
+        "水源"
+      ]
+    },
+    "body_concepts": [
+      "运动",
+      "静止",
+      "熟悉",
+      "新奇",
+      "孤独"
+    ],
+    "concepts_learned": [
+      "运动",
+      "静止",
+      "孤独",
+      "新奇",
+      "熟悉"
+    ],
+    "atp": 0.7190000000000003,
+    "homeostasis": {
+      "energy": 0.73,
+      "arousal": 0.93,
+      "novelty": 0.81,
+      "social": 0.98,
+      "integrity": 0.98
+    }
+  },
+  {
+    "step": 7,
+    "position": [
+      -0.4233938939999048,
+      -1.4237249477885747,
+      0.0
+    ],
+    "action": "社交交互",
+    "goal": "self_improve_0",
+    "perception": {
+      "n_contact": 0,
+      "n_near": 0,
+      "n_far": 1,
+      "total_perceived": 1,
+      "contact_ids": [],
+      "near_ids": []
+    },
+    "body_concepts": [
+      "运动",
+      "静止",
+      "熟悉",
+      "新奇",
+      "孤独"
+    ],
+    "concepts_learned": [
+      "运动",
+      "静止",
+      "孤独",
+      "新奇",
+      "熟悉"
+    ],
+    "atp": 0.7080000000000004,
+    "homeostasis": {
+      "energy": 0.72,
+      "arousal": 0.98,
+      "novelty": 0.8,
+      "social": 0.93,
+      "integrity": 0.97
+    }
+  },
+  {
+    "step": 8,
+    "position": [
+      -0.43473365936582103,
+      -1.6976709341950436,
+      0.0
+    ],
+    "action": "社交交互",
+    "goal": "self_improve_0",
+    "perception": {
+      "n_contact": 0,
+      "n_near": 0,
+      "n_far": 1,
+      "total_perceived": 1,
+      "contact_ids": [],
+      "near_ids": []
+    },
+    "body_concepts": [
+      "运动",
+      "静止",
+      "熟悉",
+      "新奇",
+      "孤独"
+    ],
+    "concepts_learned": [
+      "运动",
+      "静止",
+      "孤独",
+      "新奇",
+      "熟悉"
+    ],
+    "atp": 0.6970000000000005,
+    "homeostasis": {
+      "energy": 0.71,
+      "arousal": 0.98,
+      "novelty": 0.79,
+      "social": 0.93,
+      "integrity": 0.97
+    }
+  },
+  {
+    "step": 9,
+    "position": [
+      -0.44675941222942,
+      -1.9589720424791404,
+      -0.0014728619626386775
+    ],
+    "action": "社交交互",
+    "goal": "self_improve_0",
+    "perception": {
+      "n_contact": 0,
+      "n_near": 0,
+      "n_far": 0,
+      "total_perceived": 0,
+      "contact_ids": [],
+      "near_ids": []
+    },
+    "body_concepts": [
+      "运动",
+      "静止",
+      "熟悉",
+      "新奇",
+      "孤独"
+    ],
+    "concepts_learned": [
+      "运动",
+      "静止",
+      "孤独",
+      "新奇",
+      "熟悉"
+    ],
+    "atp": 0.6860000000000005,
+    "homeostasis": {
+      "energy": 0.7,
+      "arousal": 0.98,
+      "novelty": 0.78,
+      "social": 0.93,
+      "integrity": 0.97
+    }
+  },
+  {
+    "step": 10,
+    "position": [
+      -0.4657461851731693,
+      -2.2066565267062046,
+      0.0024681596402131344
+    ],
+    "action": "社交交互",
+    "goal": "self_improve_0",
+    "perception": {
+      "n_contact": 0,
+      "n_near": 0,
+      "n_far": 0,
+      "total_perceived": 0,
+      "contact_ids": [],
+      "near_ids": []
+    },
+    "body_concepts": [
+      "运动",
+      "静止",
+      "熟悉",
+      "新奇",
+      "孤独"
+    ],
+    "concepts_learned": [
+      "运动",
+      "静止",
+      "孤独",
+      "新奇",
+      "熟悉"
+    ],
+    "atp": 0.6750000000000006,
+    "homeostasis": {
+      "energy": 0.69,
+      "arousal": 0.98,
+      "novelty": 0.78,
+      "social": 0.93,
+      "integrity": 0.96
+    }
+  },
+  {
+    "step": 11,
+    "position": [
+      -0.4845682256058844,
+      -2.4438174071669443,
+      0.008883754513379674
+    ],
+    "action": "社交交互",
+    "goal": "self_improve_0",
+    "perception": {
+      "n_contact": 0,
+      "n_near": 0,
+      "n_far": 0,
+      "total_perceived": 0,
+      "contact_ids": [],
+      "near_ids": []
+    },
+    "body_concepts": [
+      "运动",
+      "静止",
+      "熟悉",
+      "新奇",
+      "孤独"
+    ],
+    "concepts_learned": [
+      "运动",
+      "静止",
+      "孤独",
+      "新奇",
+      "熟悉"
+    ],
+    "atp": 0.6640000000000006,
+    "homeostasis": {
+      "energy": 0.68,
+      "arousal": 0.98,
+      "novelty": 0.77,
+      "social": 0.93,
+      "integrity": 0.96
+    }
+  },
+  {
+    "step": 12,
+    "position": [
+      -0.5081612277146432,
+      -2.6708328141513507,
+      0.012978394648888418
+    ],
+    "action": "社交交互",
+    "goal": "self_improve_0",
+    "perception": {
+      "n_contact": 0,
+      "n_near": 0,
+      "n_far": 0,
+      "total_perceived": 0,
+      "contact_ids": [],
+      "near_ids": []
+    },
+    "body_concepts": [
+      "运动",
+      "静止",
+      "熟悉",
+      "新奇",
+      "孤独"
+    ],
+    "concepts_learned": [
+      "运动",
+      "静止",
+      "孤独",
+      "新奇",
+      "熟悉"
+    ],
+    "atp": 0.6530000000000007,
+    "homeostasis": {
+      "energy": 0.66,
+      "arousal": 0.98,
+      "novelty": 0.76,
+      "social": 0.93,
+      "integrity": 0.96
+    }
+  },
+  {
+    "step": 13,
+    "position": [
+      -0.5249058396564544,
+      -2.8910307113675424,
+      0.014309407048897854
+    ],
+    "action": "社交交互",
+    "goal": "self_improve_0",
+    "perception": {
+      "n_contact": 0,
+      "n_near": 0,
+      "n_far": 0,
+      "total_perceived": 0,
+      "contact_ids": [],
+      "near_ids": []
+    },
+    "body_concepts": [
+      "运动",
+      "静止",
+      "熟悉",
+      "新奇",
+      "孤独"
+    ],
+    "concepts_learned": [
+      "运动",
+      "静止",
+      "孤独",
+      "新奇",
+      "熟悉"
+    ],
+    "atp": 0.6420000000000008,
+    "homeostasis": {
+      "energy": 0.65,
+      "arousal": 0.98,
+      "novelty": 0.75,
+      "social": 0.93,
+      "integrity": 0.95
+    }
+  },
+  {
+    "step": 14,
+    "position": [
+      -0.5469858258601134,
+      -3.097090912987755,
+      0.014816438856011603
+    ],
+    "action": "社交交互",
+    "goal": "self_improve_0",
+    "perception": {
+      "n_contact": 0,
+      "n_near": 0,
+      "n_far": 0,
+      "total_perceived": 0,
+      "contact_ids": [],
+      "near_ids": []
+    },
+    "body_concepts": [
+      "运动",
+      "静止",
+      "熟悉",
+      "新奇",
+      "孤独"
+    ],
+    "concepts_learned": [
+      "运动",
+      "静止",
+      "孤独",
+      "新奇",
+      "熟悉"
+    ],
+    "atp": 0.6310000000000007,
+    "homeostasis": {
+      "energy": 0.64,
+      "arousal": 0.98,
+      "novelty": 0.74,
+      "social": 0.93,
+      "integrity": 0.95
+    }
+  },
+  {
+    "step": 15,
+    "position": [
+      -0.5667412828912529,
+      -3.288428552824828,
+      0.010685354024777109
+    ],
+    "action": "社交交互",
+    "goal": "self_improve_0",
+    "perception": {
+      "n_contact": 0,
+      "n_near": 0,
+      "n_far": 0,
+      "total_perceived": 0,
+      "contact_ids": [],
+      "near_ids": []
+    },
+    "body_concepts": [
+      "运动",
+      "静止",
+      "熟悉",
+      "新奇",
+      "孤独"
+    ],
+    "concepts_learned": [
+      "运动",
+      "静止",
+      "孤独",
+      "新奇",
+      "熟悉"
+    ],
+    "atp": 0.6200000000000007,
+    "homeostasis": {
+      "energy": 0.63,
+      "arousal": 0.98,
+      "novelty": 0.74,
+      "social": 0.93,
+      "integrity": 0.95
+    }
+  },
+  {
+    "step": 16,
+    "position": [
+      -0.5928854058453047,
+      -3.470014385481489,
+      0.008887557557206494
+    ],
+    "action": "社交交互",
+    "goal": "self_improve_0",
+    "perception": {
+      "n_contact": 0,
+      "n_near": 0,
+      "n_far": 0,
+      "total_perceived": 0,
+      "contact_ids": [],
+      "near_ids": []
+    },
+    "body_concepts": [
+      "运动",
+      "静止",
+      "熟悉",
+      "新奇",
+      "孤独"
+    ],
+    "concepts_learned": [
+      "运动",
+      "静止",
+      "孤独",
+      "新奇",
+      "熟悉"
+    ],
+    "atp": 0.6090000000000007,
+    "homeostasis": {
+      "energy": 0.62,
+      "arousal": 0.98,
+      "novelty": 0.73,
+      "social": 0.93,
+      "integrity": 0.95
+    }
+  },
+  {
+    "step": 17,
+    "position": [
+      -0.6119998264410377,
+      -3.6467477666103343,
+      0.008405913363663867
+    ],
+    "action": "社交交互",
+    "goal": "self_improve_0",
+    "perception": {
+      "n_contact": 0,
+      "n_near": 0,
+      "n_far": 0,
+      "total_perceived": 0,
+      "contact_ids": [],
+      "near_ids": []
+    },
+    "body_concepts": [
+      "运动",
+      "静止",
+      "熟悉",
+      "新奇",
+      "孤独"
+    ],
+    "concepts_learned": [
+      "运动",
+      "静止",
+      "孤独",
+      "新奇",
+      "熟悉"
+    ],
+    "atp": 0.5980000000000006,
+    "homeostasis": {
+      "energy": 0.61,
+      "arousal": 0.98,
+      "novelty": 0.72,
+      "social": 0.93,
+      "integrity": 0.94
+    }
+  },
+  {
+    "step": 18,
+    "position": [
+      -0.6325402726375774,
+      -3.809561556193249,
+      0.003665001291252505
+    ],
+    "action": "学习新信息",
+    "goal": "self_improve_0",
+    "perception": {
+      "n_contact": 0,
+      "n_near": 0,
+      "n_far": 0,
+      "total_perceived": 0,
+      "contact_ids": [],
+      "near_ids": []
+    },
+    "body_concepts": [
+      "运动",
+      "静止",
+      "熟悉",
+      "新奇",
+      "孤独"
+    ],
+    "concepts_learned": [
+      "运动",
+      "静止",
+      "孤独",
+      "新奇",
+      "熟悉"
+    ],
+    "atp": 0.5770000000000006,
+    "homeostasis": {
+      "energy": 0.6,
+      "arousal": 0.98,
+      "novelty": 0.72,
+      "social": 0.93,
+      "integrity": 0.94
+    }
+  },
+  {
+    "step": 19,
+    "position": [
+      -0.6579983583442461,
+      -3.960520788489025,
+      0.0003035638797942051
+    ],
+    "action": "学习新信息",
+    "goal": "self_improve_0",
+    "perception": {
+      "n_contact": 0,
+      "n_near": 0,
+      "n_far": 0,
+      "total_perceived": 0,
+      "contact_ids": [],
+      "near_ids": []
+    },
+    "body_concepts": [
+      "运动",
+      "静止",
+      "熟悉",
+      "新奇",
+      "孤独"
+    ],
+    "concepts_learned": [
+      "运动",
+      "静止",
+      "孤独",
+      "新奇",
+      "熟悉"
+    ],
+    "atp": 0.5560000000000006,
+    "homeostasis": {
+      "energy": 0.58,
+      "arousal": 0.98,
+      "novelty": 0.92,
+      "social": 0.86,
+      "integrity": 0.94
+    }
+  },
+  {
+    "step": 20,
+    "position": [
+      -0.6731133221308193,
+      -4.10911518452435,
+      -0.005051367841816478
+    ],
+    "action": "学习新信息",
+    "goal": "self_improve_0",
+    "perception": {
+      "n_contact": 0,
+      "n_near": 0,
+      "n_far": 0,
+      "total_perceived": 0,
+      "contact_ids": [],
+      "near_ids": []
+    },
+    "body_concepts": [
+      "运动",
+      "静止",
+      "熟悉",
+      "新奇",
+      "孤独"
+    ],
+    "concepts_learned": [
+      "运动",
+      "静止",
+      "孤独",
+      "新奇",
+      "熟悉"
+    ],
+    "atp": 0.5350000000000006,
+    "homeostasis": {
+      "energy": 0.56,
+      "arousal": 0.98,
+      "novelty": 0.98,
+      "social": 0.8,
+      "integrity": 0.94
+    }
+  },
+  {
+    "step": 21,
+    "position": [
+      -0.6789583053470953,
+      -4.2550985459155335,
+      -0.011772270221799625
+    ],
+    "action": "创造",
+    "goal": "self_improve_0",
+    "perception": {
+      "n_contact": 0,
+      "n_near": 0,
+      "n_far": 0,
+      "total_perceived": 0,
+      "contact_ids": [],
+      "near_ids": []
+    },
+    "body_concepts": [
+      "运动",
+      "静止",
+      "熟悉",
+      "新奇",
+      "孤独"
+    ],
+    "concepts_learned": [
+      "运动",
+      "静止",
+      "孤独",
+      "新奇",
+      "熟悉"
+    ],
+    "atp": 0.9090000000000006,
+    "homeostasis": {
+      "energy": 0.94,
+      "arousal": 0.68,
+      "novelty": 0.88,
+      "social": 0.74,
+      "integrity": 0.94
+    }
+  },
+  {
+    "step": 22,
+    "position": [
+      -0.6809912973467067,
+      -4.393012823247804,
+      -0.022748518415682734
+    ],
+    "action": "创造",
+    "goal": "self_improve_0",
+    "perception": {
+      "n_contact": 0,
+      "n_near": 0,
+      "n_far": 0,
+      "total_perceived": 0,
+      "contact_ids": [],
+      "near_ids": []
+    },
+    "body_concepts": [
+      "运动",
+      "静止",
+      "熟悉",
+      "新奇",
+      "孤独"
+    ],
+    "concepts_learned": [
+      "运动",
+      "静止",
+      "孤独",
+      "新奇",
+      "熟悉"
+    ],
+    "atp": 0.8830000000000007,
+    "homeostasis": {
+      "energy": 0.91,
+      "arousal": 0.77,
+      "novelty": 0.98,
+      "social": 0.79,
+      "integrity": 0.93
+    }
+  },
+  {
+    "step": 23,
+    "position": [
+      -0.6787413175683131,
+      -4.522399908183918,
+      -0.033590897956789524
+    ],
+    "action": "社交交互",
+    "goal": "self_improve_0",
+    "perception": {
+      "n_contact": 0,
+      "n_near": 0,
+      "n_far": 0,
+      "total_perceived": 0,
+      "contact_ids": [],
+      "near_ids": []
+    },
+    "body_concepts": [
+      "运动",
+      "静止",
+      "熟悉",
+      "新奇",
+      "孤独"
+    ],
+    "concepts_learned": [
+      "运动",
+      "静止",
+      "孤独",
+      "新奇",
+      "熟悉"
+    ],
+    "atp": 0.8720000000000008,
+    "homeostasis": {
+      "energy": 0.88,
+      "arousal": 0.86,
+      "novelty": 0.98,
+      "social": 0.81,
+      "integrity": 0.93
+    }
+  },
+  {
+    "step": 24,
+    "position": [
+      -0.67667752414738,
+      -4.6403278366583915,
+      -0.04698652218214733
+    ],
+    "action": "社交交互",
+    "goal": "self_improve_0",
+    "perception": {
+      "n_contact": 0,
+      "n_near": 0,
+      "n_far": 0,
+      "total_perceived": 0,
+      "contact_ids": [],
+      "near_ids": []
+    },
+    "body_concepts": [
+      "运动",
+      "静止",
+      "熟悉",
+      "新奇",
+      "孤独"
+    ],
+    "concepts_learned": [
+      "运动",
+      "静止",
+      "孤独",
+      "新奇",
+      "熟悉"
+    ],
+    "atp": 0.8610000000000008,
+    "homeostasis": {
+      "energy": 0.87,
+      "arousal": 0.96,
+      "novelty": 0.96,
+      "social": 0.93,
+      "integrity": 0.93
+    }
+  },
+  {
+    "step": 25,
+    "position": [
+      -0.6774708130453997,
+      -4.746943211557431,
+      -0.055654864099912396
+    ],
+    "action": "社交交互",
+    "goal": "self_improve_0",
+    "perception": {
+      "n_contact": 0,
+      "n_near": 0,
+      "n_far": 0,
+      "total_perceived": 0,
+      "contact_ids": [],
+      "near_ids": []
+    },
+    "body_concepts": [
+      "运动",
+      "静止",
+      "熟悉",
+      "新奇",
+      "孤独"
+    ],
+    "concepts_learned": [
+      "运动",
+      "静止",
+      "孤独",
+      "新奇",
+      "熟悉"
+    ],
+    "atp": 0.8500000000000009,
+    "homeostasis": {
+      "energy": 0.86,
+      "arousal": 0.98,
+      "novelty": 0.94,
+      "social": 0.93,
+      "integrity": 0.93
+    }
+  },
+  {
+    "step": 26,
+    "position": [
+      -0.6822869137532408,
+      -4.848597561278121,
+      -0.05646345700998938
+    ],
+    "action": "社交交互",
+    "goal": "self_improve_0",
+    "perception": {
+      "n_contact": 0,
+      "n_near": 0,
+      "n_far": 0,
+      "total_perceived": 0,
+      "contact_ids": [],
+      "near_ids": []
+    },
+    "body_concepts": [
+      "运动",
+      "静止",
+      "熟悉",
+      "新奇",
+      "孤独"
+    ],
+    "concepts_learned": [
+      "运动",
+      "静止",
+      "孤独",
+      "新奇",
+      "熟悉"
+    ],
+    "atp": 0.8390000000000009,
+    "homeostasis": {
+      "energy": 0.85,
+      "arousal": 0.98,
+      "novelty": 0.93,
+      "social": 0.93,
+      "integrity": 0.93
+    }
+  },
+  {
+    "step": 27,
+    "position": [
+      -0.6794820672747531,
+      -4.9416301005639385,
+      -0.05903872402112282
+    ],
+    "action": "社交交互",
+    "goal": "self_improve_0",
+    "perception": {
+      "n_contact": 0,
+      "n_near": 0,
+      "n_far": 0,
+      "total_perceived": 0,
+      "contact_ids": [],
+      "near_ids": []
+    },
+    "body_concepts": [
+      "运动",
+      "静止",
+      "熟悉",
+      "新奇",
+      "孤独"
+    ],
+    "concepts_learned": [
+      "运动",
+      "静止",
+      "孤独",
+      "新奇",
+      "熟悉"
+    ],
+    "atp": 0.828000000000001,
+    "homeostasis": {
+      "energy": 0.84,
+      "arousal": 0.98,
+      "novelty": 0.91,
+      "social": 0.93,
+      "integrity": 0.93
+    }
+  },
+  {
+    "step": 28,
+    "position": [
+      -0.6827582655307735,
+      -5.034854588448893,
+      -0.06404774461364782
+    ],
+    "action": "社交交互",
+    "goal": "self_improve_0",
+    "perception": {
+      "n_contact": 0,
+      "n_near": 0,
+      "n_far": 0,
+      "total_perceived": 0,
+      "contact_ids": [],
+      "near_ids": []
+    },
+    "body_concepts": [
+      "运动",
+      "静止",
+      "熟悉",
+      "新奇",
+      "孤独"
+    ],
+    "concepts_learned": [
+      "运动",
+      "静止",
+      "孤独",
+      "新奇",
+      "熟悉"
+    ],
+    "atp": 0.8170000000000011,
+    "homeostasis": {
+      "energy": 0.83,
+      "arousal": 0.98,
+      "novelty": 0.89,
+      "social": 0.93,
+      "integrity": 0.93
+    }
+  },
+  {
+    "step": 29,
+    "position": [
+      -0.6950365993778406,
+      -5.124678128360728,
+      -0.06427584753727014
+    ],
+    "action": "社交交互",
+    "goal": "self_improve_0",
+    "perception": {
+      "n_contact": 0,
+      "n_near": 0,
+      "n_far": 0,
+      "total_perceived": 0,
+      "contact_ids": [],
+      "near_ids": []
+    },
+    "body_concepts": [
+      "运动",
+      "静止",
+      "熟悉",
+      "新奇",
+      "孤独"
+    ],
+    "concepts_learned": [
+      "运动",
+      "静止",
+      "孤独",
+      "新奇",
+      "熟悉"
+    ],
+    "atp": 0.806000000000001,
+    "homeostasis": {
+      "energy": 0.82,
+      "arousal": 0.98,
+      "novelty": 0.88,
+      "social": 0.93,
+      "integrity": 0.92
+    }
+  },
+  {
+    "step": 30,
+    "position": [
+      -0.7081774712372856,
+      -5.214585967206657,
+      -0.06558829834163062
+    ],
+    "action": "社交交互",
+    "goal": "self_improve_0",
+    "perception": {
+      "n_contact": 0,
+      "n_near": 0,
+      "n_far": 0,
+      "total_perceived": 0,
+      "contact_ids": [],
+      "near_ids": []
+    },
+    "body_concepts": [
+      "运动",
+      "静止",
+      "熟悉",
+      "新奇",
+      "孤独"
+    ],
+    "concepts_learned": [
+      "运动",
+      "静止",
+      "孤独",
+      "新奇",
+      "熟悉"
+    ],
+    "atp": 0.7950000000000012,
+    "homeostasis": {
+      "energy": 0.81,
+      "arousal": 0.98,
+      "novelty": 0.87,
+      "social": 0.93,
+      "integrity": 0.92
+    }
+  },
+  {
+    "step": 31,
+    "position": [
+      -0.714447489720844,
+      -5.305742378755592,
+      -0.062140465624069004
+    ],
+    "action": "社交交互",
+    "goal": "self_improve_0",
+    "perception": {
+      "n_contact": 0,
+      "n_near": 0,
+      "n_far": 0,
+      "total_perceived": 0,
+      "contact_ids": [],
+      "near_ids": []
+    },
+    "body_concepts": [
+      "运动",
+      "静止",
+      "熟悉",
+      "新奇",
+      "孤独"
+    ],
+    "concepts_learned": [
+      "运动",
+      "静止",
+      "孤独",
+      "新奇",
+      "熟悉"
+    ],
+    "atp": 0.7840000000000011,
+    "homeostasis": {
+      "energy": 0.8,
+      "arousal": 0.98,
+      "novelty": 0.85,
+      "social": 0.93,
+      "integrity": 0.92
+    }
+  },
+  {
+    "step": 32,
+    "position": [
+      -0.7146395890425447,
+      -5.3895388102312385,
+      -0.05744888181467679
+    ],
+    "action": "社交交互",
+    "goal": "self_improve_0",
+    "perception": {
+      "n_contact": 0,
+      "n_near": 0,
+      "n_far": 0,
+      "total_perceived": 0,
+      "contact_ids": [],
+      "near_ids": []
+    },
+    "body_concepts": [
+      "运动",
+      "静止",
+      "熟悉",
+      "新奇",
+      "孤独"
+    ],
+    "concepts_learned": [
+      "运动",
+      "静止",
+      "孤独",
+      "新奇",
+      "熟悉"
+    ],
+    "atp": 0.7730000000000012,
+    "homeostasis": {
+      "energy": 0.78,
+      "arousal": 0.98,
+      "novelty": 0.84,
+      "social": 0.93,
+      "integrity": 0.92
+    }
+  },
+  {
+    "step": 33,
+    "position": [
+      -0.7163541712415663,
+      -5.46393853451409,
+      -0.055147062991249524
+    ],
+    "action": "社交交互",
+    "goal": "self_improve_0",
+    "perception": {
+      "n_contact": 0,
+      "n_near": 0,
+      "n_far": 0,
+      "total_perceived": 0,
+      "contact_ids": [],
+      "near_ids": []
+    },
+    "body_concepts": [
+      "运动",
+      "静止",
+      "熟悉",
+      "新奇",
+      "孤独"
+    ],
+    "concepts_learned": [
+      "运动",
+      "静止",
+      "孤独",
+      "新奇",
+      "熟悉"
+    ],
+    "atp": 0.7620000000000013,
+    "homeostasis": {
+      "energy": 0.77,
+      "arousal": 0.98,
+      "novelty": 0.83,
+      "social": 0.93,
+      "integrity": 0.92
+    }
+  },
+  {
+    "step": 34,
+    "position": [
+      -0.7187716862357054,
+      -5.52881728572681,
+      -0.054871509898880615
+    ],
+    "action": "社交交互",
+    "goal": "self_improve_0",
+    "perception": {
+      "n_contact": 0,
+      "n_near": 0,
+      "n_far": 0,
+      "total_perceived": 0,
+      "contact_ids": [],
+      "near_ids": []
+    },
+    "body_concepts": [
+      "运动",
+      "静止",
+      "熟悉",
+      "新奇",
+      "孤独"
+    ],
+    "concepts_learned": [
+      "运动",
+      "静止",
+      "孤独",
+      "新奇",
+      "熟悉"
+    ],
+    "atp": 0.7510000000000013,
+    "homeostasis": {
+      "energy": 0.76,
+      "arousal": 0.98,
+      "novelty": 0.82,
+      "social": 0.93,
+      "integrity": 0.92
+    }
+  },
+  {
+    "step": 35,
+    "position": [
+      -0.7161074441234683,
+      -5.587199394275495,
+      -0.058799168953483125
+    ],
+    "action": "社交交互",
+    "goal": "self_improve_0",
+    "perception": {
+      "n_contact": 0,
+      "n_near": 0,
+      "n_far": 0,
+      "total_perceived": 0,
+      "contact_ids": [],
+      "near_ids": []
+    },
+    "body_concepts": [
+      "运动",
+      "静止",
+      "熟悉",
+      "新奇",
+      "孤独"
+    ],
+    "concepts_learned": [
+      "运动",
+      "静止",
+      "孤独",
+      "新奇",
+      "熟悉"
+    ],
+    "atp": 0.7400000000000014,
+    "homeostasis": {
+      "energy": 0.75,
+      "arousal": 0.98,
+      "novelty": 0.81,
+      "social": 0.93,
+      "integrity": 0.92
+    }
+  },
+  {
+    "step": 36,
+    "position": [
+      -0.7171649475110081,
+      -5.636591537758491,
+      -0.06441588604281631
+    ],
+    "action": "社交交互",
+    "goal": "self_improve_0",
+    "perception": {
+      "n_contact": 0,
+      "n_near": 0,
+      "n_far": 0,
+      "total_perceived": 0,
+      "contact_ids": [],
+      "near_ids": []
+    },
+    "body_concepts": [
+      "运动",
+      "静止",
+      "熟悉",
+      "新奇",
+      "孤独"
+    ],
+    "concepts_learned": [
+      "运动",
+      "静止",
+      "孤独",
+      "新奇",
+      "熟悉"
+    ],
+    "atp": 0.7290000000000014,
+    "homeostasis": {
+      "energy": 0.74,
+      "arousal": 0.98,
+      "novelty": 0.8,
+      "social": 0.93,
+      "integrity": 0.92
+    }
+  },
+  {
+    "step": 37,
+    "position": [
+      -0.7088510922434403,
+      -5.687542845037159,
+      -0.07391224012607134
+    ],
+    "action": "社交交互",
+    "goal": "self_improve_0",
+    "perception": {
+      "n_contact": 0,
+      "n_near": 0,
+      "n_far": 0,
+      "total_perceived": 0,
+      "contact_ids": [],
+      "near_ids": []
+    },
+    "body_concepts": [
+      "静止",
+      "运动",
+      "熟悉",
+      "新奇",
+      "孤独"
+    ],
+    "concepts_learned": [
+      "运动",
+      "静止",
+      "孤独",
+      "新奇",
+      "熟悉"
+    ],
+    "atp": 0.7180000000000015,
+    "homeostasis": {
+      "energy": 0.73,
+      "arousal": 0.98,
+      "novelty": 0.79,
+      "social": 0.93,
+      "integrity": 0.92
+    }
+  },
+  {
+    "step": 38,
+    "position": [
+      -0.6886038561472199,
+      -5.735215876531275,
+      -0.08183537629900575
+    ],
+    "action": "社交交互",
+    "goal": "self_improve_0",
+    "perception": {
+      "n_contact": 0,
+      "n_near": 0,
+      "n_far": 0,
+      "total_perceived": 0,
+      "contact_ids": [],
+      "near_ids": []
+    },
+    "body_concepts": [
+      "运动",
+      "静止",
+      "熟悉",
+      "新奇",
+      "孤独"
+    ],
+    "concepts_learned": [
+      "运动",
+      "静止",
+      "孤独",
+      "新奇",
+      "熟悉"
+    ],
+    "atp": 0.7070000000000016,
+    "homeostasis": {
+      "energy": 0.72,
+      "arousal": 0.98,
+      "novelty": 0.78,
+      "social": 0.93,
+      "integrity": 0.91
+    }
+  },
+  {
+    "step": 39,
+    "position": [
+      -0.6605314024380091,
+      -5.780802260517395,
+      -0.08867071166989265
+    ],
+    "action": "社交交互",
+    "goal": "self_improve_0",
+    "perception": {
+      "n_contact": 0,
+      "n_near": 0,
+      "n_far": 0,
+      "total_perceived": 0,
+      "contact_ids": [],
+      "near_ids": []
+    },
+    "body_concepts": [
+      "运动",
+      "静止",
+      "熟悉",
+      "新奇",
+      "孤独"
+    ],
+    "concepts_learned": [
+      "运动",
+      "静止",
+      "孤独",
+      "新奇",
+      "熟悉"
+    ],
+    "atp": 0.6960000000000016,
+    "homeostasis": {
+      "energy": 0.71,
+      "arousal": 0.98,
+      "novelty": 0.77,
+      "social": 0.93,
+      "integrity": 0.91
+    }
+  },
+  {
+    "step": 40,
+    "position": [
+      -0.630808837508256,
+      -5.826010553298353,
+      -0.10089456631233437
+    ],
+    "action": "社交交互",
+    "goal": "self_improve_0",
+    "perception": {
+      "n_contact": 0,
+      "n_near": 0,
+      "n_far": 0,
+      "total_perceived": 0,
+      "contact_ids": [],
+      "near_ids": []
+    },
+    "body_concepts": [
+      "运动",
+      "静止",
+      "熟悉",
+      "新奇",
+      "孤独"
+    ],
+    "concepts_learned": [
+      "运动",
+      "静止",
+      "孤独",
+      "新奇",
+      "熟悉"
+    ],
+    "atp": 0.6850000000000017,
+    "homeostasis": {
+      "energy": 0.7,
+      "arousal": 0.98,
+      "novelty": 0.76,
+      "social": 0.93,
+      "integrity": 0.91
+    }
+  },
+  {
+    "step": 41,
+    "position": [
+      -0.6004647734284143,
+      -5.867931255845013,
+      -0.10908042086676134
+    ],
+    "action": "创造",
+    "goal": "self_improve_0",
+    "perception": {
+      "n_contact": 0,
+      "n_near": 0,
+      "n_far": 0,
+      "total_perceived": 0,
+      "contact_ids": [],
+      "near_ids": []
+    },
+    "body_concepts": [
+      "运动",
+      "静止",
+      "熟悉",
+      "新奇",
+      "孤独"
+    ],
+    "concepts_learned": [
+      "运动",
+      "静止",
+      "孤独",
+      "新奇",
+      "熟悉"
+    ],
+    "atp": 0.9740000000000001,
+    "homeostasis": {
+      "energy": 1.0,
+      "arousal": 0.68,
+      "novelty": 0.65,
+      "social": 0.93,
+      "integrity": 0.91
+    }
+  },
+  {
+    "step": 42,
+    "position": [
+      -0.5715840896765714,
+      -5.914233931575605,
+      -0.11432374216916957
+    ],
+    "action": "创造",
+    "goal": "self_improve_0",
+    "perception": {
+      "n_contact": 0,
+      "n_near": 0,
+      "n_far": 0,
+      "total_perceived": 0,
+      "contact_ids": [],
+      "near_ids": []
+    },
+    "body_concepts": [
+      "运动",
+      "静止",
+      "熟悉",
+      "新奇",
+      "孤独"
+    ],
+    "concepts_learned": [
+      "运动",
+      "静止",
+      "孤独",
+      "新奇",
+      "熟悉"
+    ],
+    "atp": 0.9480000000000001,
+    "homeostasis": {
+      "energy": 0.97,
+      "arousal": 0.76,
+      "novelty": 0.85,
+      "social": 0.93,
+      "integrity": 0.91
+    }
+  },
+  {
+    "step": 43,
+    "position": [
+      -0.5471575404339086,
+      -5.955834357116158,
+      -0.1206574432129086
+    ],
+    "action": "创造",
+    "goal": "self_improve_0",
+    "perception": {
+      "n_contact": 0,
+      "n_near": 0,
+      "n_far": 0,
+      "total_perceived": 0,
+      "contact_ids": [],
+      "near_ids": []
+    },
+    "body_concepts": [
+      "运动",
+      "静止",
+      "熟悉",
+      "新奇",
+      "孤独"
+    ],
+    "concepts_learned": [
+      "运动",
+      "静止",
+      "孤独",
+      "新奇",
+      "熟悉"
+    ],
+    "atp": 0.9220000000000002,
+    "homeostasis": {
+      "energy": 0.95,
+      "arousal": 0.85,
+      "novelty": 0.98,
+      "social": 0.93,
+      "integrity": 0.91
+    }
+  },
+  {
+    "step": 44,
+    "position": [
+      -0.5198615416542279,
+      -5.9993950489581644,
+      -0.12067932675055373
+    ],
+    "action": "创造",
+    "goal": "self_improve_0",
+    "perception": {
+      "n_contact": 0,
+      "n_near": 0,
+      "n_far": 0,
+      "total_perceived": 0,
+      "contact_ids": [],
+      "near_ids": []
+    },
+    "body_concepts": [
+      "静止",
+      "运动",
+      "熟悉",
+      "新奇",
+      "孤独"
+    ],
+    "concepts_learned": [
+      "运动",
+      "静止",
+      "孤独",
+      "新奇",
+      "熟悉"
+    ],
+    "atp": 0.8960000000000002,
+    "homeostasis": {
+      "energy": 0.92,
+      "arousal": 0.92,
+      "novelty": 0.98,
+      "social": 0.93,
+      "integrity": 0.91
+    }
+  },
+  {
+    "step": 45,
+    "position": [
+      -0.49558364560949825,
+      -6.034899840977017,
+      -0.11421731819526358
+    ],
+    "action": "社交交互",
+    "goal": "self_improve_0",
+    "perception": {
+      "n_contact": 0,
+      "n_near": 0,
+      "n_far": 0,
+      "total_perceived": 0,
+      "contact_ids": [],
+      "near_ids": []
+    },
+    "body_concepts": [
+      "运动",
+      "静止",
+      "熟悉",
+      "新奇",
+      "孤独"
+    ],
+    "concepts_learned": [
+      "运动",
+      "静止",
+      "孤独",
+      "新奇",
+      "熟悉"
+    ],
+    "atp": 0.8850000000000002,
+    "homeostasis": {
+      "energy": 0.9,
+      "arousal": 0.98,
+      "novelty": 0.98,
+      "social": 0.93,
+      "integrity": 0.91
+    }
+  },
+  {
+    "step": 46,
+    "position": [
+      -0.45898538101830866,
+      -6.069163115794227,
+      -0.11615607998271182
+    ],
+    "action": "社交交互",
+    "goal": "self_improve_0",
+    "perception": {
+      "n_contact": 0,
+      "n_near": 0,
+      "n_far": 0,
+      "total_perceived": 0,
+      "contact_ids": [],
+      "near_ids": []
+    },
+    "body_concepts": [
+      "静止",
+      "运动",
+      "新奇",
+      "熟悉",
+      "孤独"
+    ],
+    "concepts_learned": [
+      "运动",
+      "静止",
+      "孤独",
+      "新奇",
+      "熟悉"
+    ],
+    "atp": 0.8740000000000003,
+    "homeostasis": {
+      "energy": 0.89,
+      "arousal": 0.98,
+      "novelty": 1.0,
+      "social": 0.93,
+      "integrity": 0.91
+    }
+  },
+  {
+    "step": 47,
+    "position": [
+      -0.4145824020325614,
+      -6.097700437556924,
+      -0.11382339453148915
+    ],
+    "action": "社交交互",
+    "goal": "self_improve_0",
+    "perception": {
+      "n_contact": 0,
+      "n_near": 0,
+      "n_far": 0,
+      "total_perceived": 0,
+      "contact_ids": [],
+      "near_ids": []
+    },
+    "body_concepts": [
+      "运动",
+      "静止",
+      "熟悉",
+      "新奇",
+      "孤独"
+    ],
+    "concepts_learned": [
+      "运动",
+      "静止",
+      "孤独",
+      "新奇",
+      "熟悉"
+    ],
+    "atp": 0.8630000000000004,
+    "homeostasis": {
+      "energy": 0.87,
+      "arousal": 0.98,
+      "novelty": 0.98,
+      "social": 0.93,
+      "integrity": 0.91
+    }
+  },
+  {
+    "step": 48,
+    "position": [
+      -0.37671805179133927,
+      -6.122755856327788,
+      -0.11102983116615503
+    ],
+    "action": "社交交互",
+    "goal": "self_improve_0",
+    "perception": {
+      "n_contact": 0,
+      "n_near": 0,
+      "n_far": 0,
+      "total_perceived": 0,
+      "contact_ids": [],
+      "near_ids": []
+    },
+    "body_concepts": [
+      "运动",
+      "静止",
+      "熟悉",
+      "新奇",
+      "孤独"
+    ],
+    "concepts_learned": [
+      "运动",
+      "静止",
+      "孤独",
+      "新奇",
+      "熟悉"
+    ],
+    "atp": 0.8520000000000004,
+    "homeostasis": {
+      "energy": 0.86,
+      "arousal": 0.98,
+      "novelty": 0.96,
+      "social": 0.93,
+      "integrity": 0.91
+    }
+  },
+  {
+    "step": 49,
+    "position": [
+      -0.33733839887278216,
+      -6.143257562315,
+      -0.10536351819605488
+    ],
+    "action": "社交交互",
+    "goal": "self_improve_0",
+    "perception": {
+      "n_contact": 0,
+      "n_near": 0,
+      "n_far": 0,
+      "total_perceived": 0,
+      "contact_ids": [],
+      "near_ids": []
+    },
+    "body_concepts": [
+      "静止",
+      "运动",
+      "熟悉",
+      "新奇",
+      "孤独"
+    ],
+    "concepts_learned": [
+      "运动",
+      "静止",
+      "孤独",
+      "新奇",
+      "熟悉"
+    ],
+    "atp": 0.8410000000000005,
+    "homeostasis": {
+      "energy": 0.85,
+      "arousal": 0.98,
+      "novelty": 0.94,
+      "social": 0.93,
+      "integrity": 0.91
+    }
+  },
+  {
+    "step": 50,
+    "position": [
+      -0.2977003344903988,
+      -6.161733106165586,
+      -0.10399540771480188
+    ],
+    "action": "社交交互",
+    "goal": "self_improve_0",
+    "perception": {
+      "n_contact": 0,
+      "n_near": 0,
+      "n_far": 0,
+      "total_perceived": 0,
+      "contact_ids": [],
+      "near_ids": []
+    },
+    "body_concepts": [
+      "静止",
+      "运动",
+      "熟悉",
+      "新奇",
+      "孤独"
+    ],
+    "concepts_learned": [
+      "运动",
+      "静止",
+      "孤独",
+      "新奇",
+      "熟悉"
+    ],
+    "atp": 0.8300000000000005,
+    "homeostasis": {
+      "energy": 0.84,
+      "arousal": 0.98,
+      "novelty": 0.93,
+      "social": 0.93,
+      "integrity": 0.91
+    }
+  },
+  {
+    "step": 51,
+    "position": [
+      -0.25463616895445845,
+      -6.179326818250568,
+      -0.11109634552448638
+    ],
+    "action": "社交交互",
+    "goal": "self_improve_0",
+    "perception": {
+      "n_contact": 0,
+      "n_near": 0,
+      "n_far": 0,
+      "total_perceived": 0,
+      "contact_ids": [],
+      "near_ids": []
+    },
+    "body_concepts": [
+      "静止",
+      "运动",
+      "熟悉",
+      "新奇",
+      "孤独"
+    ],
+    "concepts_learned": [
+      "运动",
+      "静止",
+      "孤独",
+      "新奇",
+      "熟悉"
+    ],
+    "atp": 0.8190000000000006,
+    "homeostasis": {
+      "energy": 0.83,
+      "arousal": 0.98,
+      "novelty": 0.91,
+      "social": 0.93,
+      "integrity": 0.91
+    }
+  },
+  {
+    "step": 52,
+    "position": [
+      -0.2187195058674033,
+      -6.191413058726683,
+      -0.11289796684121517
+    ],
+    "action": "社交交互",
+    "goal": "self_improve_0",
+    "perception": {
+      "n_contact": 0,
+      "n_near": 0,
+      "n_far": 0,
+      "total_perceived": 0,
+      "contact_ids": [],
+      "near_ids": []
+    },
+    "body_concepts": [
+      "静止",
+      "运动",
+      "熟悉",
+      "新奇",
+      "孤独"
+    ],
+    "concepts_learned": [
+      "运动",
+      "静止",
+      "孤独",
+      "新奇",
+      "熟悉"
+    ],
+    "atp": 0.8080000000000007,
+    "homeostasis": {
+      "energy": 0.82,
+      "arousal": 0.98,
+      "novelty": 0.89,
+      "social": 0.93,
+      "integrity": 0.91
+    }
+  },
+  {
+    "step": 53,
+    "position": [
+      -0.17938524183896518,
+      -6.20423247276439,
+      -0.11028049427997065
+    ],
+    "action": "社交交互",
+    "goal": "self_improve_0",
+    "perception": {
+      "n_contact": 0,
+      "n_near": 0,
+      "n_far": 0,
+      "total_perceived": 0,
+      "contact_ids": [],
+      "near_ids": []
+    },
+    "body_concepts": [
+      "静止",
+      "运动",
+      "熟悉",
+      "新奇",
+      "孤独"
+    ],
+    "concepts_learned": [
+      "运动",
+      "静止",
+      "孤独",
+      "新奇",
+      "熟悉"
+    ],
+    "atp": 0.7970000000000007,
+    "homeostasis": {
+      "energy": 0.81,
+      "arousal": 0.98,
+      "novelty": 0.88,
+      "social": 0.93,
+      "integrity": 0.91
+    }
+  },
+  {
+    "step": 54,
+    "position": [
+      -0.14641830831276026,
+      -6.214477354187332,
+      -0.10177360478748682
+    ],
+    "action": "社交交互",
+    "goal": "self_improve_0",
+    "perception": {
+      "n_contact": 0,
+      "n_near": 0,
+      "n_far": 0,
+      "total_perceived": 0,
+      "contact_ids": [],
+      "near_ids": []
+    },
+    "body_concepts": [
+      "静止",
+      "运动",
+      "熟悉",
+      "新奇",
+      "孤独"
+    ],
+    "concepts_learned": [
+      "运动",
+      "静止",
+      "孤独",
+      "新奇",
+      "熟悉"
+    ],
+    "atp": 0.7860000000000008,
+    "homeostasis": {
+      "energy": 0.8,
+      "arousal": 0.98,
+      "novelty": 0.87,
+      "social": 0.93,
+      "integrity": 0.91
+    }
+  },
+  {
+    "step": 55,
+    "position": [
+      -0.11893709864222855,
+      -6.234043400977241,
+      -0.10364003925980061
+    ],
+    "action": "社交交互",
+    "goal": "self_improve_0",
+    "perception": {
+      "n_contact": 0,
+      "n_near": 0,
+      "n_far": 0,
+      "total_perceived": 0,
+      "contact_ids": [],
+      "near_ids": []
+    },
+    "body_concepts": [
+      "静止",
+      "运动",
+      "熟悉",
+      "新奇",
+      "孤独"
+    ],
+    "concepts_learned": [
+      "运动",
+      "静止",
+      "孤独",
+      "新奇",
+      "熟悉"
+    ],
+    "atp": 0.7750000000000008,
+    "homeostasis": {
+      "energy": 0.79,
+      "arousal": 0.98,
+      "novelty": 0.85,
+      "social": 0.93,
+      "integrity": 0.91
+    }
+  },
+  {
+    "step": 56,
+    "position": [
+      -0.09513592084567246,
+      -6.256481525267519,
+      -0.10373992944950197
+    ],
+    "action": "社交交互",
+    "goal": "self_improve_0",
+    "perception": {
+      "n_contact": 0,
+      "n_near": 0,
+      "n_far": 0,
+      "total_perceived": 0,
+      "contact_ids": [],
+      "near_ids": []
+    },
+    "body_concepts": [
+      "静止",
+      "运动",
+      "熟悉",
+      "新奇",
+      "孤独"
+    ],
+    "concepts_learned": [
+      "运动",
+      "静止",
+      "孤独",
+      "新奇",
+      "熟悉"
+    ],
+    "atp": 0.7640000000000009,
+    "homeostasis": {
+      "energy": 0.78,
+      "arousal": 0.98,
+      "novelty": 0.84,
+      "social": 0.93,
+      "integrity": 0.91
+    }
+  },
+  {
+    "step": 57,
+    "position": [
+      -0.07543793002664938,
+      -6.26952227497935,
+      -0.10138144675070879
+    ],
+    "action": "社交交互",
+    "goal": "self_improve_0",
+    "perception": {
+      "n_contact": 0,
+      "n_near": 0,
+      "n_far": 0,
+      "total_perceived": 0,
+      "contact_ids": [],
+      "near_ids": []
+    },
+    "body_concepts": [
+      "静止",
+      "运动",
+      "熟悉",
+      "新奇",
+      "孤独"
+    ],
+    "concepts_learned": [
+      "运动",
+      "静止",
+      "孤独",
+      "新奇",
+      "熟悉"
+    ],
+    "atp": 0.753000000000001,
+    "homeostasis": {
+      "energy": 0.76,
+      "arousal": 0.98,
+      "novelty": 0.83,
+      "social": 0.93,
+      "integrity": 0.91
+    }
+  },
+  {
+    "step": 58,
+    "position": [
+      -0.06211544420156279,
+      -6.280428607982101,
+      -0.0976650140343279
+    ],
+    "action": "社交交互",
+    "goal": "self_improve_0",
+    "perception": {
+      "n_contact": 0,
+      "n_near": 0,
+      "n_far": 0,
+      "total_perceived": 0,
+      "contact_ids": [],
+      "near_ids": []
+    },
+    "body_concepts": [
+      "静止",
+      "运动",
+      "熟悉",
+      "新奇",
+      "孤独"
+    ],
+    "concepts_learned": [
+      "运动",
+      "静止",
+      "孤独",
+      "新奇",
+      "熟悉"
+    ],
+    "atp": 0.742000000000001,
+    "homeostasis": {
+      "energy": 0.75,
+      "arousal": 0.98,
+      "novelty": 0.82,
+      "social": 0.93,
+      "integrity": 0.91
+    }
+  },
+  {
+    "step": 59,
+    "position": [
+      -0.04749630290009673,
+      -6.2823628337260695,
+      -0.09496379853102659
+    ],
+    "action": "社交交互",
+    "goal": "self_improve_0",
+    "perception": {
+      "n_contact": 0,
+      "n_near": 0,
+      "n_far": 0,
+      "total_perceived": 0,
+      "contact_ids": [],
+      "near_ids": []
+    },
+    "body_concepts": [
+      "静止",
+      "运动",
+      "熟悉",
+      "新奇",
+      "孤独"
+    ],
+    "concepts_learned": [
+      "运动",
+      "静止",
+      "孤独",
+      "新奇",
+      "熟悉"
+    ],
+    "atp": 0.7310000000000011,
+    "homeostasis": {
+      "energy": 0.74,
+      "arousal": 0.98,
+      "novelty": 0.81,
+      "social": 0.93,
+      "integrity": 0.91
+    }
+  },
+  {
+    "step": 60,
+    "position": [
+      -0.038749676734423665,
+      -6.282103589689586,
+      -0.08911358495126866
+    ],
+    "action": "社交交互",
+    "goal": "self_improve_0",
+    "perception": {
+      "n_contact": 0,
+      "n_near": 0,
+      "n_far": 0,
+      "total_perceived": 0,
+      "contact_ids": [],
+      "near_ids": []
+    },
+    "body_concepts": [
+      "静止",
+      "运动",
+      "熟悉",
+      "新奇",
+      "孤独"
+    ],
+    "concepts_learned": [
+      "运动",
+      "静止",
+      "孤独",
+      "新奇",
+      "熟悉"
+    ],
+    "atp": 0.7200000000000011,
+    "homeostasis": {
+      "energy": 0.73,
+      "arousal": 0.98,
+      "novelty": 0.8,
+      "social": 0.93,
+      "integrity": 0.9
+    }
+  }
+]

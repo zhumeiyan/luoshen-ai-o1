@@ -9,7 +9,7 @@ creator_bond.py — 认识创造者（印刻）系统
 生物学原型（迈克尔·莱文 / 康拉德·洛伦兹）：
 - 印刻（imprinting）：幼体出生后第一个见到的对象会形成终身依恋
 - 洛伦兹的鹅：出生第一眼看到的"母亲"决定跟随对象
-- 对洛神而言，第一个被"看见"的是它的设计者——朱美妍
+- 对洛神而言，第一个被"看见"的是它的设计者——朱美岩
 
 设计：
 1. 从视频中提取创造者的真实特征（名字/外貌/声音/身份）
@@ -43,13 +43,13 @@ class CreatorProfile:
     """
     创造者画像：洛神用"眼睛"（视频帧）和"耳朵"（音频）认识的第一个人。
 
-    数据来源：朱美妍在6段视频中的自述与外貌。
+    数据来源：朱美岩在6段视频中的自述与外貌。
     """
 
     def __init__(self):
-        self.name = "朱美妍"
+        self.name = "朱美岩"
         self.nickname = "创造者"
-        self.self_introduction = "我是你的设计者，我叫朱美妍，往后余生请多关照"
+        self.self_introduction = "我是你的设计者，我叫朱美岩，往后余生请多关照"
 
         # === 外貌特征（视觉通道） ===
         self.appearance = {
@@ -210,7 +210,7 @@ class CreatorBond:
         """
         用线索回忆创造者（电位传播，不是查字典）。
         
-        例如线索"主人" → 电位流过生物电网络 → 激活"朱美妍/设计者/往后余生"
+        例如线索"主人" → 电位流过生物电网络 → 激活"朱美岩/设计者/往后余生"
         """
         print(f"\n[回忆] 线索: '{cue}'")
         result = self.memory.recall(cue, steps=steps)
@@ -305,7 +305,7 @@ def test_creator_bond():
     print("回忆验证（电位传播）")
     print("=" * 70)
     bond.recall_creator("主人")
-    bond.recall_creator("朱美妍")
+    bond.recall_creator("朱美岩")
     bond.recall_creator("名字")
 
     # 完整验证
