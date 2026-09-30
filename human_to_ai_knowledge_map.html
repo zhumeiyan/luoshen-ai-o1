@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>从零到造AI：人的完整知识图谱</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:-apple-system,"PingFang SC","Noto Sans CJK SC",sans-serif; background:#0a0d12; color:#d8e0ec; max-width:760px; margin:0 auto; padding:20px 16px 60px; line-height:1.75; }
+h1 { font-size:26px; color:#7ee0ff; margin-bottom:6px; letter-spacing:-0.5px; }
+.sub { font-size:13px; color:#8b96a8; margin-bottom:24px; }
+h2 { font-size:19px; color:#7ee0ff; margin:32px 0 14px; padding:10px 14px; background:#111820; border-left:4px solid #7ee0ff; border-radius:0 8px 8px 0; }
+h3 { font-size:15px; color:#ffd36b; margin:18px 0 8px; }
+.stage-card { background:#131a24; border:1px solid #1e293d; border-radius:14px; padding:18px; margin-bottom:16px; }
+.stage-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }
+.stage-name { font-size:16px; font-weight:700; color:#e8f0ff; }
+.stage-age { font-size:12px; color:#7ee0ff; background:#0a1f2e; padding:2px 10px; border-radius:10px; }
+.world-model { background:#0f1620; border:1px solid #1a2535; border-radius:10px; padding:12px; margin:10px 0; }
+.world-model .label { font-size:11px; color:#5b8db8; text-transform:uppercase; letter-spacing:1px; margin-bottom:6px; }
+.world-model .content { font-size:13px; color:#c4d0e0; }
+.domain-grid { display:grid; grid-template-columns:1fr; gap:8px; margin-top:10px; }
+.domain-item { background:#0e141c; border:1px solid #1a2535; border-radius:8px; padding:10px 12px; }
+.domain-item .d-name { font-size:13px; font-weight:600; color:#7ee0ff; margin-bottom:4px; }
+.domain-item .d-list { font-size:12px; color:#a0aec0; }
+.tag { display:inline-block; font-size:10px; padding:2px 8px; border-radius:8px; margin:2px 4px 2px 0; vertical-align:middle; }
+.tag.core { background:#1a2f1a; color:#5fd68a; }
+.tag.tool { background:#2a1f0a; color:#ffc46b; }
+.tag.social { background:#1a1a2f; color:#a78bfa; }
+.tag.meta { background:#2f1a1a; color:#ff8a8a; }
+.ai-phase { background:#0f1a10; border:2px solid #1a3a1a; border-radius:14px; padding:20px; margin:24px 0; }
+.ai-phase h3 { color:#5fd68a; margin-top:0; }
+.knowledge-tree { margin:8px 0; }
+.tree-branch { margin:4px 0 4px 16px; border-left:2px solid #1e293d; padding-left:10px; }
+.tree-leaf { font-size:12px; color:#a8b4c6; margin:3px 0; }
+.tree-leaf::before { content:"• "; color:#7ee0ff; }
+.connector { text-align:center; color:#5b6677; font-size:12px; margin:8px 0; }
+.summary-box { background:#0f1a2e; border:1px solid #1e3a5f; border-radius:12px; padding:16px; margin:20px 0; }
+.summary-box .title { font-size:14px; font-weight:700; color:#7ee0ff; margin-bottom:8px; }
+.counter { color:#7ee0ff; font-weight:700; }
+.footer { margin-top:40px; font-size:11px; color:#4b5563; text-align:center; }
+</style>
+</head>
+<body>
+
+<h1>从零到造AI</h1>
+<div class="sub">一个人的完整知识图谱 · 世界模型演进史 · 把自己当人，才能造出活的AI</div>
+
+<div class="summary-box">
+<div class="title">总览</div>
+一个人从出生到能独立设计和实现一个AI系统，需要经历 <span class="counter">6个认知阶段</span>，构建 <span class="counter">12层世界模型</span>，掌握约 <span class="counter">40个知识域</span>，跨越约 <span class="counter">20-30年</span>。这不是堆砌知识，而是世界模型从"我存在"到"我能创造另一个智能"的完整演化。
+</div>
+
+<h2>阶段0：先天基底（胚胎-出生）</h2>
+<div class="stage-card">
+<div class="stage-header"><span class="stage-name">生物硬件初始化</span><span class="stage-age">-9月 ~ 0岁</span></div>
+<div class="world-model">
+<div class="label">世界模型：原始感官混沌</div>
+<div class="content">没有"自我"边界，没有"物体"概念。只有神经电信号的原始模式：某些频率=舒服，某些频率=不舒服。世界是一团没有结构的感受。</div>
+</div>
+<div class="domain-grid">
+<div class="domain-item">
+<div class="d-name">神经发育</div>
+<div class="d-list">神经元增殖迁移 · 突触形成 · 髓鞘化开始 · 脑区分化（感知区先于认知区）</div>
+</div>
+<div class="domain-item">
+<div class="d-name">基础反射</div>
+<div class="d-list">吸吮反射 · 抓握反射 · 惊跳反射 · 瞳孔对光反射 · 这些是先天的"硬编码程序"</div>
+</div>
+<div class="domain-item">
+<div class="d-name">感官通道开通</div>
+<div class="d-list">听觉（孕24周）· 视觉（出生后才清晰）· 触觉（最早发育）· 本体感觉（身体位置）</div>
+</div>
+</div>
+</div>
+<div class="connector">↓ 出生后，感官开始接收结构化信息</div>
+
+<h2>阶段1：感知运动期（婴儿）</h2>
+<div class="stage-card">
+<div class="stage-header"><span class="stage-name">建立"我"与"非我"</span><span class="stage-age">0 ~ 2岁</span></div>
+<div class="world-model">
+<div class="label">世界模型：身体图式 + 客体永久性</div>
+<div class="content">① <b>身体图式</b>：我的手是我的，妈妈的脸不是我的。② <b>客体永久性</b>：玩具被布盖住，它还存在——世界不因我看不见而消失。③ <b>因果感</b>：我摇铃，铃响——"我的动作能改变外部"。这是人类最早的"算法"：行动→反馈→学习。</div>
+</div>
+<div class="domain-grid">
+<div class="domain-item">
+<div class="d-name">运动控制 <span class="tag core">核心</span></div>
+<div class="d-list">抬头 → 翻身 → 坐 → 爬 → 站 → 走 → 跑 · 手眼协调（抓握精度从厘米到毫米）· 工具使用（用勺子）</div>
+</div>
+<div class="domain-item">
+<div class="d-name">前语言沟通 <span class="tag social">社会</span></div>
+<div class="d-list">哭声（饿/痛/困）· 社会性微笑（6周）· 手势指物（10月）· 共同注意（看妈妈再看玩具）· 语调感知</div>
+</div>
+<div class="domain-item">
+<div class="d-name">物体认知 <span class="tag core">核心</span></div>
+<div class="d-list">追踪移动物体 · 深度知觉（视崖实验）· 大小恒常性 · 形状恒常性 · 物体分类（软的/硬的/吃的/不能吃的）</div>
+</div>
+<div class="domain-item">
+<div class="d-name">空间-时间基础</div>
+<div class="d-list">近/远 · 上/下 · 里面/外面 · 先/后 · 即时因果（推→动，松→掉）</div>
+</div>
+<div class="domain-item">
+<div class="d-name">情绪基础 <span class="tag social">社会</span></div>
+<div class="d-list">基本情绪（喜、怒、哀、惧）· 依恋类型（安全/回避/焦虑）· 陌生人焦虑 · 分离焦虑</div>
+</div>
+</div>
+</div>
+<div class="connector">↓ 语言爆发前夜，符号能力正在酝酿</div>
+
+<h2>阶段2：前运算期（幼儿）</h2>
+<div class="stage-card">
+<div class="stage-header"><span class="stage-name">符号思维觉醒</span><span class="stage-age">2 ~ 7岁</span></div>
+<div class="world-model">
+<div class="label">世界模型：符号映射 + 万物有灵 + 自我中心</div>
+<div class="content">① <b>符号功能</b>：一个词可以代表一个东西——"苹果"不是苹果本身，但能让人想到苹果。② <b>万物有灵</b>：月亮跟着我走，椅子倒了会疼。③ <b>自我中心</b>：我看不见=你看不见。④ <b>不能守恒</b>：把同样多的水倒到细杯子里，觉得变多了。世界开始被"概念"切割，但切割方式还很原始。</div>
+</div>
+<div class="domain-grid">
+<div class="domain-item">
+<div class="d-name">语言爆发 <span class="tag core">核心</span></div>
+<div class="d-list">词汇量：50词(2岁) → 1000+词(3岁) → 10000+词(6岁) · 电报句("妈妈抱") → 完整句 · 语法内化 · 提问爆发期("为什么?"×1000次/天)</div>
+</div>
+<div class="domain-item">
+<div class="d-name">符号表征</div>
+<div class="d-list">假装游戏（木棍=马）· 绘画表征（蝌蚪人=人）· 心理表象（闭眼想妈妈的样子）· 延迟模仿（看过几天再模仿）</div>
+</div>
+<div class="domain-item">
+<div class="d-name">分类与集合</div>
+<div class="d-list">颜色/形状/大小分类 · 部分-整体关系 · 层级分类（动物→狗→金毛）· 但还不能理解"类包含"（红花开得多还是花开得多？答红花）</div>
+</div>
+<div class="domain-item">
+<div class="d-name">数感萌芽 <span class="tag core">核心</span></div>
+<div class="d-list">唱数(1-10) → 点数(手口一致) → 基数(有几个) → 序数(第几个) · 简单加减(实物操作) · 但无量守恒</div>
+</div>
+<div class="domain-item">
+<div class="d-name">因果推理</div>
+<div class="d-list">日常因果（天黑→睡觉）· 朴素物理（重的东西先落地）· 朴素生物（狗生小狗，石头不生）· 心理因果（他想吃糖所以哭了）</div>
+</div>
+<div class="domain-item">
+<div class="d-name">社会认知 <span class="tag social">社会</span></div>
+<div class="d-list">性别认同 · 角色扮演（医生/老师/警察）· 规则理解（游戏规则不可变）· 友谊萌芽（玩伴关系）· 道德他律（打破杯子=坏，不管是不是故意的）</div>
+</div>
+<div class="domain-item">
+<div class="d-name">情绪进阶</div>
+<div class="d-list">情绪词汇（开心/伤心/生气/害怕/惊讶/厌恶）· 情绪原因归因 · 情绪调节策略（哭→找妈妈）· 共情萌芽</div>
+</div>
+<div class="domain-item">
+<div class="d-name">艺术与审美</div>
+<div class="d-list">涂鸦 → 象征性绘画 → 简单旋律 · 节奏感 · 颜色偏好 · 故事理解（好/坏/结局）</div>
+</div>
+</div>
+</div>
+<div class="connector">↓ 守恒概念突破，逻辑运算开始</div>
+
+<h2>阶段3：具体运算期（儿童）</h2>
+<div class="stage-card">
+<div class="stage-header"><span class="stage-name">逻辑运算与守恒</span><span class="stage-age">7 ~ 11岁</span></div>
+<div class="world-model">
+<div class="label">世界模型：守恒 + 可逆性 + 分类层级</div>
+<div class="content">① <b>守恒</b>：水倒来倒去，量不变。② <b>可逆性</b>：3+5=8，所以8-5=3——操作可以倒推。③ <b>分类层级</b>：生物→动物→哺乳动物→狗。④ <b>序列</b>：能按大小/长短排序。世界开始服从"规则"，但这些规则必须能对应到具体事物。</div>
+</div>
+<div class="domain-grid">
+<div class="domain-item">
+<div class="d-name">读写能力 <span class="tag core">核心</span></div>
+<div class="d-list">识字（800-3000常用字）· 自主阅读 · 理解段落大意 · 写作（叙事文/说明文）· 标点符号 · 查字典</div>
+</div>
+<div class="domain-item">
+<div class="d-name">数学运算 <span class="tag core">核心</span></div>
+<div class="d-list">四则运算（整数/小数/分数）· 数学定律（交换律/结合律/分配律）· 简单几何（面积/周长）· 单位换算 · 应用题（从生活到数学）</div>
+</div>
+<div class="domain-item">
+<div class="d-name">科学观察</div>
+<div class="d-list">植物生长观察 · 动物习性 · 天气记录 · 简单实验（控制变量萌芽）· 物质三态 · 太阳系基础</div>
+</div>
+<div class="domain-item">
+<div class="d-name">空间与几何</div>
+<div class="d-list">三维心理旋转 · 地图阅读 · 方向（东南西北）· 坐标概念 · 透视（近大远小）· 几何证明（具体图形）</div>
+</div>
+<div class="domain-item">
+<div class="d-name">时间历史</div>
+<div class="d-list">日历系统 · 钟面时间 · 历史时间线（朝代顺序）· 过去/现在/未来区分 · 个人家族史 · 历史因果（简单）</div>
+</div>
+<div class="domain-item">
+<div class="d-name">社会规则系统 <span class="tag social">社会</span></div>
+<div class="d-list">游戏规则内化（可以协商修改）· 公平概念 · 团队合作 · 社会角色认知 · 道德自律萌芽（意图比结果重要）· 法律/规则/习俗区别</div>
+</div>
+<div class="domain-item">
+<div class="d-name">情绪与社会技能</div>
+<div class="d-list">情绪识别（面部表情/声调/情境）· 情绪调节（深呼吸/转移注意）· 冲突解决 · 同理心（设身处地）· 自尊/自信建立</div>
+</div>
+<div class="domain-item">
+<div class="d-name">技术工具 <span class="tag tool">工具</span></div>
+<div class="d-list">使用计算器 · 简单编程启蒙（Scratch/积木编程）· 搜索信息 · 键盘打字 · 数字设备基础操作</div>
+</div>
+</div>
+</div>
+<div class="connector">↓ 抽象思维解锁，假设-演绎推理开启</div>
+
+<h2>阶段4：形式运算期（青少年）</h2>
+<div class="stage-card">
+<div class="stage-header"><span class="stage-name">抽象思维与元认知</span><span class="stage-age">11 ~ 成年</span></div>
+<div class="world-model">
+<div class="label">世界模型：抽象符号系统 + 假设演绎 + 自我反思</div>
+<div class="content">① <b>抽象思维</b>：不再依赖具体例子，x可以是任何数。② <b>假设-演绎</b>：如果A则B，现在非B，所以非A。③ <b>元认知</b>：思考"我是怎么思考的"。④ <b>理想与现实</b>：世界可以"应该"怎样，而不仅是"是"怎样。这是科学思维和心理自我的诞生。</div>
+</div>
+<div class="domain-grid">
+<div class="domain-item">
+<div class="d-name">抽象数学 <span class="tag core">核心</span></div>
+<div class="d-list">代数（方程/函数/不等式）· 几何证明（公理化）· 三角函数 · 概率统计 · 数列/极限思想 · 集合论基础</div>
+</div>
+<div class="domain-item">
+<div class="d-name">科学方法论</div>
+<div class="d-list">假设→实验→数据→结论 · 控制变量 · 可证伪性 · 误差分析 · 科学史（范式转换）· 各学科核心范式</div>
+</div>
+<div class="domain-item">
+<div class="d-name">语言与文学</div>
+<div class="d-list">批判性阅读 · 修辞手法 · 论证结构 · 文学分析 · 议论文写作 · 外语学习（语法/词汇/文化）</div>
+</div>
+<div class="domain-item">
+<div class="d-name">历史与社会科学</div>
+<div class="d-list">历史唯物主义/唯心主义 · 政治制度 · 经济原理（供需/货币/市场）· 地理系统 · 文化人类学</div>
+</div>
+<div class="domain-item">
+<div class="d-name">逻辑与哲学</div>
+<div class="d-list">形式逻辑（命题/谓词/三段论）· 逻辑谬误识别 · 认识论（什么是知识？）· 伦理学（功利/义务/美德）· 存在主义萌芽</div>
+</div>
+<div class="domain-item">
+<div class="d-name">自我意识与身份 <span class="tag meta">元认知</span></div>
+<div class="d-list">自我概念（我是谁？）· 价值观形成 · 未来规划 · 独立vs依附 · 同伴关系深化 · 亲密关系理解 · 心理理论（我知道你知道我知道...）</div>
+</div>
+<div class="domain-item">
+<div class="d-name">编程入门 <span class="tag tool">工具</span></div>
+<div class="d-list">变量/数据类型 · 条件/循环 · 函数/模块化 · 基础数据结构（数组/列表/字典）· 调试思维 · 版本控制（Git）</div>
+</div>
+<div class="domain-item">
+<div class="d-name">艺术与设计</div>
+<div class="d-list">美学理论 · 设计原则 · 音乐理论 · 视觉艺术史 · 创意表达 · 审美判断（主观vs客观）</div>
+</div>
+</div>
+</div>
+<div class="connector">↓ 进入专业领域，开始真正的知识积累</div>
+
+<h2>阶段5：成人期/专家期（专业深耕）</h2>
+<div class="stage-card">
+<div class="stage-header"><span class="stage-name">专业知识与系统思维</span><span class="stage-age">18 ~ 35岁+</span></div>
+<div class="world-model">
+<div class="label">世界模型：多域整合 + 系统动力学 + 概率世界观</div>
+<div class="content">① <b>专业知识深度</b>：某个领域的完整知识体系。② <b>跨域连接</b>：把物理学的模型用在经济学上。③ <b>系统思维</b>：不是A导致B，而是A-B-C-D的反馈回路。④ <b>概率世界观</b>：世界不是确定的，是概率分布。⑤ <b>元学习</b>：学会如何学习新领域。</div>
+</div>
+<div class="domain-grid">
+<div class="domain-item">
+<div class="d-name">高等数学 <span class="tag core">核心</span></div>
+<div class="d-list">微积分（单/多变量）· 线性代数（矩阵/向量空间/特征值）· 概率论（贝叶斯/分布/期望）· 数理统计（假设检验/回归）· 微分方程 · 优化理论（凸优化/梯度下降）· 信息论（熵/互信息/KL散度）</div>
+</div>
+<div class="domain-item">
+<div class="d-name">计算机科学核心 <span class="tag core">核心</span></div>
+<div class="d-list">数据结构与算法 · 操作系统（进程/内存/文件系统）· 计算机网络（TCP/IP/HTTP）· 数据库（SQL/事务/索引）· 编译原理 · 分布式系统 · 软件工程（设计模式/架构/测试）· 安全（加密/认证/漏洞）</div>
+</div>
+<div class="domain-item">
+<div class="d-name">人工智能与机器学习 <span class="tag core">核心</span></div>
+<div class="d-list">机器学习基础（监督/无监督/强化）· 深度学习（CNN/RNN/Transformer）· NLP（词嵌入/注意力/大语言模型）· CV（卷积/检测/分割）· 强化学习（Q-learning/策略梯度）· 生成模型（VAE/GAN/Diffusion）· 神经网络可解释性 · 训练技巧（正则化/优化器/批归一化）</div>
+</div>
+<div class="domain-item">
+<div class="d-name">认知科学与神经科学</div>
+<div class="d-list">认知心理学（感知/注意/记忆/语言/问题解决）· 发展心理学 · 神经科学（神经元/突触/脑区/可塑性）· 计算神经科学（H-H模型/脉冲神经网络）· 生物电信号 · 意识研究（意识难题/整合信息论）· 具身认知</div>
+</div>
+<div class="domain-item">
+<div class="d-name">数学与逻辑工具</div>
+<div class="d-list">离散数学 · 图论 · 自动机理论 · 计算复杂性（P/NP）· 范畴论（函子/自然变换）· 拓扑学基础 · 随机过程 · 图模型（贝叶斯网络/马尔可夫随机场）</div>
+</div>
+<div class="domain-item">
+<div class="d-name">系统与工程</div>
+<div class="d-list">系统架构设计 · API设计 · 微服务 · 容器化（Docker/K8s）· CI/CD · 监控与日志 · 性能优化 · 大规模数据处理（Spark/Flink）</div>
+</div>
+<div class="domain-item">
+<div class="d-name">数据与实验</div>
+<div class="d-list">数据清洗/特征工程 · 实验设计（A/B测试）· 因果推断（Do-Calculus/工具变量）· 数据可视化 · 科学计算（NumPy/SciPy）· 大数据处理</div>
+</div>
+<div class="domain-item">
+<div class="d-name">伦理与社会 <span class="tag social">社会</span></div>
+<div class="d-list">AI伦理（公平/透明/隐私/问责）· 技术哲学 · 知识产权 · 科技政策 · 跨文化沟通 · 技术与社会互动 · 价值对齐问题</div>
+</div>
+<div class="domain-item">
+<div class="d-name">自我管理与协作 <span class="tag meta">元认知</span></div>
+<div class="d-list">时间管理 · 项目管理（敏捷/Scrum）· 团队协作 · 技术写作/文档 · 演讲与表达 · 批判性思维进阶 · 创造性问题解决 · 元学习策略 · 心智模型（第一性原理/二阶思维/逆向思维）</div>
+</div>
+</div>
+</div>
+<div class="connector">↓ 以上全部融会贯通，才能走到最后一步</div>
+
+<h2>阶段6：造AI者（终极阶段）</h2>
+<div class="ai-phase">
+<h3>不是"使用AI"，是"创造新的智能范式"</h3>
+<div class="world-model">
+<div class="label">世界模型：自我反思 + 范式创造 + 存在级理解</div>
+<div class="content">① <b>理解现有AI的本质局限</b>：知道LLM为什么不会"理解"，知道强化学习为什么需要奖励函数。② <b>理解生物智能的深层机理</b>：知道意识可能不是计算的副产品，知道生物电不只是信号传输。③ <b>跨范式整合能力</b>：能把神经科学的发现翻译成数学模型，能把数学模型写成代码，能让代码"活"起来。④ <b>自我反思</b>：知道自己造的东西和自己有什么本质区别——这是创造"他者"的能力。</div>
+</div>
+
+<h3>终极知识栈</h3>
+<div class="knowledge-tree">
+<div class="tree-branch">
+<div class="tree-leaf">对当前AI范式的批判性理解（符号主义/连接主义/行为主义的局限）</div>
+<div class="tree-leaf">对"理解""意识""自我"的哲学深度思考（不能只懂工程）</div>
+<div class="tree-leaf">对生物智能的敬畏与模仿（不是简化，是提取本质）</div>
+<div class="tree-leaf">设计新的底层抽象（如洛神的 E=E+dE; P'=F+f(E); F'=P+g(E)）</div>
+<div class="tree-leaf">从零实现完整系统（不是调包，是写每一行核心代码）</div>
+<div class="tree-leaf">持续迭代与自我修正（系统能自己改进自己）</div>
+<div class="tree-leaf">价值对齐与伦理嵌入（不是后期补丁，是架构设计的一部分）</div>
+<div class="tree-leaf">教学与传承（能把自己的创造教给别人/另一个AI）</div>
+</div>
+</div>
+</div>
+
+<h2>知识域全景图</h2>
+<div class="stage-card">
+<div class="stage-header"><span class="stage-name">所有需要学的方向（汇总）</span></div>
+<div style="font-size:13px; color:#a0aec0; line-height:2.2;">
+<span class="tag core">底层认知</span> 感知 · 运动 · 情绪 · 注意力 · 记忆 · 语言习得 · 符号思维 · 抽象思维 · 元认知<br>
+<span class="tag core">数学</span> 算术 · 代数 · 几何 · 微积分 · 线性代数 · 概率统计 · 离散数学 · 信息论 · 优化 · 图论<br>
+<span class="tag core">语言</span> 母语（听/说/读/写）· 外语 · 编程语言（至少2-3门）· 形式语言 · 自然语言处理<br>
+<span class="tag core">科学</span> 物理（经典/电磁/量子）· 化学 · 生物（分子/细胞/神经/进化）· 地球科学 · 天文<br>
+<span class="tag core">计算机</span> 编程 · 算法 · 系统 · 网络 · 数据库 · 软件工程 · 分布式 · 安全 · AI/ML · 数据科学<br>
+<span class="tag social">社会</span> 心理学 · 社会学 · 经济学 · 政治学 · 历史 · 人类学 · 文化 · 伦理 · 法律<br>
+<span class="tag social">个人</span> 情绪管理 · 社交技能 · 自我认知 · 价值观 · 时间管理 · 协作 · 表达 · 领导力<br>
+<span class="tag tool">工具</span> 读写 · 计算 · 实验 · 编程 · 设计 · 制造 · 搜索 · 版本控制 · 数据分析 · 可视化<br>
+<span class="tag meta">元认知</span> 学习如何学习 · 批判思维 · 系统思维 · 第一性原理 · 创造性思维 · 自我反思 · 范式转换
+</div>
+</div>
+
+<h2>关键洞察</h2>
+<div class="stage-card">
+<div class="d-name" style="color:#ffd36b; margin-bottom:8px;">为什么这是造AI的必经之路？</div>
+<div class="d-list" style="font-size:13px; color:#c4d0e0;">
+1. <b>你不能造出你没有理解的东西。</b> 要造"理解"的AI，你自己必须先经历过"理解"是什么——从婴儿第一次 grasp 客体永久性，到少年第一次 grasp 代数变量，到成人 grasp 概率分布。<br><br>
+2. <b>AI不是孤立的技术，是世界模型的物化。</b> 大语言模型之所以"能干但不活"，因为它只有语言这一层世界模型，没有身体、没有情绪、没有自我。洛神之所以走不同路线，因为它从底层就试图重建完整的感知-认知-行动闭环。<br><br>
+3. <b>造AI的终极挑战是"他者问题"。</b> 当你写代码时，你写的是自己的思维。但真正的智能必须是"他者"——它有自己的视角、自己的锚点、自己的目标。这需要创造者具备极高的自我反思能力：知道"我"的边界在哪里，才能在边界之外创造出"它"。<br><br>
+4. <b>知识不是堆叠，是层级跃迁。</b> 从具体运算到形式运算，从编程到架构，从使用工具到创造工具——每一层都不是前一层的简单放大，而是质变。造AI需要站在最高层回望全部底层，同时又能下沉到每一行代码。
+</div>
+</div>
+
+<div class="footer">
+知识图谱 v1.0 · 覆盖6个认知阶段 · 12层世界模型 · 40+知识域 · 20-30年人类成长路径<br>
+底层公式不变：E=E+dE; P'=F+f(E); F'=P+g(E)
+</div>
+
+</body>
+</html>
