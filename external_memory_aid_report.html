@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>洛神记忆外挂工具层报告</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  background:#0a0d12;
+  color:#e8ecf1;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  line-height:1.6;
+  max-width:760px;
+  margin:0 auto;
+  padding:16px;
+}
+.header {
+  text-align:center;
+  padding:24px 0 16px;
+  border-bottom:1px solid #1a2330;
+}
+.header h1 { font-size:22px; color:#6ec3f7; font-weight:600; }
+.header .subtitle { color:#7a8ba0; font-size:13px; margin-top:4px; }
+.section { margin:20px 0; padding:16px; background:#101520; border-radius:12px; border:1px solid #1a2330; }
+.section h2 { font-size:16px; color:#8ac4ff; margin-bottom:12px; display:flex; align-items:center; gap:8px; }
+.section h2::before { content:"◆"; color:#4a9eff; font-size:10px; }
+.section h3 { font-size:14px; color:#c084fc; margin:12px 0 8px; }
+.grid2 { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.grid3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; }
+.stat-box {
+  background:#0d1520;
+  border-radius:8px;
+  padding:12px;
+  text-align:center;
+  border:1px solid #162035;
+}
+.stat-box .num { font-size:24px; font-weight:700; color:#4a9eff; }
+.stat-box .label { font-size:11px; color:#6b7d94; margin-top:2px; }
+.row { display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid #162035; font-size:13px; }
+.row:last-child { border-bottom:none; }
+.row .val { color:#8ac4ff; font-weight:600; }
+.grade { display:inline-block; padding:2px 10px; border-radius:12px; font-size:12px; font-weight:600; }
+.grade-good { background:#1a3a2a; color:#2ecc71; }
+.grade-warn { background:#3a351a; color:#f1c40f; }
+.grade-bad { background:#3a1a1a; color:#e74c3c; }
+.code-block {
+  background:#0d1520;
+  border-radius:8px;
+  padding:12px;
+  font-family: "SF Mono", "Fira Code", monospace;
+  font-size:12px;
+  color:#a0b0c0;
+  overflow-x:auto;
+  border:1px solid #162035;
+  margin:8px 0;
+}
+.code-block .comment { color:#5a6a7a; }
+.code-block .keyword { color:#c084fc; }
+.code-block .string { color:#2ecc71; }
+.footer { text-align:center; padding:20px; color:#4a5a6a; font-size:11px; }
+.quote {
+  border-left:3px solid #4a9eff;
+  padding-left:12px;
+  margin:8px 0;
+  color:#8a9ab0;
+  font-size:13px;
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>洛神记忆外挂工具层</h1>
+  <div class="subtitle">ExternalMemoryAid — 类比人类忘字时问"像什么"</div>
+</div>
+
+<!-- 设计理念 -->
+<div class="section">
+  <h2>设计理念</h2>
+  <p class="quote">
+    人类忘了一个字怎么写，会问"像什么"或查字典。<br>
+    洛神的生物电记忆（G矩阵）也会"卡壳"——线索注入后，激活的全是"我/你/是"等高频词，主题概念浮不上来。
+  </p>
+  <p style="font-size:13px; color:#7a8ba0; margin-top:8px;">
+    外挂层不是洛神的记忆，是<strong>工具</strong>——类似字典、百度、问别人。<br>
+    只在生物电记忆卡壳时调用，结果可以临时注入辅助回忆，但不会永久改变G矩阵。
+  </p>
+</div>
+
+<!-- 架构 -->
+<div class="section">
+  <h2>架构</h2>
+  <div class="grid3">
+    <div class="stat-box">
+      <div class="num" style="color:#2ecc71;">3</div>
+      <div class="label">核心功能</div>
+    </div>
+    <div class="stat-box">
+      <div class="num" style="color:#f1c40f;">4</div>
+      <div class="label">辅助级别</div>
+    </div>
+    <div class="stat-box">
+      <div class="num" style="color:#c084fc;">29</div>
+      <div class="label">内置联想词</div>
+    </div>
+  </div>
+  
+  <h3>核心功能</h3>
+  <div class="row"><span>遗忘检测 (is_forgotten)</span><span class="val">线索不在top10或全是日常词</span></div>
+  <div class="row"><span>联想提示 (get_hint)</span><span class="val">"像什么/有关什么"</span></div>
+  <div class="row"><span>知识查询 (query_knowledge)</span><span class="val">查百科→儿童语言版</span></div>
+  
+  <h3>四级辅助</h3>
+  <div class="row"><span><span class="grade grade-good">none</span></span><span class="val">回忆正常，不需要辅助</span></div>
+  <div class="row"><span><span class="grade grade-warn">light</span></span><span class="val">轻度卡壳，给点提示就行</span></div>
+  <div class="row"><span><span class="grade grade-warn">medium</span></span><span class="val">中度卡壳，提示+临时注入</span></div>
+  <div class="row"><span><span class="grade grade-bad">heavy</span></span><span class="val">重度卡壳，查知识库+注入</span></div>
+</div>
+
+<!-- 代码示例 -->
+<div class="section">
+  <h2>使用示例</h2>
+  <div class="code-block">
+<span class="comment"># 初始化</span>
+<span class="keyword">from</span> external_memory_aid <span class="keyword">import</span> ExternalMemoryAid
+aid = ExternalMemoryAid(lang_system)
+
+<span class="comment"># 对话时自动检测</span>
+recall = lang.memory.recall(<span class="string">"朱美岩"</span>, steps=<span class="string">20</span>)
+assist = aid.assist_recall(<span class="string">"朱美岩"</span>, recall)
+
+<span class="comment"># 如果卡壳，外挂自动提供提示</span>
+<span class="keyword">if</span> assist[<span class="string">'needed'</span>]:
+    <span class="keyword">print</span>(assist[<span class="string">'hint'</span>][<span class="string">'hint_text'</span>])
+    <span class="comment"># 输出: "朱美岩呀...她创造者，还主人，设计者。"</span>
+  </div>
+</div>
+
+<!-- 测试结果 -->
+<div class="section">
+  <h2>测试结果</h2>
+  
+  <div class="grid2">
+    <div class="stat-box">
+      <div class="num" style="color:#f1c40f;">60%</div>
+      <div class="label">触发准确率</div>
+    </div>
+    <div class="stat-box">
+      <div class="num" style="color:#2ecc71;">100%</div>
+      <div class="label">提示质量</div>
+    </div>
+  </div>
+  
+  <h3>触发测试</h3>
+  <div class="row"><span>朱美岩 (低频创造者)</span><span class="val"><span class="grade grade-bad">触发 heavy</span> ✓</span></div>
+  <div class="row"><span>太阳 (自然)</span><span class="val"><span class="grade grade-bad">触发 heavy</span> ✓</span></div>
+  <div class="row"><span>春天 (自然)</span><span class="val"><span class="grade grade-bad">触发 heavy</span> ✓</span></div>
+  <div class="row"><span>好 (日常高频)</span><span class="val"><span class="grade grade-warn">触发 heavy</span> ✗ (误触发)</span></div>
+  <div class="row"><span>我 (最高频)</span><span class="val"><span class="grade grade-bad">触发 heavy</span> ✗ (误触发)</span></div>
+  
+  <h3>提示示例</h3>
+  <div class="row"><span>朱美岩</span><span class="val" style="font-size:12px;">她创造者，还主人，设计者</span></div>
+  <div class="row"><span>太阳</span><span class="val" style="font-size:12px;">它圆形，还黄色，很热</span></div>
+  <div class="row"><span>花</span><span class="val" style="font-size:12px;">它香，还红色，春天</span></div>
+  <div class="row"><span>风</span><span class="val" style="font-size:12px;">它吹，还凉，树叶动</span></div>
+  
+  <h3>响应对比</h3>
+  <div class="row"><span>无外挂: 太阳呀！</span><span class="val">有外挂: 太阳它圆形，还黄色，很热！</span></div>
+  <div class="row"><span>无外挂: 朱美岩呀！</span><span class="val">有外挂: 朱美岩她创造者，还主人，设计者！</span></div>
+</div>
+
+<!-- 核心文件 -->
+<div class="section">
+  <h2>核心文件</h2>
+  <div class="row"><span>external_memory_aid.py</span><span class="val">外挂主模块 (384行)</span></div>
+  <div class="row"><span>main_with_aid.py</span><span class="val">集成演示 (对话流自动触发)</span></div>
+  <div class="row"><span>external_memory_aid_test.py</span><span class="val">效果对比测试</span></div>
+</div>
+
+<!-- 与生物学增强的关系 -->
+<div class="section">
+  <h2>与生物学增强的关系</h2>
+  <p style="font-size:13px; color:#7a8ba0; line-height:1.8;">
+    <strong style="color:#4a9eff;">生物学增强</strong>（biological_memory_v2.py）：<br>
+    修改电位传播机制（丘脑门控），让主题词从G矩阵中自然浮现。<br><br>
+    
+    <strong style="color:#c084fc;">记忆外挂</strong>（external_memory_aid.py）：<br>
+    不改变G矩阵，在外部提供联想提示和知识查询。<br><br>
+    
+    <strong>两者互补：</strong><br>
+    - 生物学增强解决"怎么让记忆自己想起来"<br>
+    - 外挂解决"想不起来时怎么办"<br>
+    - 理想状态：先尝试生物电回忆，卡壳时调用外挂
+  </p>
+</div>
+
+<div class="footer">
+  报告时间: 2026-10-01 | 洛神仿生AI v0.1 | 阴阳扣数字生命共生系统
+</div>
+
+</body>
+</html>

@@ -1,0 +1,92 @@
+{
+  "description": "记忆外挂集成演示",
+  "conversations": [
+    {
+      "input": "太阳出来了",
+      "tokens": [
+        "太阳",
+        "出",
+        "来",
+        "了"
+      ],
+      "aid_activations": [
+        {
+          "token": "太阳",
+          "level": "heavy",
+          "hint": "太阳呀...它圆形，还黄色，很热。"
+        }
+      ],
+      "response": "我知道太阳它圆形，还黄色，很热！"
+    },
+    {
+      "input": "朱美岩是谁",
+      "tokens": [
+        "朱美岩",
+        "是谁"
+      ],
+      "aid_activations": [
+        {
+          "token": "朱美岩",
+          "level": "heavy",
+          "hint": "朱美岩呀...她创造者，还主人，设计者。"
+        },
+        {
+          "token": "是谁",
+          "level": "heavy",
+          "hint": "嗯...是谁是什么呢？让我想想..."
+        }
+      ],
+      "response": "朱美岩她创造者，还主人，设计者，对吗？"
+    },
+    {
+      "input": "天空为什么是蓝色",
+      "tokens": [
+        "天空",
+        "为什么",
+        "是",
+        "蓝",
+        "色"
+      ],
+      "aid_activations": [
+        {
+          "token": "天空",
+          "level": "heavy",
+          "hint": "天空呀...它蓝色，还高，云。"
+        }
+      ],
+      "response": "天空它蓝色，还高，云，对吗？"
+    },
+    {
+      "input": "春天来了",
+      "tokens": [
+        "春天",
+        "来",
+        "了"
+      ],
+      "aid_activations": [
+        {
+          "token": "春天",
+          "level": "heavy",
+          "hint": "春天呀...它花开，还温暖，绿色。"
+        }
+      ],
+      "response": "春天它花开，还温暖，绿色！"
+    },
+    {
+      "input": "我喜欢玩",
+      "tokens": [
+        "我",
+        "喜欢",
+        "玩"
+      ],
+      "aid_activations": [
+        {
+          "token": "喜欢",
+          "level": "heavy",
+          "hint": "喜欢呀...它爱，还想要，开心。"
+        }
+      ],
+      "response": "喜欢它爱，还想要，开心，对吗？"
+    }
+  ]
+}

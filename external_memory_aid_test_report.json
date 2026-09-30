@@ -1,0 +1,195 @@
+{
+  "test_summary": {
+    "trigger_accuracy": 0.6,
+    "hint_quality": 1.0,
+    "recall_improvement": 0.02
+  },
+  "trigger_tests": [
+    {
+      "cue": "朱美岩",
+      "expected": true,
+      "actual": true,
+      "correct": true,
+      "level": "heavy"
+    },
+    {
+      "cue": "太阳",
+      "expected": true,
+      "actual": true,
+      "correct": true,
+      "level": "heavy"
+    },
+    {
+      "cue": "春天",
+      "expected": true,
+      "actual": true,
+      "correct": true,
+      "level": "heavy"
+    },
+    {
+      "cue": "好",
+      "expected": false,
+      "actual": true,
+      "correct": false,
+      "level": "heavy"
+    },
+    {
+      "cue": "我",
+      "expected": false,
+      "actual": true,
+      "correct": false,
+      "level": "heavy"
+    }
+  ],
+  "hint_tests": [
+    {
+      "cue": "朱美岩",
+      "category": "创造者",
+      "associations": [
+        "创造者",
+        "主人",
+        "设计者",
+        "美丽",
+        "聪明"
+      ],
+      "hint_text": "朱美岩呀...她创造者，还主人，设计者。",
+      "quality_score": 1.0
+    },
+    {
+      "cue": "太阳",
+      "category": "自然",
+      "associations": [
+        "圆形",
+        "黄色",
+        "很热",
+        "发光",
+        "白天出现"
+      ],
+      "hint_text": "太阳呀...它圆形，还黄色，很热。",
+      "quality_score": 1.0
+    },
+    {
+      "cue": "花",
+      "category": "自然",
+      "associations": [
+        "香",
+        "红色",
+        "春天",
+        "蜜蜂",
+        "像笑脸"
+      ],
+      "hint_text": "花呀...它香，还红色，春天。",
+      "quality_score": 1.0
+    },
+    {
+      "cue": "风",
+      "category": "自然",
+      "associations": [
+        "吹",
+        "凉",
+        "树叶动",
+        "像手",
+        "看不见"
+      ],
+      "hint_text": "风呀...它吹，还凉，树叶动。",
+      "quality_score": 1.0
+    },
+    {
+      "cue": "开心",
+      "category": "日常",
+      "associations": [
+        "笑",
+        "好",
+        "喜欢",
+        "像气球飞起来"
+      ],
+      "hint_text": "开心呀...它笑，还好，喜欢。",
+      "quality_score": 1.0
+    }
+  ],
+  "recall_tests": [
+    {
+      "cue": "朱美岩",
+      "purity_before": 0.05,
+      "purity_after": 0.1,
+      "improvement": 0.05,
+      "top5_before": [
+        "想",
+        "早上好",
+        "要",
+        "今天",
+        "难过"
+      ],
+      "top5_after": [
+        "我",
+        "早上好",
+        "今天",
+        "明天",
+        "晚安"
+      ]
+    },
+    {
+      "cue": "太阳",
+      "purity_before": 0.0,
+      "purity_after": 0.0,
+      "improvement": 0.0,
+      "top5_before": [
+        "很",
+        "是",
+        "有",
+        "我",
+        "比"
+      ],
+      "top5_after": [
+        "很",
+        "是",
+        "有",
+        "比",
+        "因为"
+      ]
+    },
+    {
+      "cue": "春天",
+      "purity_before": 0.1,
+      "purity_after": 0.1,
+      "improvement": 0.0,
+      "top5_before": [
+        "是",
+        "很",
+        "有",
+        "我",
+        "花"
+      ],
+      "top5_after": [
+        "花",
+        "可",
+        "是",
+        "我",
+        "儿"
+      ]
+    }
+  ],
+  "response_tests": [
+    {
+      "input": "太阳出来了",
+      "response_no_aid": "太阳呀！",
+      "response_with_aid": "太阳它圆形，还黄色，很热！",
+      "has_theme_no_aid": true,
+      "has_theme_with_aid": true
+    },
+    {
+      "input": "朱美岩是谁",
+      "response_no_aid": "朱美岩呀！",
+      "response_with_aid": "朱美岩她创造者，还主人，设计者！",
+      "has_theme_no_aid": true,
+      "has_theme_with_aid": true
+    },
+    {
+      "input": "春天来了",
+      "response_no_aid": "春天呀！",
+      "response_with_aid": "春天它花开，还温暖，绿色！",
+      "has_theme_no_aid": true,
+      "has_theme_with_aid": true
+    }
+  ]
+}
