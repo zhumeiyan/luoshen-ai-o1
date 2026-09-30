@@ -1,0 +1,90 @@
+{
+  "mechanisms": {
+    "lateral_inhibition": 0.3,
+    "sparse_top_pct": 0.15,
+    "ach_boost": 3.0,
+    "protein_tag_decay": 0.95
+  },
+  "imprint": {
+    "n_imprinted": 14,
+    "n_protein_tags": 106496,
+    "creator_concepts": [
+      "朱美岩",
+      "创造者",
+      "主人",
+      "设计者"
+    ],
+    "nature_concepts": [
+      "太阳",
+      "春天",
+      "花",
+      "鸟",
+      "云",
+      "雨",
+      "风",
+      "星星",
+      "天空",
+      "雷"
+    ]
+  },
+  "biological_recall": {
+    "creator_purity": 0.05,
+    "nature_purity": 0.15,
+    "daily_purity": 0.25,
+    "avg_purity": 0.15,
+    "creator_top5": [
+      "你",
+      "谢谢",
+      "早上好",
+      "晚安",
+      "我"
+    ],
+    "nature_top5": [
+      "因为",
+      "出",
+      "有",
+      "比",
+      "是"
+    ],
+    "daily_top5": [
+      "你",
+      "明天",
+      "中午",
+      "朋友",
+      "今天"
+    ]
+  },
+  "standard_recall": {
+    "creator_purity": 0.05,
+    "nature_purity": 0.15,
+    "daily_purity": 0.3,
+    "avg_purity": 0.17,
+    "creator_top5": [
+      "你",
+      "中午",
+      "明天",
+      "晚安",
+      "问"
+    ],
+    "nature_top5": [
+      "因为",
+      "你",
+      "出",
+      "明天",
+      "有"
+    ],
+    "daily_top5": [
+      "你",
+      "明天",
+      "中午",
+      "问",
+      "不"
+    ]
+  },
+  "improvement": {
+    "creator_delta": "0%",
+    "nature_delta": "0%",
+    "daily_delta": "-5%",
+    "avg_delta": "-2%"
+  }
+}

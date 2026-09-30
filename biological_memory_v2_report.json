@@ -1,0 +1,18 @@
+{
+  "method": "concept_cluster_competition",
+  "biology": "thalamic_reticular_nucleus_gating",
+  "best_threshold": 3,
+  "cluster_recall": {
+    "creator_purity": 0.1,
+    "nature_purity": 0.1,
+    "daily_purity": 0.2,
+    "avg_purity": 0.13
+  },
+  "standard_recall": {
+    "creator_purity": 0.05,
+    "nature_purity": 0.1,
+    "daily_purity": 0.1,
+    "avg_purity": 0.08
+  },
+  "improvement": "5%"
+}
