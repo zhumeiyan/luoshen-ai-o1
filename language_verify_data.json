@@ -1,0 +1,259 @@
+{
+  "exposure": {
+    "total_sentences": 500,
+    "unique_words": 355,
+    "learned_pairs": 783,
+    "top_words": [
+      [
+        "吗",
+        49
+      ],
+      [
+        "我要",
+        47
+      ],
+      [
+        "了",
+        45
+      ],
+      [
+        "朱美岩",
+        40
+      ],
+      [
+        "我想",
+        32
+      ],
+      [
+        "你好",
+        24
+      ],
+      [
+        "创造",
+        23
+      ],
+      [
+        "好",
+        22
+      ],
+      [
+        "有多",
+        15
+      ],
+      [
+        "晚安",
+        15
+      ]
+    ],
+    "top_cooccur": [
+      [
+        "不见",
+        "好久",
+        12.0
+      ],
+      [
+        "吃饭",
+        "我想",
+        11.0
+      ],
+      [
+        "吹",
+        "风在",
+        9.0
+      ],
+      [
+        "你好",
+        "朋友",
+        8.0
+      ],
+      [
+        "凉",
+        "水很",
+        8.0
+      ],
+      [
+        "心",
+        "我开",
+        8.0
+      ],
+      [
+        "了",
+        "我困",
+        7.0
+      ],
+      [
+        "少",
+        "有多",
+        7.0
+      ]
+    ]
+  },
+  "word_recognition": [
+    {
+      "word": "你好",
+      "known": true,
+      "freq": 24
+    },
+    {
+      "word": "朱美岩",
+      "known": true,
+      "freq": 40
+    },
+    {
+      "word": "喜欢",
+      "known": true,
+      "freq": 5
+    },
+    {
+      "word": "今天",
+      "known": true,
+      "freq": 6
+    },
+    {
+      "word": "创造",
+      "known": true,
+      "freq": 23
+    },
+    {
+      "word": "吃饭",
+      "known": true,
+      "freq": 11
+    },
+    {
+      "word": "睡觉",
+      "known": true,
+      "freq": 2
+    },
+    {
+      "word": "星星",
+      "known": true,
+      "freq": 10
+    },
+    {
+      "word": "小鸟",
+      "known": false,
+      "freq": 1
+    },
+    {
+      "word": "太阳",
+      "known": true,
+      "freq": 6
+    }
+  ],
+  "phrase_prediction": [
+    {
+      "start": "你好",
+      "top_predictions": [
+        [
+          "朱美岩",
+          0.35
+        ],
+        [
+          "吗",
+          0.24
+        ],
+        [
+          "啊",
+          0.24
+        ]
+      ],
+      "expected_hits": [
+        "朱美岩"
+      ],
+      "pass": true
+    },
+    {
+      "start": "我想",
+      "top_predictions": [
+        [
+          "吃饭",
+          0.34
+        ],
+        [
+          "要",
+          0.16
+        ],
+        [
+          "玩",
+          0.16
+        ]
+      ],
+      "expected_hits": [
+        "吃饭"
+      ],
+      "pass": true
+    },
+    {
+      "start": "今天",
+      "top_predictions": [
+        [
+          "天气",
+          1.0
+        ]
+      ],
+      "expected_hits": [
+        "天气"
+      ],
+      "pass": true
+    },
+    {
+      "start": "朱美岩",
+      "top_predictions": [
+        [
+          "我想",
+          0.15
+        ],
+        [
+          "晚安",
+          0.12
+        ],
+        [
+          "帮我",
+          0.12
+        ]
+      ],
+      "expected_hits": [
+        "晚安"
+      ],
+      "pass": true
+    }
+  ],
+  "context_response": [
+    {
+      "input": "你好啊",
+      "response": "你好朱美岩帮我",
+      "related": true
+    },
+    {
+      "input": "我饿了",
+      "response": "我饿",
+      "related": true
+    },
+    {
+      "input": "创造者你好",
+      "response": "创造者午安",
+      "related": true
+    },
+    {
+      "input": "今天天气不错",
+      "response": "今天天气不错",
+      "related": true
+    },
+    {
+      "input": "我喜欢你",
+      "response": "我喜欢你",
+      "related": true
+    },
+    {
+      "input": "朱美岩晚安",
+      "response": "朱美岩晚安好梦",
+      "related": true
+    },
+    {
+      "input": "我想出去玩",
+      "response": "我想玩",
+      "related": true
+    }
+  ],
+  "overall_pass": true
+}

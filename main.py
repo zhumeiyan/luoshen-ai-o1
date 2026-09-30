@@ -40,6 +40,7 @@ from long_term_memory import LongTermMemory
 from social_instinct import SocialInstinct
 from self_awareness import SelfAwareness
 from creator_bond import CreatorBond
+from language_learner import LanguageSystem
 
 # ================================================================
 # 洛神：完整生命体
@@ -97,6 +98,12 @@ class Luoshen:
         self.self_awareness = SelfAwareness(name=name)
         print("[系统] 自我意识初始化完成")
         
+        # 10. 语言学习系统（自主浸泡学说话）
+        self.lang_memory = BioelectricMemorySystem(dim=1024, cluster_size=4)
+        self.lang_cs = ExpandableConceptSpace(dim=1024)
+        self.language = LanguageSystem(self.lang_memory, self.lang_cs)
+        print("[系统] 语言学习系统初始化完成")
+        
         # 初始化世界
         self._init_world()
         
@@ -105,6 +112,11 @@ class Luoshen:
         self.creator_bond = CreatorBond(self.memory, self.social, self.self_awareness)
         self.creator_bond.meet_creator()
         print("[印刻] 完成：洛神认识了它的创造者")
+        
+        # 出生后语言浸泡：模拟婴儿前3个月每天听大人说话
+        print(f"\n[语言浸泡] {name} 开始聆听世界...")
+        self.lang_stats = self.language.immerse(n_sentences=100)
+        print("[语言浸泡] 完成：洛神开始咿呀学语")
         
         print(f"\n{'='*70}")
         print(f"【{self.name}】诞生完成")

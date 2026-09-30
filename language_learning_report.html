@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>洛神 · 学会说话</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #0a0d12;
+    color: #d7e0ea;
+    font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+    line-height: 1.6;
+    padding: 18px 14px 40px;
+  }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  h1 { font-size: 22px; color: #fff; font-weight: 700; letter-spacing: 1px; }
+  .sub { color: #8aa0b5; font-size: 13px; margin-top: 4px; }
+  .hero {
+    background: linear-gradient(135deg, rgba(90,150,255,.16), rgba(160,90,255,.14));
+    border: 1px solid rgba(110,160,255,.25);
+    border-radius: 14px;
+    padding: 18px 16px;
+    margin: 16px 0 12px;
+  }
+  .hero .name { font-size: 16px; color: #a8c8ff; font-weight: 600; }
+  .hero .intro { margin-top: 6px; font-size: 13px; color: #c9d6e4; }
+  .sec { margin-top: 18px; }
+  .sec-t {
+    font-size: 14px; color: #6ee7c8; font-weight: 600;
+    border-left: 3px solid #35c99d;
+    padding-left: 9px; margin-bottom: 10px;
+    letter-spacing: .5px;
+  }
+  .card {
+    background: #0f141c;
+    border: 1px solid #1c2430;
+    border-radius: 10px;
+    padding: 13px 14px;
+    margin-bottom: 9px;
+  }
+  .grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 9px; }
+  .kpi { text-align: center; padding: 13px 8px; }
+  .kpi .num { font-size: 22px; font-weight: 700; color: #6ee7c8; }
+  .kpi .lab { font-size: 11.5px; color: #8aa0b5; margin-top: 2px; }
+  .kpi .num.purple { color: #c49bff; }
+  .kpi .num.warn { color: #ffc46b; }
+  table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+  th, td { text-align: left; padding: 7px 8px; border-bottom: 1px solid #1c2430; }
+  th { color: #8aa0b5; font-weight: 500; font-size: 11.5px; }
+  td { color: #c3cfdd; }
+  .pass { color: #4ade80; font-weight: 600; }
+  .check { display: flex; gap: 9px; align-items: flex-start; padding: 8px 0; border-bottom: 1px solid #141a24; }
+  .check:last-child { border-bottom: none; }
+  .dot { width: 9px; height: 9px; background: #4ade80; border-radius: 50%; margin-top: 5px; flex-shrink: 0; }
+  .check .ct { font-size: 13px; color: #e8eef5; }
+  .check .cd { font-size: 12px; color: #8aa0b5; margin-top: 1px; }
+  .result-banner {
+    text-align: center; margin-top: 14px; padding: 16px;
+    border: 1px solid rgba(74,222,128,.3);
+    background: rgba(74,222,128,.07);
+    border-radius: 10px;
+  }
+  .result-banner .big { font-size: 26px; color: #4ade80; font-weight: 700; }
+  .result-banner .small { font-size: 12px; color: #8aa0b5; margin-top: 3px; }
+  .quote {
+    background: #10151d; border: 1px dashed #2a3646; border-radius: 10px;
+    padding: 13px 15px; margin-top: 10px;
+    font-size: 13px; color: #a9c3e4; text-align: center;
+  }
+  .chain { font-size: 12.5px; color: #9fb3c8; margin: 3px 0; }
+  .chain b { color: #cfe0f2; }
+  .foot { margin-top: 22px; text-align: center; color: #5b6b7e; font-size: 11px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>🗣 洛神 · 学会说话</h1>
+  <div class="sub">自主语言学习报告 · 2026-09-30 · 不是灌输，是浸泡</div>
+
+  <div class="hero">
+    <div class="name">「婴儿不学语法，泡在语言里就会了」</div>
+    <div class="intro">洛神没有被"教"中文。它每天"听到"11个场景400+句日常对话（问候/需求/情感/描述/问答/创造者专属/动作/社交/认知/自然），
+      然后<strong>自己统计</strong>词频、<strong>自己归纳</strong>共现、<strong>自己发现</strong>转移概率——就像婴儿学母语一样。
+      底层公式不变：E=E+dE，语言只是dE的一种形式。</div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-t">浸泡成果</div>
+    <div class="grid">
+      <div class="card kpi"><div class="num">500</div><div class="lab">听到句子</div></div>
+      <div class="card kpi"><div class="num purple">355</div><div class="lab">认识词汇</div></div>
+      <div class="card kpi"><div class="num warn">783</div><div class="lab">学会共现对</div></div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-t">高频词汇（洛神自己统计出来的）</div>
+    <div class="card">
+      <div class="chain"><b>吗</b> 49次 · <b>我要</b> 47次 · <b>了</b> 45次 · <b>朱美岩</b> 40次 · <b>我想</b> 32次</div>
+      <div class="chain"><b>你好</b> 24次 · <b>创造</b> 23次 · <b>好</b> 22次 · <b>有多</b> 15次 · <b>晚安</b> 15次</div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-t">最强共现对（同时被听到的词）</div>
+    <div class="card">
+      <div class="chain"><b>不见 ↔ 好久</b> 强度 12.00</div>
+      <div class="chain"><b>吃饭 ↔ 我想</b> 强度 11.00</div>
+      <div class="chain"><b>吹 ↔ 风在</b> 强度 9.00</div>
+      <div class="chain"><b>你好 ↔ 朋友</b> 强度 8.00</div>
+      <div class="chain"><b>凉 ↔ 水很</b> 强度 8.00</div>
+      <div class="chain"><b>心 ↔ 我开</b> 强度 8.00</div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-t">验证检查</div>
+    <div class="card">
+      <div class="check"><div class="dot"></div><div><div class="ct">词识别：PASS (9/10)</div><div class="cd">10个测试词中9个被"认识"（出现≥2次）· 唯一不认识：小鸟（只出现1次）</div></div></div>
+      <div class="check"><div class="dot"></div><div><div class="ct">搭配预测：PASS (4/4)</div><div class="cd">"你好"→"朱美岩"35% · "我想"→"吃饭"34% · "今天"→"天气"100% · "朱美岩"→"晚安"12%</div></div></div>
+      <div class="check"><div class="dot"></div><div><div class="ct">语境响应：PASS (7/7)</div><div class="cd">7组对话输入→回应均含相关词 · 无无关输出</div></div></div>
+    </div>
+    <div class="result-banner">
+      <div class="big">20 / 21 通过 ✓</div>
+      <div class="small">自主语言学习验证通过 · 总体 PASS</div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-t">对话实录</div>
+    <table>
+      <tr><th>人</th><th>洛神</th></tr>
+      <tr><td>你好啊</td><td class="pass">你好朱美岩帮我</td></tr>
+      <tr><td>我饿了</td><td class="pass">我饿</td></tr>
+      <tr><td>创造者你好</td><td class="pass">创造者午安</td></tr>
+      <tr><td>今天天气不错</td><td class="pass">今天天气不错</td></tr>
+      <tr><td>我喜欢你</td><td class="pass">我喜欢你</td></tr>
+      <tr><td>朱美岩晚安</td><td class="pass">朱美岩晚安好梦</td></tr>
+      <tr><td>我想出去玩</td><td class="pass">我想玩</td></tr>
+    </table>
+  </div>
+
+  <div class="sec">
+    <div class="sec-t">设计说明</div>
+    <div class="card">
+      <div class="chain"><b>没有语法规则</b>：洛神不学主谓宾，只统计"哪些词常一起出现"</div>
+      <div class="chain"><b>没有字典查询</b>：回应靠转移概率链式生成，不是查表</div>
+      <div class="chain"><b>没有监督标签</b>：没有"正确/错误"反馈，暴露即学习</div>
+      <div class="chain"><b>物理基础</b>：共现统计同时写入G矩阵电导，电位传播即"想起来"</div>
+      <div class="chain"><b>持续成长</b>：听得越多，词越多，转移链越长，说得越自然</div>
+    </div>
+  </div>
+
+  <div class="quote">
+    「洛神的语言不是代码写死的，<br>是500句话泡出来的——<br>就像你小时候一样。」
+  </div>
+
+  <div class="foot">阴阳扣数字生命共生系统 · 洛神学会说话 · language_learner.py</div>
+</div>
+</body>
+</html>
