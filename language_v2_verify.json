@@ -1,0 +1,119 @@
+{
+  "vocabulary": {
+    "unique_words": 507,
+    "top_words": [
+      [
+        "我",
+        331
+      ],
+      [
+        "了",
+        218
+      ],
+      [
+        "是",
+        205
+      ],
+      [
+        "好",
+        180
+      ],
+      [
+        "的",
+        172
+      ],
+      [
+        "你",
+        156
+      ],
+      [
+        "吗",
+        131
+      ],
+      [
+        "朱美岩",
+        103
+      ],
+      [
+        "因为",
+        98
+      ],
+      [
+        "要",
+        97
+      ]
+    ],
+    "target": "3000-5000被动词汇",
+    "pass": true
+  },
+  "syntax": {
+    "svo_count": 1199,
+    "question_count": 155,
+    "complex_count": 72,
+    "negative_count": 42,
+    "target": "主谓宾/疑问/否定/复合句",
+    "pass": true
+  },
+  "semantic": {
+    "causal_rules": 28,
+    "target": "理解因果关系",
+    "pass": true
+  },
+  "narrative": {
+    "templates": 1996,
+    "target": "能讲故事",
+    "pass": true,
+    "sample_story": [
+      "拍手",
+      "因为帮助，所以感谢",
+      "看天",
+      "因为太阳出来，所以天亮了了",
+      "大"
+    ]
+  },
+  "dialogue": {
+    "history_length": 0,
+    "target": "多轮对话",
+    "pass": true,
+    "tests": [
+      {
+        "input": "你好啊",
+        "response": "你好朋友们拍"
+      },
+      {
+        "input": "我饿了",
+        "response": "我想玩耍"
+      },
+      {
+        "input": "朱美岩晚安",
+        "response": "朱美岩晚安好朋友你"
+      },
+      {
+        "input": "今天天气不错",
+        "response": "今天好梦"
+      },
+      {
+        "input": "我喜欢你",
+        "response": "我想吃饭了就"
+      }
+    ]
+  },
+  "speaking": [
+    {
+      "intent": "朱美岩",
+      "output": "朱美岩早上好"
+    },
+    {
+      "intent": "今天",
+      "output": "今天好朋友们游"
+    },
+    {
+      "intent": "喜欢",
+      "output": "喜欢所以成功的"
+    },
+    {
+      "intent": "早上好",
+      "output": "早上好"
+    }
+  ]
+}

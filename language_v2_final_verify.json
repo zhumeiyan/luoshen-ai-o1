@@ -1,0 +1,119 @@
+{
+  "vocabulary": {
+    "unique_words": 503,
+    "learned_pairs": 10848,
+    "top_words": [
+      [
+        "我",
+        323
+      ],
+      [
+        "是",
+        212
+      ],
+      [
+        "了",
+        186
+      ],
+      [
+        "的",
+        181
+      ],
+      [
+        "好",
+        168
+      ],
+      [
+        "你",
+        150
+      ],
+      [
+        "吗",
+        128
+      ],
+      [
+        "因为",
+        99
+      ],
+      [
+        "朱美岩",
+        97
+      ],
+      [
+        "所以",
+        92
+      ]
+    ],
+    "pass": true
+  },
+  "syntax": {
+    "svo": 1176,
+    "question": 164,
+    "complex": 82,
+    "negative": 61,
+    "pass": true
+  },
+  "semantic": {
+    "causal_rules": 30,
+    "pass": true
+  },
+  "narrative": {
+    "templates": 1996,
+    "pass": true
+  },
+  "voice": {
+    "pinyin_coverage": 171,
+    "pass": true
+  },
+  "speaking": [
+    {
+      "intent": "朱美岩",
+      "output": "朱美岩今天好开心吗"
+    },
+    {
+      "intent": "今天",
+      "output": "今天天气不错"
+    },
+    {
+      "intent": "喜欢",
+      "output": "喜欢就吃饭最后画"
+    },
+    {
+      "intent": "早上好",
+      "output": "早上好"
+    }
+  ],
+  "dialogue": [
+    {
+      "input": "你好啊",
+      "response": "你想出去玩吗所以"
+    },
+    {
+      "input": "我饿了",
+      "response": "我要先起来"
+    },
+    {
+      "input": "朱美岩晚安",
+      "response": "朱美岩我好开心吗"
+    },
+    {
+      "input": "今天天气不错",
+      "response": "今天好朋友你想"
+    },
+    {
+      "input": "我喜欢你",
+      "response": "我想吃草房"
+    }
+  ],
+  "story_sample": [
+    "冬天",
+    "有点害怕",
+    "喜欢吗",
+    "不同意",
+    "懂吗"
+  ],
+  "overall": {
+    "passed": 5,
+    "total": 5
+  }
+}
