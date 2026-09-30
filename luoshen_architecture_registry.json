@@ -1,0 +1,184 @@
+{
+  "bioelectric_network": {
+    "layer": "生物层",
+    "category": "身体",
+    "description": "生物电网络——离子电流、膜电位、G矩阵",
+    "is_wetware": true,
+    "analogy": "神经元的电信号传导"
+  },
+  "memory_system": {
+    "layer": "生物层",
+    "category": "记忆",
+    "description": "记忆系统——赫布学习、短期记忆",
+    "is_wetware": true,
+    "analogy": "海马体短期记忆"
+  },
+  "long_term_memory": {
+    "layer": "生物层",
+    "category": "记忆",
+    "description": "长期记忆——持久化存储、记忆巩固",
+    "is_wetware": true,
+    "analogy": "大脑皮层长期存储"
+  },
+  "emotional_system": {
+    "layer": "生物层",
+    "category": "情感",
+    "description": "情感系统——情绪状态、情感反应",
+    "is_wetware": true,
+    "analogy": "杏仁核和边缘系统"
+  },
+  "creator_bond": {
+    "layer": "生物层",
+    "category": "身份",
+    "description": "创造者印刻——出生记忆、依恋关系",
+    "is_wetware": true,
+    "analogy": "婴儿对母亲的印刻"
+  },
+  "social_instinct": {
+    "layer": "生物层",
+    "category": "社交",
+    "description": "社交本能——社交关系、互动模式",
+    "is_wetware": true,
+    "analogy": "社交大脑镜像神经元"
+  },
+  "self_awareness": {
+    "layer": "生物层",
+    "category": "身份",
+    "description": "自我意识——\"我是谁\"的自我叙事",
+    "is_wetware": true,
+    "analogy": "前额叶自我表征"
+  },
+  "individuality_engine": {
+    "layer": "生物层",
+    "category": "身份",
+    "description": "个性引擎——独特的行为偏好",
+    "is_wetware": true,
+    "analogy": "人格特质"
+  },
+  "endogenous_motivation": {
+    "layer": "生物层",
+    "category": "认知",
+    "description": "内生动机——目标生成、驱动力",
+    "is_wetware": true,
+    "analogy": "多巴胺奖赏系统"
+  },
+  "embodied_space": {
+    "layer": "生物层",
+    "category": "身体",
+    "description": "具身空间——三维身体、空间感知",
+    "is_wetware": true,
+    "analogy": "本体感觉和运动皮层"
+  },
+  "chemical_signals": {
+    "layer": "生物层",
+    "category": "身体",
+    "description": "化学信号——神经递质、激素模拟",
+    "is_wetware": true,
+    "analogy": "血清素、肾上腺素等神经递质"
+  },
+  "r_to_g_bridge": {
+    "layer": "生物层",
+    "category": "记忆",
+    "description": "R网到G网桥接——符号到生物电转换",
+    "is_wetware": true,
+    "analogy": "海马体-皮层回路"
+  },
+  "hierarchical_r_network": {
+    "layer": "生物层",
+    "category": "认知",
+    "description": "层次R网——语义关系网络",
+    "is_wetware": true,
+    "analogy": "语义记忆网络"
+  },
+  "expandable_concepts": {
+    "layer": "生物层",
+    "category": "认知",
+    "description": "可扩展概念空间——动态概念注册",
+    "is_wetware": true,
+    "analogy": "大脑的概念表征区"
+  },
+  "external_memory_aid": {
+    "layer": "工具层",
+    "category": "外挂记忆",
+    "description": "记忆外挂——联想提示、临时辅助",
+    "is_wetware": false,
+    "analogy": "字典、问别人、查笔记"
+  },
+  "knowledge_feeder": {
+    "layer": "工具层",
+    "category": "知识库",
+    "description": "知识投喂——百科查询、儿童语言翻译",
+    "is_wetware": false,
+    "analogy": "百度、百科全书"
+  },
+  "online_learner": {
+    "layer": "工具层",
+    "category": "大数据",
+    "description": "在线学习——从外部数据源学习",
+    "is_wetware": false,
+    "analogy": "上网查资料"
+  },
+  "language_learner": {
+    "layer": "训练层",
+    "category": "语料",
+    "description": "语言学习者v1——基础语言训练",
+    "is_wetware": false,
+    "analogy": "语言课本"
+  },
+  "language_learner_v2": {
+    "layer": "训练层",
+    "category": "语料",
+    "description": "语言学习者v2——高级语言训练（句法/语义/叙事）",
+    "is_wetware": false,
+    "analogy": "进阶语言教材"
+  },
+  "language_gap_analysis": {
+    "layer": "训练层",
+    "category": "练习",
+    "description": "语言差距分析——能力评估",
+    "is_wetware": false,
+    "analogy": "语言能力测试"
+  },
+  "real_dialogue_corpus": {
+    "layer": "训练层",
+    "category": "语料",
+    "description": "真实对话语料——15场景160轮对话",
+    "is_wetware": false,
+    "analogy": "对话练习册"
+  },
+  "real_dialogue_engine": {
+    "layer": "训练层",
+    "category": "游戏",
+    "description": "真实对话引擎——意图/情感/话题模拟",
+    "is_wetware": false,
+    "analogy": "对话模拟器"
+  },
+  "curiosity_engine": {
+    "layer": "训练层",
+    "category": "游戏",
+    "description": "好奇心引擎——预测/惊讶/探索驱动",
+    "is_wetware": false,
+    "analogy": "探索游戏"
+  },
+  "text_bridge": {
+    "layer": "接口层",
+    "category": "桥接",
+    "description": "文本桥接——人类语言↔生物电转换",
+    "is_wetware": false,
+    "analogy": "耳朵和嘴巴"
+  },
+  "yinyang_dual_channel": {
+    "layer": "接口层",
+    "category": "桥接",
+    "description": "阴阳双通道——灰度空间通信协议",
+    "is_wetware": false,
+    "analogy": "特殊感官通道"
+  },
+  "yinyang_entangled_channel": {
+    "layer": "接口层",
+    "category": "桥接",
+    "description": "阴阳纠缠通道——量子纠缠式通信",
+    "is_wetware": false,
+    "analogy": "心灵感应"
+  }
+}

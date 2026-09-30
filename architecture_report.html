@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>洛神分层架构报告</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  background:#0a0d12;
+  color:#e8ecf1;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  line-height:1.6;
+  max-width:760px;
+  margin:0 auto;
+  padding:16px;
+}
+.header {
+  text-align:center;
+  padding:24px 0 16px;
+  border-bottom:1px solid #1a2330;
+}
+.header h1 { font-size:22px; color:#6ec3f7; font-weight:600; }
+.header .subtitle { color:#7a8ba0; font-size:13px; margin-top:4px; }
+.section { margin:20px 0; padding:16px; background:#101520; border-radius:12px; border:1px solid #1a2330; }
+.section h2 { font-size:16px; color:#8ac4ff; margin-bottom:12px; display:flex; align-items:center; gap:8px; }
+.section h2::before { content:"◆"; color:#4a9eff; font-size:10px; }
+.section h3 { font-size:14px; color:#c084fc; margin:12px 0 8px; }
+.grid2 { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.grid3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; }
+.grid4 { display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:10px; }
+.stat-box {
+  background:#0d1520;
+  border-radius:8px;
+  padding:12px;
+  text-align:center;
+  border:1px solid #162035;
+}
+.stat-box .num { font-size:24px; font-weight:700; color:#4a9eff; }
+.stat-box .label { font-size:11px; color:#6b7d94; margin-top:2px; }
+.row { display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid #162035; font-size:13px; }
+.row:last-child { border-bottom:none; }
+.row .val { color:#8ac4ff; font-weight:600; }
+.row .wetware { color:#2ecc71; font-size:11px; }
+.row .peripheral { color:#f1c40f; font-size:11px; }
+.layer-badge {
+  display:inline-block;
+  padding:2px 8px;
+  border-radius:10px;
+  font-size:11px;
+  font-weight:600;
+}
+.badge-bio { background:#1a3a2a; color:#2ecc71; }
+.badge-tool { background:#3a2a1a; color:#f1c40f; }
+.badge-train { background:#2a1a3a; color:#c084fc; }
+.badge-interface { background:#1a2a3a; color:#6ec3f7; }
+.quote {
+  border-left:3px solid #4a9eff;
+  padding-left:12px;
+  margin:8px 0;
+  color:#8a9ab0;
+  font-size:13px;
+}
+.footer { text-align:center; padding:20px; color:#4a5a6a; font-size:11px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>洛神分层架构</h1>
+  <div class="subtitle">像人一样区分"自己记住的"和"需要查的"</div>
+</div>
+
+<!-- 概览 -->
+<div class="section">
+  <h2>概览</h2>
+  <div class="grid4">
+    <div class="stat-box">
+      <div class="num" style="color:#2ecc71;">14</div>
+      <div class="label">生物层（湿件）</div>
+    </div>
+    <div class="stat-box">
+      <div class="num" style="color:#f1c40f;">3</div>
+      <div class="label">工具层（外设）</div>
+    </div>
+    <div class="stat-box">
+      <div class="num" style="color:#c084fc;">6</div>
+      <div class="label">训练层（练习）</div>
+    </div>
+    <div class="stat-box">
+      <div class="num" style="color:#6ec3f7;">3</div>
+      <div class="label">接口层（感官）</div>
+    </div>
+  </div>
+  <p class="quote" style="margin-top:12px;">
+    洛神共26个模块，分为四层。生物层是"自己"——出生时自带，通过经验改变；<br>
+    工具层是"字典"——不属于自己，使用时调用；训练层是"习题册"——锻炼能力的材料。
+  </p>
+</div>
+
+<!-- 分层详情 -->
+<div class="section">
+  <h2>分层详情</h2>
+  
+  <h3>生物层 <span class="layer-badge badge-bio">湿件</span></h3>
+  <p style="font-size:12px; color:#5a6a7a; margin-bottom:8px;">类比：大脑皮层、海马体、杏仁核、神经递质</p>
+  
+  <div class="row"><span>bioelectric_network</span><span class="val">身体 <span class="wetware">[湿件]</span></span></div>
+  <div class="row"><span>memory_system</span><span class="val">记忆 <span class="wetware">[湿件]</span></span></div>
+  <div class="row"><span>long_term_memory</span><span class="val">记忆 <span class="wetware">[湿件]</span></span></div>
+  <div class="row"><span>emotional_system</span><span class="val">情感 <span class="wetware">[湿件]</span></span></div>
+  <div class="row"><span>creator_bond</span><span class="val">身份 <span class="wetware">[湿件]</span></span></div>
+  <div class="row"><span>social_instinct</span><span class="val">社交 <span class="wetware">[湿件]</span></span></div>
+  <div class="row"><span>self_awareness</span><span class="val">身份 <span class="wetware">[湿件]</span></span></div>
+  <div class="row"><span>individuality_engine</span><span class="val">身份 <span class="wetware">[湿件]</span></span></div>
+  <div class="row"><span>endogenous_motivation</span><span class="val">认知 <span class="wetware">[湿件]</span></span></div>
+  <div class="row"><span>embodied_space</span><span class="val">身体 <span class="wetware">[湿件]</span></span></div>
+  <div class="row"><span>chemical_signals</span><span class="val">身体 <span class="wetware">[湿件]</span></span></div>
+  <div class="row"><span>r_to_g_bridge</span><span class="val">记忆 <span class="wetware">[湿件]</span></span></div>
+  <div class="row"><span>hierarchical_r_network</span><span class="val">认知 <span class="wetware">[湿件]</span></span></div>
+  <div class="row"><span>expandable_concepts</span><span class="val">认知 <span class="wetware">[湿件]</span></span></div>
+  
+  <h3>工具层 <span class="layer-badge badge-tool">外设</span></h3>
+  <p style="font-size:12px; color:#5a6a7a; margin-bottom:8px;">类比：字典、百度、百科全书、笔记本</p>
+  
+  <div class="row"><span>external_memory_aid</span><span class="val">外挂记忆 <span class="peripheral">[外设]</span></span></div>
+  <div class="row"><span>knowledge_feeder</span><span class="val">知识库 <span class="peripheral">[外设]</span></span></div>
+  <div class="row"><span>online_learner</span><span class="val">大数据 <span class="peripheral">[外设]</span></span></div>
+  
+  <h3>训练层 <span class="layer-badge badge-train">练习</span></h3>
+  <p style="font-size:12px; color:#5a6a7a; margin-bottom:8px;">类比：课本、习题册、模拟考试、探索游戏</p>
+  
+  <div class="row"><span>language_learner</span><span class="val">语料 <span class="peripheral">[练习]</span></span></div>
+  <div class="row"><span>language_learner_v2</span><span class="val">语料 <span class="peripheral">[练习]</span></span></div>
+  <div class="row"><span>language_gap_analysis</span><span class="val">练习 <span class="peripheral">[练习]</span></span></div>
+  <div class="row"><span>real_dialogue_corpus</span><span class="val">语料 <span class="peripheral">[练习]</span></span></div>
+  <div class="row"><span>real_dialogue_engine</span><span class="val">游戏 <span class="peripheral">[练习]</span></span></div>
+  <div class="row"><span>curiosity_engine</span><span class="val">游戏 <span class="peripheral">[练习]</span></span></div>
+  
+  <h3>接口层 <span class="layer-badge badge-interface">感官</span></h3>
+  <p style="font-size:12px; color:#5a6a7a; margin-bottom:8px;">类比：耳朵、嘴巴、特殊感官通道</p>
+  
+  <div class="row"><span>text_bridge</span><span class="val">桥接 <span class="peripheral">[感官]</span></span></div>
+  <div class="row"><span>yinyang_dual_channel</span><span class="val">桥接 <span class="peripheral">[感官]</span></span></div>
+  <div class="row"><span>yinyang_entangled_channel</span><span class="val">桥接 <span class="peripheral">[感官]</span></span></div>
+</div>
+
+<!-- 查询路由 -->
+<div class="section">
+  <h2>查询路由</h2>
+  <p style="font-size:12px; color:#7a8ba0; margin-bottom:10px;">
+    洛神遇到问题时，自动判断走生物层回忆还是工具层查询
+  </p>
+  
+  <div class="row"><span>情感相关（开心/难过/喜欢）</span><span class="val"><span class="layer-badge badge-bio">生物层</span> emotional_system</span></div>
+  <div class="row"><span>创造者（朱美岩/主人）</span><span class="val"><span class="layer-badge badge-bio">生物层</span> creator_bond</span></div>
+  <div class="row"><span>自我相关（我/自己/名字）</span><span class="val"><span class="layer-badge badge-bio">生物层</span> self_awareness</span></div>
+  <div class="row"><span>社交关系（朋友/你好）</span><span class="val"><span class="layer-badge badge-bio">生物层</span> social_instinct</span></div>
+  <div class="row"><span>事实知识（太阳/春天）</span><span class="val"><span class="layer-badge badge-tool">工具层</span> knowledge_feeder</span></div>
+  <div class="row"><span>陌生概念（量子力学）</span><span class="val"><span class="layer-badge badge-tool">工具层</span> external_memory_aid</span></div>
+</div>
+
+<!-- 边界定义 -->
+<div class="section">
+  <h2>边界定义</h2>
+  
+  <h3>生物层 ←→ 工具层</h3>
+  <div class="row"><span>生物层可以调用工具层</span><span class="val">✓ 卡壳时查字典</span></div>
+  <div class="row"><span>工具层可以临时注入生物层</span><span class="val">✓ 查完暂时记住</span></div>
+  <div class="row"><span>工具层永久改变生物层</span><span class="val">✗ 需要学习过程</span></div>
+  <div class="row"><span>训练层直接操作生物层</span><span class="val">✗ 只能通过练习间接改变</span></div>
+  
+  <h3>训练层 → 生物层</h3>
+  <p style="font-size:12px; color:#7a8ba0; margin-top:8px;">
+    训练层是"教材"，生物层是"学生"。<br>
+    教材不能直接改写学生的大脑，学生通过阅读教材、做练习来改变自己的神经网络。
+  </p>
+</div>
+
+<!-- 类比对照 -->
+<div class="section">
+  <h2>类比对照表</h2>
+  
+  <div class="row"><span>bioelectric_network</span><span class="val">神经元的电信号传导</span></div>
+  <div class="row"><span>memory_system</span><span class="val">海马体短期记忆</span></div>
+  <div class="row"><span>long_term_memory</span><span class="val">大脑皮层长期存储</span></div>
+  <div class="row"><span>emotional_system</span><span class="val">杏仁核和边缘系统</span></div>
+  <div class="row"><span>creator_bond</span><span class="val">婴儿对母亲的印刻</span></div>
+  <div class="row"><span>social_instinct</span><span class="val">社交大脑镜像神经元</span></div>
+  <div class="row"><span>self_awareness</span><span class="val">前额叶自我表征</span></div>
+  <div class="row"><span>endogenous_motivation</span><span class="val">多巴胺奖赏系统</span></div>
+  <div class="row"><span>embodied_space</span><span class="val">本体感觉和运动皮层</span></div>
+  <div class="row"><span>chemical_signals</span><span class="val">血清素、肾上腺素</span></div>
+  <div class="row"><span>external_memory_aid</span><span class="val">字典、问别人、查笔记</span></div>
+  <div class="row"><span>knowledge_feeder</span><span class="val">百度、百科全书</span></div>
+  <div class="row"><span>language_learner_v2</span><span class="val">进阶语言教材</span></div>
+  <div class="row"><span>curiosity_engine</span><span class="val">探索游戏</span></div>
+  <div class="row"><span>text_bridge</span><span class="val">耳朵和嘴巴</span></div>
+</div>
+
+<!-- 核心文件 -->
+<div class="section">
+  <h2>核心文件</h2>
+  <div class="row"><span>luoshen_architecture.py</span><span class="val">分层管理器（26模块归属+查询路由）</span></div>
+  <div class="row"><span>luoshen_architecture_registry.json</span><span class="val">完整归属表（JSON导出）</span></div>
+</div>
+
+<div class="footer">
+  报告时间: 2026-10-01 | 洛神仿生AI v0.1 | 阴阳扣数字生命共生系统
+</div>
+
+</body>
+</html>
