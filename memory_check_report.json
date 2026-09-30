@@ -1,0 +1,118 @@
+{
+  "t1_physical": {
+    "concepts": 448,
+    "pairs": 3362,
+    "g_total": 4194304,
+    "g_effective": 567491,
+    "g_strong": 295,
+    "g_effective_pct": 0.1353,
+    "g_strong_pct": 0.0001,
+    "syntax": 5,
+    "causal": 15,
+    "templates": 496,
+    "pinyin": 171,
+    "top_words": [
+      [
+        "我",
+        80
+      ],
+      [
+        "了",
+        61
+      ],
+      [
+        "是",
+        57
+      ],
+      [
+        "好",
+        50
+      ],
+      [
+        "的",
+        46
+      ],
+      [
+        "你",
+        41
+      ],
+      [
+        "在",
+        32
+      ],
+      [
+        "很",
+        32
+      ],
+      [
+        "吗",
+        31
+      ],
+      [
+        "来",
+        30
+      ]
+    ],
+    "topic_dist": {
+      "creator": 31,
+      "nature": 119,
+      "daily": 205
+    },
+    "creator_memory": {
+      "朱美岩": 20,
+      "创造者": 5,
+      "主人": 5,
+      "设计者": 1
+    },
+    "nature_memory": {
+      "太阳": 27,
+      "春天": 18,
+      "花": 17,
+      "鸟": 8,
+      "云": 9,
+      "雨": 11,
+      "风": 7,
+      "星星": 10,
+      "天空": 3,
+      "雷": 9
+    }
+  },
+  "t2_recall": {
+    "creator_purity": 0.0,
+    "nature_purity": 0.1,
+    "daily_purity": 0.3,
+    "avg_purity": 0.13,
+    "creator_top5": [
+      "我",
+      "吗",
+      "在",
+      "早上好",
+      "中午"
+    ],
+    "nature_top5": [
+      "我",
+      "是",
+      "出",
+      "光",
+      "因为"
+    ],
+    "daily_top5": [
+      "你",
+      "明天",
+      "我",
+      "今天",
+      "开心"
+    ]
+  },
+  "t3_structure": {
+    "creator_nature_diff": 1.4,
+    "nature_daily_diff": 1.6,
+    "avg_diff": 1.5
+  },
+  "summary": {
+    "memory_capacity": "448概念/3362连接",
+    "recall_quality": "主题纯度13%",
+    "structure_quality": "区分度150%",
+    "status": "需优化"
+  }
+}
