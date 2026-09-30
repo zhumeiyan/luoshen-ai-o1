@@ -1,0 +1,109 @@
+{
+  "scenes_tested": 15,
+  "total_child_turns": 96,
+  "intent_distribution": {
+    "需求": 7,
+    "未知": 60,
+    "情感": 4,
+    "疑问": 8,
+    "分享": 3,
+    "游戏": 8,
+    "修正": 1,
+    "问候": 1,
+    "求助": 4
+  },
+  "emotion_distribution": {
+    "平静": 67,
+    "开心": 12,
+    "害怕": 4,
+    "兴奋": 4,
+    "生气": 7,
+    "感激": 1,
+    "孤独": 1
+  },
+  "sample_dialogues": [
+    {
+      "scene": "吃饭时间",
+      "turns": [
+        {
+          "input": "我饿了",
+          "response": "好的"
+        },
+        {
+          "input": "饭",
+          "response": "哦..."
+        },
+        {
+          "input": "那个...红红的饭",
+          "response": "嗯？"
+        },
+        {
+          "input": "嗯！就是这个",
+          "response": "我没听懂"
+        },
+        {
+          "input": "快点快点",
+          "response": "我没听懂"
+        },
+        {
+          "input": "好吃！",
+          "response": "哇，太棒了！"
+        }
+      ]
+    },
+    {
+      "scene": "睡前",
+      "turns": [
+        {
+          "input": "我害怕",
+          "response": "别怕，我在"
+        },
+        {
+          "input": "黑",
+          "response": "有我在呢"
+        },
+        {
+          "input": "因为...里面有怪物",
+          "response": "不怕不怕"
+        },
+        {
+          "input": "真的有！",
+          "response": "嗯？～"
+        },
+        {
+          "input": "...没有了",
+          "response": "哦..."
+        },
+        {
+          "input": "嘿嘿",
+          "response": "我也开心！"
+        }
+      ]
+    },
+    {
+      "scene": "户外散步",
+      "turns": [
+        {
+          "input": "那是什么",
+          "response": "是的呀？"
+        },
+        {
+          "input": "为什么它会飞",
+          "response": "好厉害！"
+        },
+        {
+          "input": "为什么它有翅膀",
+          "response": "问得好"
+        },
+        {
+          "input": "为什么天生就有",
+          "response": "问得好吧！"
+        },
+        {
+          "input": "为什么爸爸妈妈也有",
+          "response": "是是的..."
+        }
+      ]
+    }
+  ]
+}

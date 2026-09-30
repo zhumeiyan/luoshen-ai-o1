@@ -1,0 +1,266 @@
+{
+  "metrics": {
+    "intent_match": 39,
+    "emotion_detected": 29,
+    "topic_consistent": 54,
+    "response_natural": 81,
+    "total_turns": 96
+  },
+  "scores": {
+    "intent_accuracy": 40.6,
+    "emotion_detection_rate": 30.2,
+    "topic_consistency": 56.2,
+    "response_naturalness": 84.4,
+    "overall": 52.9
+  },
+  "dialogues": [
+    {
+      "scene": "吃饭时间",
+      "turns": [
+        {
+          "input": "我饿了",
+          "response": "吃吧/喝吧呢",
+          "intent": "需求",
+          "emotion": "平静",
+          "topic": "吃饭"
+        },
+        {
+          "input": "饭",
+          "response": "嗯嗯",
+          "intent": "未知",
+          "emotion": "平静",
+          "topic": "吃饭"
+        },
+        {
+          "input": "那个...红红的饭",
+          "response": "我没听懂哦！",
+          "intent": "未知",
+          "emotion": "平静",
+          "topic": "吃饭"
+        },
+        {
+          "input": "嗯！就是这个",
+          "response": "我没听懂",
+          "intent": "未知",
+          "emotion": "平静",
+          "topic": "吃饭"
+        },
+        {
+          "input": "快点快点",
+          "response": "我没听懂",
+          "intent": "未知",
+          "emotion": "平静",
+          "topic": "吃饭"
+        },
+        {
+          "input": "好吃！",
+          "response": "开心就好！",
+          "intent": "未知",
+          "emotion": "开心",
+          "topic": "吃饭"
+        }
+      ]
+    },
+    {
+      "scene": "睡前",
+      "turns": [
+        {
+          "input": "我害怕",
+          "response": "有我在呢",
+          "intent": "情感",
+          "emotion": "害怕",
+          "topic": "情绪"
+        },
+        {
+          "input": "黑",
+          "response": "我保护你",
+          "intent": "未知",
+          "emotion": "害怕",
+          "topic": "情绪"
+        },
+        {
+          "input": "因为...里面有怪物",
+          "response": "我保护你",
+          "intent": "未知",
+          "emotion": "害怕",
+          "topic": "情绪"
+        },
+        {
+          "input": "真的有！",
+          "response": "再说一遍",
+          "intent": "未知",
+          "emotion": "平静",
+          "topic": "情绪"
+        },
+        {
+          "input": "...没有了",
+          "response": "我没听懂",
+          "intent": "未知",
+          "emotion": "平静",
+          "topic": "情绪"
+        },
+        {
+          "input": "嘿嘿",
+          "response": "哇，太棒了！",
+          "intent": "未知",
+          "emotion": "开心",
+          "topic": "情绪"
+        }
+      ]
+    },
+    {
+      "scene": "户外散步",
+      "turns": [
+        {
+          "input": "那是什么",
+          "response": "是的呀...",
+          "intent": "疑问",
+          "emotion": "平静",
+          "topic": "一般"
+        },
+        {
+          "input": "为什么它会飞",
+          "response": "真棒！",
+          "intent": "疑问",
+          "emotion": "兴奋",
+          "topic": "游戏"
+        },
+        {
+          "input": "为什么它有翅膀",
+          "response": "我也不知道...！",
+          "intent": "疑问",
+          "emotion": "平静",
+          "topic": "游戏"
+        },
+        {
+          "input": "为什么天生就有",
+          "response": "因为我也不知道嗯～",
+          "intent": "疑问",
+          "emotion": "平静",
+          "topic": "自然"
+        },
+        {
+          "input": "为什么爸爸妈妈也有",
+          "response": "是是的",
+          "intent": "疑问",
+          "emotion": "平静",
+          "topic": "自然"
+        }
+      ]
+    },
+    {
+      "scene": "幼儿园回家",
+      "turns": [
+        {
+          "input": "他打我",
+          "response": "别生气",
+          "intent": "未知",
+          "emotion": "生气",
+          "topic": "一般"
+        },
+        {
+          "input": "那个...穿蓝衣服的",
+          "response": "我没听懂呢",
+          "intent": "未知",
+          "emotion": "平静",
+          "topic": "一般"
+        },
+        {
+          "input": "对！就是他",
+          "response": "再说一遍",
+          "intent": "未知",
+          "emotion": "平静",
+          "topic": "一般"
+        },
+        {
+          "input": "因为我拿了他的玩具",
+          "response": "马上？",
+          "intent": "需求",
+          "emotion": "平静",
+          "topic": "游戏"
+        },
+        {
+          "input": "我知道要分享",
+          "response": "你真好",
+          "intent": "分享",
+          "emotion": "平静",
+          "topic": "游戏"
+        },
+        {
+          "input": "...没有",
+          "response": "嗯？",
+          "intent": "未知",
+          "emotion": "平静",
+          "topic": "游戏"
+        },
+        {
+          "input": "下次分享",
+          "response": "分享真开心？",
+          "intent": "分享",
+          "emotion": "平静",
+          "topic": "游戏"
+        }
+      ]
+    },
+    {
+      "scene": "玩玩具",
+      "turns": [
+        {
+          "input": "我是超人",
+          "response": "加油！？",
+          "intent": "游戏",
+          "emotion": "平静",
+          "topic": "游戏"
+        },
+        {
+          "input": "轰隆隆——飞！",
+          "response": "真棒！",
+          "intent": "游戏",
+          "emotion": "兴奋",
+          "topic": "游戏"
+        },
+        {
+          "input": "去救小猫",
+          "response": "哦...呀",
+          "intent": "未知",
+          "emotion": "平静",
+          "topic": "游戏"
+        },
+        {
+          "input": "在树上！",
+          "response": "什么？～",
+          "intent": "未知",
+          "emotion": "平静",
+          "topic": "自然"
+        },
+        {
+          "input": "飞上去！",
+          "response": "我也想玩！",
+          "intent": "游戏",
+          "emotion": "兴奋",
+          "topic": "游戏"
+        },
+        {
+          "input": "抱下来！",
+          "response": "什么？嗯",
+          "intent": "未知",
+          "emotion": "平静",
+          "topic": "游戏"
+        },
+        {
+          "input": "喵喵得救啦！",
+          "response": "嗯？呢！",
+          "intent": "未知",
+          "emotion": "平静",
+          "topic": "游戏"
+        }
+      ]
+    }
+  ],
+  "summary": {
+    "scenes": 15,
+    "total_turns": 96,
+    "pass_threshold": 60,
+    "overall_pass": false
+  }
+}

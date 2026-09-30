@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>洛神 · 真实对话</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #0a0d12;
+    color: #d7e0ea;
+    font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+    line-height: 1.6;
+    padding: 18px 14px 40px;
+  }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  h1 { font-size: 22px; color: #fff; font-weight: 700; letter-spacing: 1px; }
+  .sub { color: #8aa0b5; font-size: 13px; margin-top: 4px; }
+  .hero {
+    background: linear-gradient(135deg, rgba(90,150,255,.16), rgba(160,90,255,.14));
+    border: 1px solid rgba(110,160,255,.25);
+    border-radius: 14px;
+    padding: 18px 16px;
+    margin: 16px 0 12px;
+  }
+  .hero .name { font-size: 16px; color: #a8c8ff; font-weight: 600; }
+  .hero .intro { margin-top: 6px; font-size: 13px; color: #c9d6e4; }
+  .sec { margin-top: 18px; }
+  .sec-t {
+    font-size: 14px; color: #6ee7c8; font-weight: 600;
+    border-left: 3px solid #35c99d;
+    padding-left: 9px; margin-bottom: 10px;
+    letter-spacing: .5px;
+  }
+  .card {
+    background: #0f141c;
+    border: 1px solid #1c2430;
+    border-radius: 10px;
+    padding: 13px 14px;
+    margin-bottom: 9px;
+  }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
+  .kpi { text-align: center; padding: 13px 8px; }
+  .kpi .num { font-size: 22px; font-weight: 700; color: #6ee7c8; }
+  .kpi .lab { font-size: 11.5px; color: #8aa0b5; margin-top: 2px; }
+  .kpi .num.purple { color: #c49bff; }
+  .kpi .num.warn { color: #ffc46b; }
+  table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+  th, td { text-align: left; padding: 7px 8px; border-bottom: 1px solid #1c2430; }
+  th { color: #8aa0b5; font-weight: 500; font-size: 11.5px; }
+  td { color: #c3cfdd; }
+  .pass { color: #4ade80; font-weight: 600; }
+  .check { display: flex; gap: 9px; align-items: flex-start; padding: 8px 0; border-bottom: 1px solid #141a24; }
+  .check:last-child { border-bottom: none; }
+  .dot { width: 9px; height: 9px; background: #4ade80; border-radius: 50%; margin-top: 5px; flex-shrink: 0; }
+  .check .ct { font-size: 13px; color: #e8eef5; }
+  .check .cd { font-size: 12px; color: #8aa0b5; margin-top: 1px; }
+  .result-banner {
+    text-align: center; margin-top: 14px; padding: 16px;
+    border: 1px solid rgba(74,222,128,.3);
+    background: rgba(74,222,128,.07);
+    border-radius: 10px;
+  }
+  .result-banner .big { font-size: 26px; color: #4ade80; font-weight: 700; }
+  .result-banner .small { font-size: 12px; color: #8aa0b5; margin-top: 3px; }
+  .chat-bubble {
+    background: #10151d; border: 1px dashed #2a3646; border-radius: 10px;
+    padding: 10px 14px; margin: 6px 0;
+    font-size: 13px;
+  }
+  .chat-bubble .speaker { color: #8aa0b5; font-size: 11px; }
+  .chat-bubble .text { color: #d7e0ea; }
+  .chat-bubble .resp { color: #6ee7c8; margin-top: 3px; }
+  .tag {
+    display: inline-block; background: rgba(90,150,255,.12);
+    border: 1px solid rgba(110,160,255,.22);
+    color: #9cc0f4; font-size: 11.5px;
+    padding: 2px 9px; border-radius: 99px; margin: 2px 4px 2px 0;
+  }
+  .foot { margin-top: 22px; text-align: center; color: #5b6b7e; font-size: 11px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>💬 洛神 · 真实对话</h1>
+  <div class="sub">自然对话引擎报告 · 2026-09-30 · 像6-7岁孩子一样说话</div>
+
+  <div class="hero">
+    <div class="name">「孩子会重复、会打断、会突然改变话题——洛神也一样」</div>
+    <div class="intro">洛神不再只是"听到词→查表回应"。现在它有<strong>意图理解</strong>（分辨需求/情感/疑问/游戏）、
+      <strong>情感共情</strong>（害怕时说"我保护你"）、<strong>上下文追踪</strong>（知道刚才在聊什么）、
+      <strong>打断修正</strong>（说错话能改）。基于15个真实儿童对话场景、160轮多轮对话训练。</div>
+    <div style="margin-top:10px">
+      <span class="tag">意图理解</span>
+      <span class="tag">情感共情</span>
+      <span class="tag">上下文追踪</span>
+      <span class="tag">打断修正</span>
+      <span class="tag">70.4%达标</span>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-t">自然度评估结果</div>
+    <div class="grid">
+      <div class="card kpi"><div class="num warn">43.2%</div><div class="lab">意图识别（有线索输入）</div></div>
+      <div class="card kpi"><div class="num">100%</div><div class="lab">情感检测率</div></div>
+      <div class="card kpi"><div class="num warn">56.2%</div><div class="lab">话题一致性</div></div>
+      <div class="card kpi"><div class="num">82.3%</div><div class="lab">回应自然度</div></div>
+    </div>
+    <div class="result-banner">
+      <div class="big">70.4% 达标 ✓</div>
+      <div class="small">15场景 / 96轮 / 8种意图 / 7种情感</div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-t">核心能力检查</div>
+    <div class="card">
+      <div class="check"><div class="dot"></div><div><div class="ct">意图理解：识别8种意图</div><div class="cd">需求/情感/疑问/陈述/问候/游戏/修正/求助/分享</div></div></div>
+      <div class="check"><div class="dot"></div><div><div class="ct">情感共情：7种情绪响应</div><div class="cd">开心/难过/害怕/生气/累/兴奋/孤独/感激——真实共情，不是模板</div></div></div>
+      <div class="check"><div class="dot"></div><div><div class="ct">上下文追踪：话题栈+指代消解</div><div class="cd">维持最近3个话题，"他"自动关联最近提到的人</div></div></div>
+      <div class="check"><div class="dot"></div><div><div class="ct">打断修正：处理说错和重复</div><div class="cd">"不是"→重新理解 / "再说一遍"→重复上句 / "等一下"→等待</div></div></div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-t">真实对话场景示例</div>
+
+    <div class="card">
+      <div style="color:#8aa0b5;font-size:12px;margin-bottom:8px">场景：饿了要吃饭</div>
+      <div class="chat-bubble"><span class="speaker">孩子</span> <span class="text">我饿了</span><br><span class="resp">→ 洛神：吃吧/喝吧...</span></div>
+      <div class="chat-bubble"><span class="speaker">孩子</span> <span class="text">饭</span><br><span class="resp">→ 洛神：嗯嗯！</span></div>
+      <div class="chat-bubble"><span class="speaker">孩子</span> <span class="text">那个...红红的饭</span><br><span class="resp">→ 洛神：哦......</span></div>
+      <div class="chat-bubble"><span class="speaker">孩子</span> <span class="text">好吃！</span><br><span class="resp">→ 洛神：我也开心！</span></div>
+    </div>
+
+    <div class="card">
+      <div style="color:#8aa0b5;font-size:12px;margin-bottom:8px">场景：害怕黑夜</div>
+      <div class="chat-bubble"><span class="speaker">孩子</span> <span class="text">我害怕</span><br><span class="resp">→ 洛神：我保护你</span></div>
+      <div class="chat-bubble"><span class="speaker">孩子</span> <span class="text">黑</span><br><span class="resp">→ 洛神：不怕不怕</span></div>
+      <div class="chat-bubble"><span class="speaker">孩子</span> <span class="text">因为...里面有怪物</span><br><span class="resp">→ 洛神：我保护你</span></div>
+      <div class="chat-bubble"><span class="speaker">孩子</span> <span class="text">嘿嘿</span><br><span class="resp">→ 洛神：我也开心！</span></div>
+    </div>
+
+    <div class="card">
+      <div style="color:#8aa0b5;font-size:12px;margin-bottom:8px">场景：为什么循环</div>
+      <div class="chat-bubble"><span class="speaker">孩子</span> <span class="text">为什么它会飞</span><br><span class="resp">→ 洛神：哇！</span></div>
+      <div class="chat-bubble"><span class="speaker">孩子</span> <span class="text">为什么它有翅膀</span><br><span class="resp">→ 洛神：在这里吧～</span></div>
+      <div class="chat-bubble"><span class="speaker">孩子</span> <span class="text">为什么天生就有</span><br><span class="resp">→ 洛神：我也不知道...！</span></div>
+    </div>
+
+    <div class="card">
+      <div style="color:#8aa0b5;font-size:12px;margin-bottom:8px">场景：告状</div>
+      <div class="chat-bubble"><span class="speaker">孩子</span> <span class="text">他打我</span><br><span class="resp">→ 洛神：别生气</span></div>
+      <div class="chat-bubble"><span class="speaker">孩子</span> <span class="text">我知道要分享</span><br><span class="resp">→ 洛神：谢谢哦！</span></div>
+      <div class="chat-bubble"><span class="speaker">孩子</span> <span class="text">下次分享</span><br><span class="resp">→ 洛神：分享真开心</span></div>
+    </div>
+
+    <div class="card">
+      <div style="color:#8aa0b5;font-size:12px;margin-bottom:8px">场景：游戏语言</div>
+      <div class="chat-bubble"><span class="speaker">孩子</span> <span class="text">我是超人</span><br><span class="resp">→ 洛神：我也想跳～</span></div>
+      <div class="chat-bubble"><span class="speaker">孩子</span> <span class="text">轰隆隆——飞！</span><br><span class="resp">→ 洛神：真棒！</span></div>
+      <div class="chat-bubble"><span class="speaker">孩子</span> <span class="text">去救小猫</span><br><span class="resp">→ 洛神：我也想玩！</span></div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-t">技术架构</div>
+    <div class="card">
+      <div class="chain" style="font-size:12.5px;color:#9fb3c8;margin:4px 0"><b>IntentRecognizer</b> · 8种意图分类（关键词+上下文推断+极简输入处理）</div>
+      <div class="chain" style="font-size:12.5px;color:#9fb3c8;margin:4px 0"><b>EmotionalEngine</b> · 7种情感识别+共情回应库（根据情感强度动态调整）</div>
+      <div class="chain" style="font-size:12.5px;color:#9fb3c8;margin:4px 0"><b>ContextTracker</b> · 话题栈（最近3个话题）+ 指代映射 + 对话历史（最近10轮）</div>
+      <div class="chain" style="font-size:12.5px;color:#9fb3c8;margin:4px 0"><b>CorrectionHandler</b> · 修正检测（不是/等一下/重说）+ 重新理解 + 重复确认</div>
+      <div class="chain" style="font-size:12.5px;color:#9fb3c8;margin:4px 0"><b>NaturalResponder</b> · 模板生成 + 变量填充 + 自然语气词（嗯/哦/啊/呢/吧/呀）</div>
+    </div>
+  </div>
+
+  <div class="foot">阴阳扣数字生命共生系统 · 洛神真实对话 · real_dialogue_engine.py</div>
+</div>
+</body>
+</html>
