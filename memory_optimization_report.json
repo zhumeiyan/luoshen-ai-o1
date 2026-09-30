@@ -1,0 +1,40 @@
+{
+  "optimization": {
+    "g_threshold": 0.02,
+    "imprint_weight": 0.15,
+    "boost_rounds": 5
+  },
+  "results": {
+    "creator_purity": 0.0,
+    "nature_purity": 0.0,
+    "daily_purity": 0.1,
+    "avg_purity": 0.03,
+    "creator_top5": [
+      "在",
+      "好",
+      "晚安",
+      "橙",
+      "张"
+    ],
+    "nature_top5": [
+      "在",
+      "好",
+      "晚安",
+      "真",
+      "道"
+    ],
+    "daily_top5": [
+      "在",
+      "好",
+      "晚安",
+      "真",
+      "早上好"
+    ],
+    "g_strong_pct": 0.0008
+  },
+  "comparison": {
+    "before_avg_purity": 0.13,
+    "after_avg_purity": 0.03,
+    "improvement": "-74%"
+  }
+}

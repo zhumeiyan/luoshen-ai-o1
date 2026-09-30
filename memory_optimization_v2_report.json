@@ -1,0 +1,38 @@
+{
+  "optimization_v2": {
+    "creator_boost": 2.0,
+    "nature_boost": 1.0,
+    "imprint_inject": 24.0
+  },
+  "results": {
+    "creator_purity": 0.1,
+    "nature_purity": 0.1,
+    "daily_purity": 0.2,
+    "avg_purity": 0.13,
+    "creator_top5": [
+      "我",
+      "是",
+      "很",
+      "了",
+      "在"
+    ],
+    "nature_top5": [
+      "是",
+      "很",
+      "了",
+      "在",
+      "我"
+    ],
+    "daily_top5": [
+      "是",
+      "很",
+      "了",
+      "在",
+      "有"
+    ]
+  },
+  "comparison": {
+    "before_avg_purity": 0.13,
+    "after_avg_purity": 0.13
+  }
+}
