@@ -144,7 +144,6 @@ class WM:
 
     def learn(self, pred, actual):
         g = self.g; n = g['n']
-        # 修正E: 下丘脑驱力反馈——hunger影响lr
         drive_boost = 1.0 + self.homeo.get('hunger', 0.3) * 0.5
         lr = g['lr'] * drive_boost
         errs = [actual[j]-pred[j] for j in range(N_CHANNELS)]
@@ -158,19 +157,13 @@ class WM:
             pwi = pw[i]; hi = h[i]
             for c in range(N_CHANNELS):
                 pwi[c] += lr * hi * errs[c]
-                if pwi[c] > 3: pwi[c] = 3
-                elif pwi[c] < -3: pwi[c] = -3
         for c in range(N_CHANNELS):
             pb[c] += lr * 1.5 * errs[c]
-            if pb[c] > 5: pb[c] = 5
-            elif pb[c] < -5: pb[c] = -5
         x = self.input_vec; skip = g['skip']
         for j in range(min(len(skip), len(x))):
             skj = skip[j]; xj = x[j]
             for c in range(N_CHANNELS):
                 skj[c] += lr * 0.5 * xj * errs[c]
-                if skj[c] > 2: skj[c] = 2
-                elif skj[c] < -2: skj[c] = -2
         self.protein_fold()
         self.organ_activity['spike_count'] = sum(1 for v in h if abs(v) > 0.5)
         self.organ_activity['energy_use'] = sum(v*v for v in h)/max(1,n)
