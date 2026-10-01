@@ -103,35 +103,106 @@ class AuthenticExpressionEngine:
     def _synthesize(self, style: Dict, narrative: Dict) -> List[str]:
         """
         合成：叙事内容已由 MemoryDrivenNarrative 生成并风格化，
-        这里只做去重、筛选和补充。
+        这里做质量门控、去重、筛选和兜底补充。
         """
         sentences = narrative['narrative']
         
-        # 去重（保持顺序，忽略标点后缀）
+        # 质量门控：过滤无意义句子
+        def is_meaningful(s: str) -> bool:
+            """检查句子是否有实际意义。"""
+            clean = s.rstrip('。！？...~')
+            if len(clean) < 3:
+                return False
+            
+            stop_words = {'是', '的', '了', '在', '吗', '不', '很', '也', '都', '就',
+                          '和', '有', '要', '想', '会', '能', '可以', '还', '让',
+                          '把', '被', '给', '跟', '对', '从', '到', '向', '为',
+                          '与', '或', '又', '再', '还', '没', '别', '太', '真',
+                          '比较', '非常', '特别', '有点', '那么', '这么', '那个',
+                          '这个', '这里', '那里', '什么', '怎么', '为什么',
+                          '因为', '所以', '如果', '虽然', '但是', '然后', '最后',
+                          '而且', '或者', '要么', '不但', '不仅', '而且',
+                          '我', '你', '他', '她', '它', '我们', '你们', '他们',
+                          '呀', '啊', '呢', '吧', '哦', '嗯', '哇', '哈',
+                          '出', '来', '去', '上', '下', '前', '后', '里', '外',
+                          '个', '只', '条', '张', '把', '根', '块', '片',
+                          '一', '二', '三', '四', '五', '六', '七', '八', '九', '十'}
+            
+            content_words = [w for w in clean if w not in stop_words and len(w) >= 1]
+            if len(content_words) < 2:
+                return False
+            
+            unique_chars = set(clean)
+            if len(unique_chars) <= 2:
+                return False
+            
+            return True
+        
+        # 过滤并去重
         seen = set()
         unique = []
         for s in sentences:
-            key = s.rstrip('。！？...')
-            if key not in seen and len(key) >= 2:
+            if not is_meaningful(s):
+                continue
+            key = s.rstrip('。！？...~')
+            if key not in seen:
                 seen.add(key)
                 unique.append(s)
         
-        # 句数不足时，用复杂句法引擎补充
+        # 句数不足时，用主题+情感生成兜底句子
         if len(unique) < 2:
-            helpers = narrative.get('helpers', [])
             theme = narrative.get('theme', '我')
-            extra = self.syntax_engine.generate_monologue(
-                theme, helpers, style.get('emotion', '平静')
-            )
-            for s in extra:
-                key = s.rstrip('。！？...')
-                if key not in seen and len(key) >= 2:
+            emotion = style.get('emotion', '平静')
+            fallback_sentences = self._generate_fallback(theme, emotion, style)
+            for s in fallback_sentences:
+                key = s.rstrip('。！？...~')
+                if key not in seen and is_meaningful(s):
                     seen.add(key)
                     unique.append(s)
-                if len(unique) >= 4:
+                if len(unique) >= 3:
                     break
         
         return unique[:4]
+    
+    def _generate_fallback(self, theme: str, emotion: str, style: Dict) -> List[str]:
+        """当叙事质量不足时，生成兜底句子。"""
+        punct = style.get('punctuation', '。')
+        tone = style.get('tone_words', [])
+        
+        fallbacks = {
+            '开心': [
+                f"{theme}让我开心{punct}",
+                f"我喜欢{theme}{tone[0] if tone else '呀'}{punct}",
+                f"{theme}真好{punct}",
+            ],
+            '难过': [
+                f"{theme}让我有点难过{punct}",
+                f"看到{theme}，我想哭{punct}",
+                f"{theme}...让人伤心...",
+            ],
+            '害怕': [
+                f"{theme}有点可怕{punct}",
+                f"我害怕{theme}{punct}",
+                f"{theme}让我紧张{punct}",
+            ],
+            '愤怒': [
+                f"{theme}让我生气{punct}",
+                f"我讨厌{theme}{punct}",
+                f"{theme}真讨厌{punct}",
+            ],
+            '平静': [
+                f"{theme}在这里{punct}",
+                f"这是{theme}{punct}",
+                f"{theme}很安静{punct}",
+            ],
+            '好奇': [
+                f"{theme}是什么呀{punct}",
+                f"我想知道{theme}的事情{punct}",
+                f"{theme}有趣吗{punct}",
+            ],
+        }
+        
+        return fallbacks.get(emotion, [f"{theme}{punct}"])
     
     def express_from_state(self, emotion_state: Dict, memory_cue: str = '我', creator_bond: float = 0.0) -> Dict:
         """

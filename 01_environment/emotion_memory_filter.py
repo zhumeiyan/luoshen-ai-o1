@@ -184,12 +184,31 @@ class EmotionMemoryFilter:
         if not activated:
             return []
         
+        # 过滤虚词：这些词不应作为主题或情感对象
+        stop_words = {'是', '的', '了', '在', '吗', '不', '很', '也', '都', '就',
+                      '和', '有', '要', '想', '会', '能', '还', '让', '把', '被',
+                      '给', '跟', '对', '从', '到', '向', '为', '与', '或',
+                      '又', '再', '没', '别', '太', '真', '比较', '非常', '特别',
+                      '有点', '那么', '这么', '什么', '怎么', '为什么',
+                      '因为', '所以', '如果', '虽然', '但是', '然后', '最后',
+                      '而且', '要么', '不但', '不仅',
+                      '我', '你', '他', '她', '它', '我们', '你们', '他们',
+                      '呀', '啊', '呢', '吧', '哦', '嗯', '哇', '哈',
+                      '出', '来', '去', '上', '下', '前', '后', '里', '外',
+                      '个', '只', '条', '张', '把', '根', '块', '片',
+                      '一', '二', '三', '四', '五', '六', '七', '八', '九', '十',
+                      '这里', '那里', '这个', '那个', '这些', '那些'}
+        
+        filtered_activated = {k: v for k, v in activated.items() if k not in stop_words and len(k) >= 2}
+        if not filtered_activated:
+            filtered_activated = activated  # 如果过滤后为空，回退到原数据
+        
         # 获取情感偏好和避免标签
         preferred_tags = self.emotion_preferences.get(emotion, ['中性'])
         avoid_tags = self.emotion_avoids.get(emotion, [])
         
         scored = []
-        for concept, activation in activated.items():
+        for concept, activation in filtered_activated.items():
             # 获取概念标签
             tags = self.concept_tags.get(concept, ['中性'])
             

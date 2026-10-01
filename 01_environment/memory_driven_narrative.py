@@ -21,6 +21,7 @@ memory_driven_narrative.py — 记忆驱动叙事生成
 """
 
 import sys
+import random
 from typing import Dict, List, Tuple, Optional
 from collections import defaultdict
 
@@ -58,35 +59,68 @@ class MemoryDrivenNarrative:
         if not activated:
             return '日常', []
         
+        # 强力虚词过滤表（统一的过滤标准）
+        stop_words = {'我', '你', '他', '她', '它', '我们', '你们', '他们',
+                      '是', '的', '了', '在', '吗', '不', '很', '也', '都', '就',
+                      '和', '有', '要', '想', '会', '能', '还', '让', '把', '被',
+                      '给', '跟', '对', '从', '到', '向', '为', '与', '或',
+                      '又', '再', '没', '别', '太', '真', '比较', '非常', '特别',
+                      '有点', '那么', '这么', '什么', '怎么', '为什么',
+                      '因为', '所以', '如果', '虽然', '但是', '然后', '最后',
+                      '而且', '要么', '不但', '不仅',
+                      '呀', '啊', '呢', '吧', '哦', '嗯', '哇', '哈',
+                      '出', '来', '去', '上', '下', '前', '后', '里', '外',
+                      '个', '只', '条', '张', '把', '根', '块', '片',
+                      '一', '二', '三', '四', '五', '六', '七', '八', '九', '十',
+                      '这', '那', '这里', '那里', '这个', '那个', '这些', '那些',
+                      '今天', '明天', '昨天', '早上', '中午', '晚上',
+                      '可以', '可能', '也许', '大概', '一定', '必须'}
+        
+        # 统一过滤函数
+        def is_content(word):
+            return word not in stop_words and len(word) >= 2
+        
         # 如果提供了情感，使用情感滤镜
         if emotion and emotion != '平静':
             filtered = self.emotion_filter.filter_concepts(activated, emotion, top_k=8)
+            # 再次过滤虚词
+            filtered = [(c, s) for c, s in filtered if is_content(c)]
             if filtered:
                 theme = filtered[0][0]
-                helpers = [c for c, _ in filtered[1:6] if c != theme]
+                helpers = [c for c, _ in filtered[1:6] if c != theme and is_content(c)]
                 return theme, helpers[:5]
         
-        # 默认：按激活度排序
-        sorted_concepts = sorted(activated.items(), key=lambda x: x[1], reverse=True)
+        # 默认：按激活度排序，但强力过滤虚词
+        # 完整的虚词表
+        stop_words = {'我', '你', '他', '她', '它', '我们', '你们', '他们',
+                      '是', '的', '了', '在', '吗', '不', '很', '也', '都', '就',
+                      '和', '有', '要', '想', '会', '能', '还', '让', '把', '被',
+                      '给', '跟', '对', '从', '到', '向', '为', '与', '或',
+                      '又', '再', '没', '别', '太', '真', '比较', '非常', '特别',
+                      '有点', '那么', '这么', '什么', '怎么', '为什么',
+                      '因为', '所以', '如果', '虽然', '但是', '然后', '最后',
+                      '而且', '要么', '不但', '不仅',
+                      '呀', '啊', '呢', '吧', '哦', '嗯', '哇', '哈',
+                      '出', '来', '去', '上', '下', '前', '后', '里', '外',
+                      '个', '只', '条', '张', '把', '根', '块', '片',
+                      '一', '二', '三', '四', '五', '六', '七', '八', '九', '十',
+                      '这', '那', '这里', '那里', '这个', '那个', '这些', '那些',
+                      '今天', '明天', '昨天', '早上', '中午', '晚上',
+                      '可以', '可能', '也许', '大概', '一定', '必须'}
         
-        # 主题词：激活度最高的概念
-        theme = sorted_concepts[0][0]
+        # 过滤后的排序
+        filtered = [(w, s) for w, s in sorted(activated.items(), key=lambda x: x[1], reverse=True)
+                    if w not in stop_words and len(w) >= 2]
         
-        # 辅助概念：前8个（排除日常高频词和虚词）
-        daily_noise = {'我', '你', '是', '的', '了', '在', '好', '很', '吗', '不', '这', '那',
-                       '有', '要', '想', '就', '和', '会', '能', '可以', '还', '也', '都',
-                       '让', '把', '被', '给', '跟', '对', '从', '到', '向', '为', '与', '或',
-                       '一个', '一种', '一起', '那个', '这个', '这里', '那里',
-                       # 高频动词/助词/方位词
-                       '出', '来', '去', '上', '下', '前', '后', '里', '外', '左', '右',
-                       '过', '着', '得', '地', '吧', '呢', '啊', '哦', '嗯',
-                       # 时间词（单独出现时较虚）
-                       '早上', '中午', '晚上', '今天', '明天', '昨天',
-                       # 单字虚词
-                       '一', '二', '三', '四', '五', '六', '七', '八', '九', '十',
-                       '个', '只', '条', '张', '把', '根', '块', '片',
-                       '大', '小', '多', '少', '高', '矮', '长', '短'}
-        helpers = [w for w, _ in sorted_concepts[1:9] if w not in daily_noise and len(w) >= 2][:5]
+        if not filtered:
+            # 如果实在没有内容词，回退到原始线索
+            return '日常', []
+        
+        # 主题词：过滤后激活度最高的内容词
+        theme = filtered[0][0]
+        
+        # 辅助概念：过滤后的前5个
+        helpers = [w for w, _ in filtered[1:6]]
         
         return theme, helpers
     
@@ -118,54 +152,71 @@ class MemoryDrivenNarrative:
     
     def _generate_content_sentences(self, theme: str, helpers: List[str], style_params: Optional[Dict] = None, lang_system=None) -> List[str]:
         """
-        基于激活概念生成内容句子，混合链式生成+复杂句法。
+        基于激活概念生成内容句子。
         
-        策略：
-        1. 第一句：用转移概率链式生成自然句子（像 speak()）
-        2. 第二句：复杂句法（因果/条件/转折，需2个helpers）
-        3. 第三句：情感表达或时间顺序
+        策略：不用不稳定的链式生成，改用模板填充+复杂句法，
+        确保每句都有明确语义。
         """
         sentences = []
         emotion = style_params.get('emotion', '平静') if style_params else '平静'
-        lang = lang_system or self.lang
         
-        # 1. 第一句：链式生成自然句子（从theme出发）
-        chain = self._generate_chain(lang, theme, max_words=6)
-        if chain and len(chain) >= 2:
-            sentences.append(''.join(chain))
-        elif helpers:
-            sentences.append(f"{theme}和{helpers[0]}")
+        # 过滤helpers：只保留有效内容词（>=2字，非虚词）
+        stop_words = {'是', '的', '了', '在', '吗', '不', '很', '也', '都', '就',
+                      '和', '有', '要', '想', '会', '能', '还', '让', '把', '被',
+                      '给', '跟', '对', '从', '到', '向', '为', '与', '或',
+                      '又', '再', '没', '别', '太', '真', '比较', '非常', '特别',
+                      '有点', '那么', '这么', '什么', '怎么', '为什么',
+                      '因为', '所以', '如果', '虽然', '但是', '然后', '最后',
+                      '我', '你', '他', '她', '它', '我们', '你们', '他们',
+                      '呀', '啊', '呢', '吧', '哦', '嗯',
+                      '出', '来', '去', '上', '下', '前', '后', '里', '外',
+                      '个', '只', '条', '张', '把', '根', '块', '片',
+                      '可以', '可能', '也许', '大概', '一定', '必须'}
+        
+        valid_helpers = [h for h in helpers if h not in stop_words and len(h) >= 2]
+        
+        # 1. 第一句：主题 + 简单描述（从helpers中找一个搭配）
+        if valid_helpers:
+            h1 = valid_helpers[0]
+            # 情感适配的谓词
+            predicates = {
+                '开心': ['很好', '让人开心', '很漂亮', '很有趣'],
+                '难过': ['让人难过', '有点伤心', '不太好', '让人想哭'],
+                '害怕': ['有点可怕', '让人害怕', '很吓人', '不安全'],
+                '愤怒': ['让人生气', '很讨厌', '不好', '真烦人'],
+                '平静': ['在这里', '很安静', '很好', '很美'],
+                '好奇': ['是什么', '很有趣', '很好奇', '想知道'],
+            }
+            preds = predicates.get(emotion, ['很好', '在这里', '很美'])
+            pred = random.choice(preds)
+            sentences.append(f"{theme}{pred}")
         else:
             sentences.append(f"{theme}在这里")
         
-        # 2. 第二句：复杂句法（选择语义最合理的组合）
-        if len(helpers) >= 2:
-            # 挑选最合理的两个helpers做复杂句
-            best_pair = self._pick_best_pair(helpers[:4])
-            if best_pair:
-                h1, h2 = best_pair
-                # 根据情感选模式
-                if emotion in ('难过', '愤怒'):
-                    pattern = ComplexPattern.CONCESSIVE
-                elif emotion in ('害怕', '惊讶'):
-                    pattern = ComplexPattern.CONDITIONAL
-                elif emotion == '开心':
-                    pattern = ComplexPattern.COORDINATE
-                else:
-                    pattern = ComplexPattern.CAUSAL
-                
-                try:
-                    complex_sent = self.syntax_engine.build_complex_sentence(pattern, [h1, h2])
-                    sentences.append(complex_sent)
-                except:
-                    pass
+        # 2. 第二句：复杂句法（如果helpers >= 2）
+        if len(valid_helpers) >= 2:
+            h1, h2 = valid_helpers[0], valid_helpers[1]
+            if emotion in ('难过', '愤怒'):
+                pattern = ComplexPattern.CONCESSIVE
+            elif emotion in ('害怕', '惊讶'):
+                pattern = ComplexPattern.CONDITIONAL
+            elif emotion == '开心':
+                pattern = ComplexPattern.COORDINATE
+            else:
+                pattern = ComplexPattern.CAUSAL
+            
+            try:
+                complex_sent = self.syntax_engine.build_complex_sentence(pattern, [h1, h2])
+                sentences.append(complex_sent)
+            except:
+                pass
         
-        # 3. 情感表达句（用helpers中的情感词）
+        # 3. 第三句：情感表达或简单陈述
         emotion_words = {'开心', '难过', '喜欢', '讨厌', '害怕', '生气', '爱', '累', '饿', '渴', '困'}
-        has_emotion = any(w in emotion_words for w in helpers)
-        if has_emotion and len(helpers) >= 1:
-            emotion_concept = next(w for w in helpers if w in emotion_words)
-            other = next((w for w in helpers if w != emotion_concept), theme)
+        has_emotion = any(w in valid_helpers for w in emotion_words)
+        if has_emotion and len(valid_helpers) >= 1:
+            emotion_concept = next(w for w in valid_helpers if w in emotion_words)
+            other = next((w for w in valid_helpers if w != emotion_concept), theme)
             try:
                 emotional = self.syntax_engine.build_complex_sentence(
                     ComplexPattern.EMOTIONAL,
@@ -174,75 +225,22 @@ class MemoryDrivenNarrative:
                 sentences.append(emotional)
             except:
                 sentences.append(f"{other}让我感到{emotion_concept}")
-        elif len(helpers) >= 3:
-            # 时间顺序句
-            try:
-                temporal = self.syntax_engine.build_complex_sentence(
-                    ComplexPattern.TEMPORAL,
-                    [helpers[0], helpers[1], helpers[2]]
-                )
-                sentences.append(temporal)
-            except:
-                pass
+        elif len(valid_helpers) >= 1:
+            # 简单情感陈述
+            if emotion == '开心':
+                sentences.append(f"我喜欢{valid_helpers[0]}")
+            elif emotion == '难过':
+                sentences.append(f"{valid_helpers[0]}让我难过")
+            elif emotion == '害怕':
+                sentences.append(f"{valid_helpers[0]}有点可怕")
+            else:
+                sentences.append(f"{valid_helpers[0]}和{theme}一起")
         
         # 兜底
         if not sentences:
             sentences.append(f"{theme}")
         
         return sentences[:4]
-    
-    def _generate_chain(self, lang, start_word: str, max_words: int = 6) -> List[str]:
-        """用转移概率链式生成自然句子序列"""
-        if not hasattr(lang, 'transitions') or not lang.transitions:
-            return [start_word]
-        
-        chain = [start_word]
-        current = start_word
-        
-        for _ in range(max_words - 1):
-            next_candidates = lang.transitions.get(current, {})
-            if not next_candidates:
-                break
-            
-            # 选概率最高的下一个词
-            words, counts = zip(*sorted(next_candidates.items(), key=lambda x: -x[1]))
-            total = sum(counts)
-            probs = [c / total for c in counts]
-            
-            import random
-            next_word = random.choices(words, weights=probs)[0]
-            
-            # 避免重复和终止词
-            if next_word in chain[-2:] or next_word in {'的', '了', '吗', '呢', '吧'}:
-                # 尝试第二选择
-                if len(words) > 1:
-                    next_word = random.choices(words[1:], weights=probs[1:])[0]
-                else:
-                    break
-            
-            chain.append(next_word)
-            current = next_word
-            
-            # 自然终止
-            if next_word in {'。', '！', '？'} or len(''.join(chain)) > 12:
-                break
-        
-        return chain
-    
-    def _pick_best_pair(self, helpers: List[str]) -> Optional[Tuple[str, str]]:
-        """从helpers中挑选语义上最合理的词对"""
-        if len(helpers) < 2:
-            return None
-        
-        # 优先选：名词+动词、名词+形容词、具象+具象
-        stop_words = {'是', '的', '了', '在', '吗', '不', '很', '好', '这', '那', '我', '你'}
-        valid = [h for h in helpers if h not in stop_words and len(h) >= 2]
-        
-        if len(valid) >= 2:
-            return (valid[0], valid[1])
-        elif len(helpers) >= 2:
-            return (helpers[0], helpers[1])
-        return None
     
     def _generate_simple_sentences(self, theme: str, helpers: List[str], style: Optional[Dict]) -> List[str]:
         """基于概念生成简单句"""
