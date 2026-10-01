@@ -1,0 +1,181 @@
+{
+  "version": "3.0",
+  "timestamp": "2026-10-01 09:07:36",
+  "modules": {
+    "complex_syntax": {
+      "templates": 10,
+      "pass_rate": "4/4"
+    },
+    "emotion_memory": {
+      "concepts_tagged": 81,
+      "emotions_supported": 19
+    },
+    "context_tracker": {
+      "max_history": 8,
+      "entity_buffer_size": 3
+    }
+  },
+  "language_stats": {
+    "exposure": {
+      "total": 500,
+      "corpus_size": 1822
+    },
+    "vocabulary": {
+      "unique_words": 385,
+      "learned_pairs": 2653,
+      "top_words": [
+        [
+          "我",
+          95
+        ],
+        [
+          "好",
+          58
+        ],
+        [
+          "是",
+          56
+        ],
+        [
+          "了",
+          50
+        ],
+        [
+          "的",
+          45
+        ],
+        [
+          "你",
+          41
+        ],
+        [
+          "吗",
+          35
+        ],
+        [
+          "要",
+          31
+        ],
+        [
+          "想",
+          30
+        ],
+        [
+          "因为",
+          25
+        ]
+      ]
+    },
+    "syntax": {
+      "pattern_count": 5,
+      "distribution": {
+        "svo": 303,
+        "question": 44,
+        "negative": 11,
+        "complex": 19
+      }
+    },
+    "semantic": {
+      "causal_rules": 15,
+      "temporal_sequences": 0
+    },
+    "narrative": {
+      "templates": 496,
+      "characters": 0
+    },
+    "dialogue": {
+      "history_length": 0
+    },
+    "voice": {
+      "pinyin_coverage": 171
+    }
+  },
+  "test_results": {
+    "syntax": [
+      {
+        "pattern": "因果",
+        "sentence": "因为太阳，所以花",
+        "ok": true
+      },
+      {
+        "pattern": "条件",
+        "sentence": "如果太阳，就花",
+        "ok": true
+      },
+      {
+        "pattern": "转折",
+        "sentence": "虽然太阳，但是花",
+        "ok": true
+      },
+      {
+        "pattern": "情感表达",
+        "sentence": "太阳让花感到开心",
+        "ok": true
+      }
+    ],
+    "emotion_filter": [
+      {
+        "emotion": "开心",
+        "top": "太阳",
+        "concepts": [
+          "太阳",
+          "花",
+          "妈妈"
+        ]
+      },
+      {
+        "emotion": "难过",
+        "top": "太阳",
+        "concepts": [
+          "太阳",
+          "妈妈",
+          "抱抱"
+        ]
+      },
+      {
+        "emotion": "害怕",
+        "top": "妈妈",
+        "concepts": [
+          "妈妈",
+          "太阳",
+          "抱抱"
+        ]
+      }
+    ],
+    "context": {
+      "continuation": true,
+      "resolved": "温暖很漂亮"
+    },
+    "expression": [
+      {
+        "cue": "太阳",
+        "emotion": "开心",
+        "sentences": [
+          "是所以哭呀！",
+          "是和最后一起。"
+        ]
+      },
+      {
+        "cue": "妈妈",
+        "emotion": "难过",
+        "sentences": [
+          "是白天是如果困...",
+          "因为设计者，所以老师..."
+        ]
+      },
+      {
+        "cue": "朋友",
+        "emotion": "开心",
+        "sentences": [
+          "好梦呀！"
+        ]
+      }
+    ]
+  },
+  "improvements": [
+    "新增10种复杂句法模式（因果/条件/转折/并列/递进/假设/选择/时间/描写/情感）",
+    "情感状态驱动记忆检索（开心→正面概念，难过→安慰概念）",
+    "多轮对话上下文追踪（话题延续检测、指代消解、情感轨迹）",
+    "记忆驱动叙事增强（链式生成+复杂句法混合）"
+  ]
+}
