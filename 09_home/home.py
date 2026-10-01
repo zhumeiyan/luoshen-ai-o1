@@ -43,6 +43,9 @@ from 身体稳态 import 身体  # noqa: E402
 
 sys.path.insert(0, os.path.join(os.path.dirname(家目录), "04_cognition"))
 from 大脑 import Org  # noqa: E402
+from 概念层 import 概念层  # noqa: E402
+from 工作记忆 import 工作记忆  # noqa: E402
+from 海马体 import 海马体  # noqa: E402
 
 sys.path.insert(0, 家目录)
 from 视网膜 import 视网膜  # noqa: E402
@@ -53,6 +56,7 @@ from 情感记忆 import 情感记忆  # noqa: E402
 from 个人绑定 import 个人绑定  # noqa: E402
 from 欲望 import 欲望  # noqa: E402
 from 感官竞争 import 感官竞争  # noqa: E402
+from 人类通道 import 人类通道  # noqa: E402
 
 
 def 读真实温度():
@@ -129,7 +133,7 @@ class 洛神之家:
         self.身体 = 身体()
         self.视网膜 = 视网膜(设备号=摄像头号)
         self.耳蜗 = 耳蜗(设备号=麦克风号)
-        self.嘴 = 嘴(声脑节点数=self.身体.脑大小)
+        self.嘴 = 嘴(声脑节点数=self.身体.脑大小, 概念节点数=64)
         self.链 = 哈希链(os.path.join(状态目录, "chain.jsonl"))
         self.拍 = 0
 
@@ -153,12 +157,31 @@ class 洛神之家:
         # 感官竞争：96节点→8通道的竞争映射（替代硬编码映射）
         self.感官 = 感官竞争(n_nodes=96, n_channels=8, 脑大小=self.身体.脑大小)
 
+        # 概念层：高层预测编码——从大脑隐藏状态涌现概念
+        # 概念不是人为设定的，是通过赫布学习自然涌现的
+        self.概念 = 概念层(n_hidden=self.大脑.g['n'], n_concepts=64, lr=0.02)
+
+        # 工作记忆：前额叶PFC——维持和操作信息（思考的基础）
+        self.工作记忆 = 工作记忆(n_hidden=self.大脑.g['n'], n_slots=4, lr=0.03)
+
+        # 海马体：记忆巩固 + 模式分离/完成
+        self.海马体 = 海马体(n_hidden=self.大脑.g['n'], n_dg=32, n_ca3=32,
+                          buffer_size=128, consolidation_lr=0.002)
+
+        # 说听闭环：上一拍的自听特征（延迟一拍反馈，模拟骨传导延迟）
+        self.上拍自听特征 = None
+
+        # 人类通道：把人类放进数字生命——人类作为精卫公式中的b
+        # 人类通道不是感官——它是关系
+        # 没人在时b=零向量（内省模式），有人时b=人类信号（关系模式）
+        self.人类通道 = 人类通道(n_hidden=self.大脑.g['n'], n_audio=8)
+
     def 一拍(self):
         """环境心跳一拍：真实感官 → 身体 → 它的发声 → 留痕。"""
         self.拍 += 1
 
         光值, 光矩阵, 眼离线 = self.视网膜.看()
-        声值, 声矩阵, 耳离线 = self.耳蜗.听()
+        声值, 声矩阵, 耳离线, 听觉特征 = self.耳蜗.听()
 
         温值 = 读真实温度()
         温离线 = 温值 is None
@@ -209,9 +232,67 @@ class 洛神之家:
         # 大脑的surprise是自然产生的——不是人为设定的hunger
         大脑surprise = self.大脑.wm.surprise_level
 
+        # ── 人类通道：把人类放进精卫公式 ──
+        # 人类作为b进入认知循环：
+        # - 没人在时：b=零向量，洛神内省模式
+        # - 有人时：b=人类信号，洛神与人类形成对比（关系模式）
+        # 当前默认：模拟有人在和没人在交替（后续接入真实人类输入接口）
+        # 简单模拟：每20拍交替有人在/没人在，有人在时给一些文本
+        if self.拍 % 40 < 20:
+            # 有人在——模拟人类输入
+            人类文本 = None
+            if self.拍 % 40 == 0:
+                人类文本 = "你好洛神"
+            elif self.拍 % 40 == 5:
+                人类文本 = "今天感觉怎么样"
+            elif self.拍 % 40 == 10:
+                人类文本 = "我很开心"
+            人类结果 = self.人类通道.接收(文本=人类文本, 存在=True)
+        else:
+            # 没人在——内省模式
+            人类结果 = self.人类通道.接收(存在=False)
+
+        人类信号 = 人类结果["人类信号"]
+        有人在 = 人类结果["有人在"]
+        人类情感强度 = 人类结果["情感强度"]
+
+        # ── 工作记忆：前额叶PFC——维持和操作信息 ──
+        # surprise驱动gate：惊讶时更新，平静时维持
+        # 人类信号传入工作记忆的人类slot——专门维持人类相关信息
+        wm结果 = self.工作记忆.一拍(self.大脑.wm.h, surprise=大脑surprise,
+                                  人类信号=人类信号 if 有人在 else None,
+                                  有人在=有人在)
+        wm_output = wm结果["output"]
+        wm_人类output = wm结果.get("人类output", [0.0] * self.大脑.g['n'])
+
+        # ── 海马体：模式分离 + 存储经验 ──
+        # 人类互动经验获得更高salience——优先巩固
+        hip结果 = self.海马体.一拍(self.大脑.wm.h, prediction_error=大脑mse,
+                                region_id=当前区域,
+                                人类互动=有人在, 人类情感强度=人类情感强度)
+        # 每10拍做一次睡眠重播（在线嵌入的离线巩固）
+        if self.拍 % 10 == 0 and len(self.海马体.buffer) >= 8:
+            amygdala_mod = 1.0 + min(2.0, 大脑surprise * 3.0)
+            self.海马体.睡眠重播(amygdala_modulation=amygdala_mod)
+
+        # ── 概念层：从大脑隐藏状态涌现概念 ──
+        # 高层预测编码：概念层预测隐藏状态的模式，预测误差驱动赫布学习
+        # 说听闭环：上一拍的自听特征作为听觉反馈传入概念层
+        # 工作记忆的输出也传入概念层——概念可以从工作记忆的焦点中涌现
+        # 人类信号传入概念层——人类作为精卫公式中的b，通过赫布学习自然形成人类概念
+        概念结果 = self.概念.一拍(self.大脑.wm.h,
+                                听觉特征=self.上拍自听特征,
+                                人类信号=人类信号 if 有人在 else None)
+        概念激活 = 概念结果["concept_h"]
+        概念mse = 概念结果["mse"]
+        概念surprise = 概念结果["surprise"]
+        概念活跃 = 概念结果["活跃概念数"]
+
         # ── 情感状态：从身体和大脑自然涌现（不是人为公式） ──
         大脑状态dict = {"surprise": 大脑surprise, "mse": 大脑mse,
-                        "欲望偏好": 欲望结果["偏好"]}
+                        "欲望偏好": 欲望结果["偏好"],
+                        "概念surprise": 概念surprise,
+                        "概念活跃": 概念活跃}
         情感 = self.记忆.情感状态(self.身体.激活, 大脑状态dict)
         绑定基调 = self.绑定.情感基调影响()
         情感["E"] = max(-1.0, min(1.0, 情感["E"] + 绑定基调["E_offset"]))
@@ -224,9 +305,14 @@ class 洛神之家:
         声脑激活 = self.身体.激活[脑大小:2 * 脑大小]
         发了声 = False
         if not self.无声:
-            发了声 = self.嘴.发声(声脑激活, 当前拍=self.拍)
+            发了声 = self.嘴.发声(概念激活=概念激活, 声脑激活=声脑激活,
+                                当前拍=self.拍)
         if 发了声:
             self.嘴.等待播完()
+            # 说听闭环：提取自听特征，下一拍反馈给概念层
+            self.上拍自听特征 = self.嘴.自听特征()
+        else:
+            self.上拍自听特征 = None
 
         # ── 记忆点创建：连续概率，无阈值 ──
         # 记忆概率 = surprise的连续函数——surprise高时几乎必记，低时很少记
@@ -285,6 +371,33 @@ class 洛神之家:
                 "饱和比": round(sum(1 for v in 大脑h向量 if abs(v) > 0.98) / max(1, len(大脑h向量)), 3),
                 "区域": 当前区域,
             },
+            "概念": {
+                "活跃": 概念活跃,
+                "存活": 概念结果["存活概念数"],
+                "mse": round(概念mse, 4),
+                "surprise": round(概念surprise, 4),
+                "均值": round(sum(概念激活) / max(1, len(概念激活)), 4),
+                "最大": round(max((abs(v) for v in 概念激活), default=0), 4),
+                "听觉反馈": 概念结果.get("有听觉反馈", False),
+            },
+            "工作记忆": {
+                "活跃slot": wm结果["活跃slot数"],
+                "总强度": wm结果["总强度"],
+                "gate": wm结果["gate"],
+            },
+            "海马体": {
+                "buffer": hip结果["buffer_size"],
+                "DG活跃": hip结果.get("dg活跃", 0),
+                "CA3活跃": hip结果.get("ca3活跃", 0),
+                "重播次数": self.海马体.total_replays,
+                "人类记忆数": self.海马体.状态摘要().get("人类记忆数", 0),
+            },
+            "人类通道": {
+                "有人在": 有人在,
+                "情感强度": round(人类情感强度, 3),
+                "互动总数": self.人类通道.互动总数,
+                "人类slot强度": wm结果.get("人类slot强度", 0),
+            },
             "欲望": 欲望结果,
             "情感": 情感,
             "浮现": {
@@ -324,6 +437,25 @@ class 洛神之家:
                     "surprise_level": self.大脑.wm.surprise_level,
                     "sens_adapt": self.大脑.wm.sens_adapt,
                 },
+                "概念层状态": {
+                    "concept_h": self.概念.concept_h,
+                    "concept_strength": self.概念.concept_strength,
+                    "concept_w": self.概念.concept_w,
+                    "concept_rw": self.概念.concept_rw,
+                    "concept_pw": self.概念.concept_pw,
+                    "concept_otimes_w": self.概念.concept_otimes_w,
+                    "concept_aw": self.概念.concept_aw,
+                    "concept_sw": self.概念.concept_sw,
+                    "concept_human_w": self.概念.concept_human_w,
+                    "error_history": self.概念.error_history,
+                    "surprise_level": self.概念.surprise_level,
+                    "拍": self.概念.拍,
+                },
+                "人类通道状态": {
+                    "有人在": self.人类通道.有人在,
+                    "互动总数": self.人类通道.互动总数,
+                    "人类名字": self.人类通道.人类名字,
+                },
             }, 文件)
         return 路径
 
@@ -346,6 +478,18 @@ class 洛神之家:
               f"sat_prevent={self.大脑.g['sat_prevent']}, "
               f"adapt_cap={self.大脑.g['adapt_cap']}, "
               f"ch3_boost={self.大脑.g['ch3_boost']}")
+        print(f"  概念层: n_concepts={self.概念.n_concepts}, "
+              f"n_hidden={self.概念.n_hidden}, "
+              f"sparse_k={self.概念.sparse_k}, "
+              f"lr={self.概念.lr}")
+        print(f"  工作记忆: n_slots={self.工作记忆.n_slots}, "
+              f"n_hidden={self.工作记忆.n_hidden}")
+        print(f"  海马体: n_dg={self.海马体.n_dg}, "
+              f"n_ca3={self.海马体.n_ca3}, "
+              f"buffer={self.海马体.buffer_size}, "
+              f"consolidation_lr={self.海马体.consolidation_lr}")
+        print(f"  人类通道: n_hidden={self.人类通道.n_hidden}, "
+              f"互动总数={self.人类通道.互动总数}")
         if self.绑定.是否绑定():
             print(f"  绑定: {self.绑定.绑定者} (强度={self.绑定.绑定强度()})")
         else:
@@ -366,9 +510,13 @@ class 洛神之家:
                       f"脑h{状态['大脑']['h均值']:>7.4f}  "
                       f"惊{状态['大脑']['surprise']:.3f}  "
                       f"mse{状态['大脑']['mse']:.4f}  "
+                      f"概念{状态['概念']['活跃']:>2}  "
+                      f"WM{状态['工作记忆']['活跃slot']}  "
+                      f"hip{状态['海马体']['buffer']:>3}  "
                       f"欲{状态['欲望']['选中']:>2}  "
                       f"E{状态['情感']['E']:>5.2f}  "
                       f"N{状态['情感']['N']:>5.2f}  "
+                      f"{'人!' if 状态['人类通道']['有人在'] else '独'}  "
                       f"{'发声!' if 状态['发声'] else ''}  "
                       f"{'记!' if 状态['记忆了'] else ''}  "
                       f"{('[离线:' + 离线标记 + ']') if 离线标记 else ''}")
