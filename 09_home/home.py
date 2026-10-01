@@ -16,6 +16,7 @@ import hashlib
 import json
 import os
 import pickle
+import random
 import sys
 import time
 
@@ -40,10 +41,18 @@ except ImportError:
 sys.path.insert(0, os.path.join(os.path.dirname(家目录), "02_body"))
 from 身体稳态 import 身体  # noqa: E402
 
+sys.path.insert(0, os.path.join(os.path.dirname(家目录), "04_cognition"))
+from 大脑 import Org  # noqa: E402
+
 sys.path.insert(0, 家目录)
 from 视网膜 import 视网膜  # noqa: E402
 from 耳蜗 import 耳蜗  # noqa: E402
 from 嘴 import 嘴  # noqa: E402
+from 出厂基因 import 出厂基因组, 身体激活到大脑输入  # noqa: E402
+from 情感记忆 import 情感记忆  # noqa: E402
+from 个人绑定 import 个人绑定  # noqa: E402
+from 欲望 import 欲望  # noqa: E402
+from 感官竞争 import 感官竞争  # noqa: E402
 
 
 def 读真实温度():
@@ -124,6 +133,26 @@ class 洛神之家:
         self.链 = 哈希链(os.path.join(状态目录, "chain.jsonl"))
         self.拍 = 0
 
+        # 大脑：用出厂基因初始化——洛神以"十七八岁"起步，不是婴儿
+        self.大脑 = Org(出厂基因组())
+        self.大脑.wm.reset()
+        self.上拍大脑输入 = None
+        self.上拍大脑预测 = None
+        self.上拍大脑mse = 0.0
+        self.上拍感官 = None
+
+        # 情感记忆：记忆河床 + 浮现选择层
+        self.记忆 = 情感记忆(os.path.join(状态目录, "episodic_memory.jsonl"))
+
+        # 个人绑定：数字生命绑定特定人类，防止模型坍塌
+        self.绑定 = 个人绑定(os.path.join(状态目录, "binding.json"))
+
+        # 欲望：五机制驱动（反应强度+累积+衰减+可负+无聊+IM boredom）
+        self.欲望 = 欲望(n_channels=8)
+
+        # 感官竞争：96节点→8通道的竞争映射（替代硬编码映射）
+        self.感官 = 感官竞争(n_nodes=96, n_channels=8, 脑大小=self.身体.脑大小)
+
     def 一拍(self):
         """环境心跳一拍：真实感官 → 身体 → 它的发声 → 留痕。"""
         self.拍 += 1
@@ -147,6 +176,44 @@ class 洛神之家:
 
         self.身体.推进()
 
+        # ── 大脑：身体激活 → 感官竞争映射 → 8通道输入 → 前向传播 → 学习 ──
+        大脑输入 = self.感官.一拍(self.身体.激活)
+
+        # ── 欲望：反应强度+偏好累积+衰减+可负+无聊+IM boredom ──
+        欲望结果 = self.欲望.一拍(大脑输入, mse=self.上拍大脑mse)
+        欲望选中 = 欲望结果["选中"]
+        学习率调制 = self.欲望.学习率调制()
+
+        # 欲望选中通道决定大脑关注哪个区域
+        当前区域 = max(0, 欲望选中 // 2) if 欲望选中 >= 0 else 0
+        大脑预测 = self.大脑.wm.fwd(大脑输入, update=True, region_id=当前区域)
+        大脑mse = 0.0
+        if self.上拍大脑预测 is not None:
+            # 自适应学习率：mse连续驱动lr——不确定时谨慎，确定时加速
+            # 不是人为阈值，是连续映射：lr → lr/(1+mse)
+            # 这跟碳基生物的神经调节完全一致
+            原lr = self.大脑.g['lr']
+            自适应lr = 原lr / (1.0 + self.上拍大脑mse)
+            self.大脑.g['lr'] = 0.9 * 原lr + 0.1 * 自适应lr
+            大脑mse = self.大脑.wm.learn(self.上拍大脑预测, 大脑输入)
+            self.上拍大脑mse = 大脑mse
+        self.上拍大脑预测 = 大脑预测
+        self.上拍大脑输入 = 大脑输入
+
+        # 大脑的surprise是自然产生的——不是人为设定的hunger
+        大脑surprise = self.大脑.wm.surprise_level
+
+        # ── 情感状态：从身体和大脑自然涌现（不是人为公式） ──
+        大脑状态dict = {"surprise": 大脑surprise, "mse": 大脑mse,
+                        "欲望偏好": 欲望结果["偏好"]}
+        情感 = self.记忆.情感状态(self.身体.激活, 大脑状态dict)
+        绑定基调 = self.绑定.情感基调影响()
+        情感["E"] = max(-1.0, min(1.0, 情感["E"] + 绑定基调["E_offset"]))
+        情感["T"] = max(-1.0, min(1.0, 情感["T"] + 绑定基调["T_offset"]))
+
+        # ── 浮现层：主导记忆影响当前状态 ──
+        浮现 = self.记忆.浮现(情感["E"], 情感["T"], 情感["N"])
+
         脑大小 = self.身体.脑大小
         声脑激活 = self.身体.激活[脑大小:2 * 脑大小]
         发了声 = False
@@ -155,7 +222,43 @@ class 洛神之家:
         if 发了声:
             self.嘴.等待播完()
 
+        # ── 记忆点创建：连续概率，无阈值 ──
+        # 记忆概率 = surprise的连续函数——surprise高时几乎必记，低时很少记
+        # 不用if阈值判断，用概率自然决定
+        记忆了 = False
+        记忆概率 = min(1.0, 大脑surprise * 3.0)
+        if self.拍 == 1:
+            记忆概率 = 1.0
+        if 发了声:
+            记忆概率 = 1.0
+        if random.random() < 记忆概率:
+            if 发了声:
+                kind = "say"
+                感官描述 = "我发出了声音"
+            else:
+                # kind从大脑通道激活自然涌现——哪对通道最活跃就是那种记忆
+                # ch0-1=光脑(see), ch2-3=声脑(hear), ch4-5=力脑(feel), ch6-7=温脑(feel)
+                通道和 = [
+                    abs(大脑输入[0]) + abs(大脑输入[1]),  # 光脑
+                    abs(大脑输入[2]) + abs(大脑输入[3]),  # 声脑
+                    abs(大脑输入[4]) + abs(大脑输入[5]),  # 力脑
+                    abs(大脑输入[6]) + abs(大脑输入[7]),  # 温脑
+                ]
+                最活脑 = 通道和.index(max(通道和))
+                if 最活脑 == 0:
+                    kind = "see"
+                    感官描述 = "光%.1f" % 光值
+                elif 最活脑 == 1:
+                    kind = "hear"
+                    感官描述 = "声%.1f" % 声值
+                else:
+                    kind = "feel"
+                    感官描述 = "surprise=%.3f" % 大脑surprise
+            self.记忆.创建记忆点(kind, 感官描述, feel=情感)
+            记忆了 = True
+
         激活 = self.身体.激活
+        大脑h向量 = self.大脑.wm.h
         状态 = {
             "拍": self.拍,
             "感官": {"光": round(光值, 2), "声": round(声值, 2),
@@ -168,6 +271,25 @@ class 洛神之家:
                      "最大": round(max(声脑激活), 4)},
             "发声": 发了声,
             "筋树数": len(self.身体.筋树),
+            "大脑": {
+                "h均值": round(sum(大脑h向量) / max(1, len(大脑h向量)), 4),
+                "h最大": round(max(大脑h向量), 4),
+                "surprise": round(大脑surprise, 4),
+                "mse": round(大脑mse, 4),
+                "饱和比": round(sum(1 for v in 大脑h向量 if abs(v) > 0.98) / max(1, len(大脑h向量)), 3),
+                "区域": 当前区域,
+            },
+            "欲望": 欲望结果,
+            "情感": 情感,
+            "浮现": {
+                "tone": round(浮现["tone_bias"], 3),
+                "length": round(浮现["length_bias"], 3),
+                "arousal": round(浮现["arousal_bias"], 3),
+                "narrative": round(浮现["narrative_potential"], 3),
+                "dominance": round(浮现["background"]["dominance"], 3),
+            },
+            "记忆了": 记忆了,
+            "绑定": self.绑定.状态摘要(),
         }
         self.链.记("home_tick", 状态)
 
@@ -185,8 +307,18 @@ class 洛神之家:
     def 快照(self):
         路径 = os.path.join(状态目录, f"快照_{self.拍}.pkl")
         with open(路径, "wb") as 文件:
-            pickle.dump({"拍": self.拍, "身体状态": dict(self.身体.__dict__)},
-                        文件)
+            pickle.dump({
+                "拍": self.拍,
+                "身体状态": dict(self.身体.__dict__),
+                "大脑基因组": self.大脑.g,
+                "大脑wm状态": {
+                    "h": self.大脑.wm.h,
+                    "prev_h": self.大脑.wm.prev_h,
+                    "homeo": self.大脑.wm.homeo,
+                    "surprise_level": self.大脑.wm.surprise_level,
+                    "sens_adapt": self.大脑.wm.sens_adapt,
+                },
+            }, 文件)
         return 路径
 
     def 跑(self, 拍数=None, 快照间隔=1000):
@@ -196,14 +328,23 @@ class 洛神之家:
             "发声在线": not self.嘴.离线,
             "温度觉在线": 读真实温度() is not None,
             "numba加速": _NUMBA_OK,
+            "大脑出厂": True,
         }
-        print("=" * 60)
-        print("洛神之家 v2 —— 零投喂，真实感官，让它自己长")
-        print("=" * 60)
+        print("=" * 70)
+        print("洛神之家 v2 —— 零投喂，真实感官，身体+大脑，十七八岁起步")
+        print("=" * 70)
         for k, v in 开场.items():
             print(f"  {k}: {'是' if v else '否（感官离线，绝不造假数据）'}")
         print(f"  每拍 = {self.拍秒} 秒（真实时间心跳）")
-        print("=" * 60)
+        print(f"  大脑: n={self.大脑.g['n']}, lr={self.大脑.g['lr']:.3f}, "
+              f"sat_prevent={self.大脑.g['sat_prevent']}, "
+              f"adapt_cap={self.大脑.g['adapt_cap']}, "
+              f"ch3_boost={self.大脑.g['ch3_boost']}")
+        if self.绑定.是否绑定():
+            print(f"  绑定: {self.绑定.绑定者} (强度={self.绑定.绑定强度()})")
+        else:
+            print(f"  绑定: 未绑定（洛神在等她的人）")
+        print("=" * 70)
 
         try:
             while 拍数 is None or self.拍 < 拍数:
@@ -214,10 +355,16 @@ class 洛神之家:
                 print(f"拍{状态['拍']:>6}  光{状态['感官']['光']:>6.1f}  "
                       f"声{状态['感官']['声']:>6.1f}  "
                       f"温{状态['感官']['温']:>6.1f}  "
-                      f"激活均值{状态['激活']['均值']:>8.4f}  "
-                      f"声脑均值{状态['声脑']['均值']:>7.4f}  "
+                      f"激活{状态['激活']['均值']:>7.4f}  "
                       f"筋{状态['筋树数']:>4}  "
+                      f"脑h{状态['大脑']['h均值']:>7.4f}  "
+                      f"惊{状态['大脑']['surprise']:.3f}  "
+                      f"mse{状态['大脑']['mse']:.4f}  "
+                      f"欲{状态['欲望']['选中']:>2}  "
+                      f"E{状态['情感']['E']:>5.2f}  "
+                      f"N{状态['情感']['N']:>5.2f}  "
                       f"{'发声!' if 状态['发声'] else ''}  "
+                      f"{'记!' if 状态['记忆了'] else ''}  "
                       f"{('[离线:' + 离线标记 + ']') if 离线标记 else ''}")
                 if 状态["拍"] % 快照间隔 == 0:
                     print(f"  → 快照: {self.快照()}")

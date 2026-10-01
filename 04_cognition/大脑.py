@@ -97,8 +97,8 @@ class WM:
         for i in range(N_CHANNELS): ext.append(math.tanh(x_raw[i] * w[0]))
         for i in range(N_CHANNELS):
             v = x_raw[i]
-            if abs(v) > thr: ext.append(v * w[1])
-            else: ext.append(0.0)
+            sig = 1.0 / (1.0 + math.exp(-abs(v) / max(0.01, thr)))
+            ext.append(v * w[1] * sig)
         for i in range(N_CHANNELS):
             c = sum(x_raw[j] * w[2] * 0.1 for j in range(N_CHANNELS) if abs(i-j) == 1)
             ext.append(c + x_raw[i] * w[2] * 0.01)
@@ -123,7 +123,7 @@ class WM:
     def amygdala_surprise(self, mse):
         g = self.g; thr = g['amy_thr']
         prev = self.surprise_level
-        self.surprise_level = max(0.0, (mse - thr) / max(0.01, 1.0 - thr))
+        self.surprise_level = mse / (1.0 + thr)
         return self.surprise_level, max(0, self.surprise_level - prev)
 
     def protein_fold(self):
@@ -133,11 +133,12 @@ class WM:
         for k in range(n):
             rwk = rw[k]; predicted = 0.0
             for i in range(n): predicted += rwk[i] * ph[i]
-            if abs(predicted) > thr:
+            fold_strength = 1.0 / (1.0 + math.exp(-abs(predicted) / max(0.01, thr)))
+            if fold_strength > 0.01:
                 predicted = activation(predicted, lk[k] if k < len(lk) else 0.01)
                 err = h[k] - predicted
                 for i in range(n):
-                    rwk[i] += fold_lr * ph[i] * err
+                    rwk[i] += fold_lr * fold_strength * ph[i] * err
                     if rwk[i] > 1.2: rwk[i] = 1.2
                     elif rwk[i] < -1.2: rwk[i] = -1.2
 
@@ -149,7 +150,8 @@ class WM:
         errs = [actual[j]-pred[j] for j in range(N_CHANNELS)]
         mse = sum(e*e for e in errs)/N_CHANNELS
         surprise, edge = self.amygdala_surprise(mse)
-        if surprise > 0.01:
+        replay_prob = min(1.0, surprise * 10.0)
+        if random.random() < replay_prob:
             self.hippocampal_replay({'target': actual[:], 'surprise': surprise, 'salience': surprise})
         pw = g['pw']; pb = g['pb']; h = self.h
         for i in range(min(n, len(pw))):
