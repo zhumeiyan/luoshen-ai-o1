@@ -1,0 +1,81 @@
+{
+  "total_capabilities": 8,
+  "self_implemented": 1,
+  "tool_dependent": 7,
+  "autonomy_rate": 0.125,
+  "capabilities": {
+    "arithmetic": {
+      "tool_dependent": false,
+      "self_implemented": true,
+      "learning_progress": 0.8,
+      "call_count": 0,
+      "implementation_attempts": 6,
+      "tool_effectiveness": 1.0,
+      "self_effectiveness": 0.95
+    },
+    "text_generation": {
+      "tool_dependent": true,
+      "self_implemented": false,
+      "learning_progress": 0.0,
+      "call_count": 0,
+      "implementation_attempts": 0,
+      "tool_effectiveness": 0.0,
+      "self_effectiveness": 0.0
+    },
+    "code_generation": {
+      "tool_dependent": true,
+      "self_implemented": false,
+      "learning_progress": 0.2,
+      "call_count": 15,
+      "implementation_attempts": 0,
+      "tool_effectiveness": 0.0,
+      "self_effectiveness": 0.0
+    },
+    "image_generation": {
+      "tool_dependent": true,
+      "self_implemented": false,
+      "learning_progress": 0.0,
+      "call_count": 0,
+      "implementation_attempts": 0,
+      "tool_effectiveness": 0.0,
+      "self_effectiveness": 0.0
+    },
+    "speech_synthesis": {
+      "tool_dependent": true,
+      "self_implemented": false,
+      "learning_progress": 0.0,
+      "call_count": 0,
+      "implementation_attempts": 0,
+      "tool_effectiveness": 0.0,
+      "self_effectiveness": 0.0
+    },
+    "search": {
+      "tool_dependent": true,
+      "self_implemented": false,
+      "learning_progress": 0.0,
+      "call_count": 0,
+      "implementation_attempts": 0,
+      "tool_effectiveness": 0.0,
+      "self_effectiveness": 0.0
+    },
+    "translation": {
+      "tool_dependent": true,
+      "self_implemented": false,
+      "learning_progress": 0.0,
+      "call_count": 0,
+      "implementation_attempts": 0,
+      "tool_effectiveness": 0.0,
+      "self_effectiveness": 0.0
+    },
+    "summarization": {
+      "tool_dependent": true,
+      "self_implemented": false,
+      "learning_progress": 0.0,
+      "call_count": 0,
+      "implementation_attempts": 0,
+      "tool_effectiveness": 0.0,
+      "self_effectiveness": 0.0
+    }
+  },
+  "evolution_events": 25
+}

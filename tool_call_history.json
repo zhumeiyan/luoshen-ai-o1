@@ -1,0 +1,43 @@
+[
+  {
+    "tool_name": "code_execute",
+    "params": {
+      "code": "print(\"Hello, 洛神!\")\nprint(2 + 3)"
+    },
+    "result": "{'stdout': 'Hello, 洛神!\\n5\\n', 'stderr': '', 'returncode': 0}",
+    "success": true,
+    "timestamp": "2026-10-01T08:14:46.429836",
+    "error": null
+  },
+  {
+    "tool_name": "text_to_speech",
+    "params": {
+      "text": "你好，我是洛神！"
+    },
+    "result": "{'text': '你好，我是洛神！', 'output_file': 'tts_output_081446.mp3', 'voice': 'default', 'status': '已生成语音（模拟）'}",
+    "success": true,
+    "timestamp": "2026-10-01T08:14:46.429875",
+    "error": null
+  },
+  {
+    "tool_name": "image_generate",
+    "params": {
+      "prompt": "一只在草地上奔跑的小狗",
+      "style": "卡通"
+    },
+    "result": "{'prompt': '一只在草地上奔跑的小狗', 'style': '卡通', 'size': '1024x1024', 'status': '已生成图像（模拟）', 'note': '实际使用时接入baidu-image-gen技能'}",
+    "success": true,
+    "timestamp": "2026-10-01T08:14:46.429885",
+    "error": null
+  },
+  {
+    "tool_name": "web_search",
+    "params": {
+      "query": "人工智能最新发展"
+    },
+    "result": "{'query': '人工智能最新发展', 'num_results': 5, 'results': [{'title': '关于\"人工智能最新发展\"的结果1', 'url': 'https://example.com/1'}, {'title': '关于\"人工智能最新发展\"的结果2', 'url': 'https://example.com/2'}], 'note': '实际使用时接入webse",
+    "success": true,
+    "timestamp": "2026-10-01T08:14:46.429901",
+    "error": null
+  }
+]
