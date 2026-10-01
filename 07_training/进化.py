@@ -1,4 +1,4 @@
-# yinyang_evo_v15.py
+# 进化.py
 # 阴阳扣数字生命系统 · v15 — Multi-Niche Evolution (Stable Attractors + IM Niche Selection)
 #
 # v14 教训：共享池每代重置 → 还是基因组无法针对性收敛。

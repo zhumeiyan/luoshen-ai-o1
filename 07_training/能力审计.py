@@ -12,7 +12,7 @@
 
 import random, math, json, sys
 sys.path.insert(0, '.')
-from yinyang_evo_v15 import Organism, WorldModel, StableRegionPool, N_CHANNELS, N_ACTIONS
+from 进化 import Organism, WorldModel, StableRegionPool, N_CHANNELS, N_ACTIONS
 
 def run_audit(genome, n_steps=400, seed=42):
     """对单个基因组跑完整能力审计"""
@@ -143,7 +143,7 @@ def run_audit(genome, n_steps=400, seed=42):
 
     # === E. 内在动机信号验证 ===
     pool5 = StableRegionPool(seed=seed+4)
-    from yinyang_evo_v15 import IntrinsicMotivation
+    from 进化 import IntrinsicMotivation
     org = Organism(genome=genome)
     org.wm = WorldModel(genome)
     org.im = IntrinsicMotivation()
@@ -276,7 +276,7 @@ if __name__ == '__main__':
         print('Loaded best genome from best_genome_v16.pkl')
     except FileNotFoundError:
         print('No saved genome. Running a quick evolution to get one...')
-        from yinyang_evo_v15 import World
+        from 进化 import World
         random.seed(99)
         w = World(n_organisms=30, steps_per_gen=300, seed=99)
         for g in range(80):
