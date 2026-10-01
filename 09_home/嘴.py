@@ -25,6 +25,9 @@ except ImportError:
 最低频 = 80.0
 最高频 = 400.0
 
+# 和耳蜗.py相同的频段边界——自听特征用同一套频率分析
+频段边界 = [100, 200, 300, 400, 600, 1000, 1500, 2000]
+
 
 class 嘴:
     """发声器官。发声(概念激活, 声脑激活) 把内部状态转成真实声波。
@@ -45,6 +48,7 @@ class 嘴:
         self.离线 = not _SD_OK
         self._频点 = np.linspace(最低频, 最高频, 声脑节点数)
         self.最近发声拍 = -1
+        self._上次波形 = None
 
         # 概念→频点映射权重（赫布学习自然形成）
         # 初始小随机值——通过说听闭环自然学习
@@ -111,10 +115,35 @@ class 嘴:
         try:
             sd.play(波形.astype(np.float32), 采样率)
             self.最近发声拍 = 当前拍
+            self._上次波形 = 波形.copy()
             return True
         except Exception:
             self.离线 = True
             return False
+
+    def 自听特征(self):
+        """从上次发声的波形提取8维听觉特征。
+
+        这是骨传导——系统听到自己的声音，不经过空气。
+        设备离线也能用：波形是自己生成的，不是外部假数据。
+        用和耳蜗相同的频段分析，确保自听和外听在同一特征空间。
+        """
+        if self._上次波形 is None:
+            return None
+        块 = self._上次波形
+        谱 = np.abs(np.fft.rfft(块))
+        频点 = np.fft.rfftfreq(len(块), 1.0 / 采样率)
+        能量 = np.zeros(8)
+        上 = 0.0
+        for i, 边界 in enumerate(频段边界):
+            带 = 谱[(频点 > 上) & (频点 <= 边界)]
+            能量[i] = float(带.mean()) if len(带) > 0 else 0.0
+            上 = 边界
+        高带 = 谱[频点 > 上]
+        能量[7] = float(高带.mean()) if len(高带) > 0 else 0.0
+        max_e = max(能量.max(), 1e-6)
+        特征 = np.tanh(能量 / max_e * 2.0 - 1.0)
+        return 特征
 
     def 等待播完(self):
         if not self.离线 and _SD_OK:
