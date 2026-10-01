@@ -761,7 +761,7 @@ def print_comparison_report(comp):
 # ============ 主流程 ============
 
 if __name__ == '__main__':
-    print("yinyang_entangled_channel — A←Ψ→B 纠缠双通道")
+    print("阴阳纠缠通道 — A←Ψ→B 纠缠双通道")
     print(f"联合态维度: {EntangledChannel.N_A}×{EntangledChannel.N_B} = {EntangledChannel.N_A*EntangledChannel.N_B}")
     print()
     
