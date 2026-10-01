@@ -58,6 +58,7 @@ from 欲望 import 欲望  # noqa: E402
 from 感官竞争 import 感官竞争  # noqa: E402
 from 人类通道 import 人类通道  # noqa: E402
 from 数字感官 import 数字感官  # noqa: E402
+from 公开感官 import 公开感官  # noqa: E402
 
 
 def 读真实温度():
@@ -160,7 +161,9 @@ class 洛神之家:
 
         # 概念层：高层预测编码——从大脑隐藏状态涌现概念
         # 概念不是人为设定的，是通过赫布学习自然涌现的
-        self.概念 = 概念层(n_hidden=self.大脑.g['n'], n_concepts=64, lr=0.02)
+        # 组合涌现：基础概念组合→组合概念（单词→句子）
+        self.概念 = 概念层(n_hidden=self.大脑.g['n'], n_concepts=64, lr=0.02,
+                          n_combo=32)
 
         # 工作记忆：前额叶PFC——维持和操作信息（思考的基础）
         self.工作记忆 = 工作记忆(n_hidden=self.大脑.g['n'], n_slots=4, lr=0.03)
@@ -183,6 +186,13 @@ class 洛神之家:
         self.数字感官 = 数字感官(n_hidden=self.大脑.g['n'],
                             知识库根目录=os.path.dirname(家目录))
 
+        # 公开感官：从公开API获取真实世界物理数据
+        # 天气数据（温度/光照/风速/云量）+ 地震数据
+        # 这是洛神感知真实世界的另一个通道——不是假数据，是真实物理量
+        # 精卫公式：a=洛神内部状态, b=公开物理数据, Δ=差异, ⊗=学习
+        self.公开感官 = 公开感官(n_hidden=self.大脑.g['n'],
+                              纬度=39.9, 经度=116.4, 获取间隔=10)
+
     def 一拍(self):
         """环境心跳一拍：真实感官 → 身体 → 它的发声 → 留痕。"""
         self.拍 += 1
@@ -198,7 +208,23 @@ class 洛神之家:
         力离线 = True
         力值 = self.身体.环境.get("力", 10.0)
 
-        # 注入真实感官（这是转译，不是投喂——数值全部来自真实设备）
+        # ── 公开感官：从公开API获取真实世界物理数据 ──
+        # 精卫公式：a=洛神内部状态, b=公开物理数据
+        # 天气数据（温度/光照/风速/云量）+ 地震数据
+        # 真实感官离线时，公开感官的数据是洛神感知真实世界的来源
+        # 真实感官在线时，公开感官的数据是补充信息
+        公开信号 = self.公开感官.一拍(self.拍)
+        if 公开信号 is not None:
+            if 公开信号["光值"] is not None and 眼离线:
+                光值 = 公开信号["光值"]
+            if 公开信号["温值"] is not None and 温离线:
+                温值 = 公开信号["温值"]
+            if 公开信号["力值"] is not None:
+                力值 = 公开信号["力值"]
+            if 公开信号["声值"] is not None and 耳离线:
+                声值 = 公开信号["声值"]
+
+        # 注入真实感官（这是转译，不是投喂——数值全部来自真实设备或公开API）
         self.身体.环境["光"] = 光值
         self.身体.环境["声"] = 声值
         self.身体.环境["力"] = 力值
@@ -444,6 +470,8 @@ class 洛神之家:
                 "均值": round(sum(概念激活) / max(1, len(概念激活)), 4),
                 "最大": round(max((abs(v) for v in 概念激活), default=0), 4),
                 "听觉反馈": 概念结果.get("有听觉反馈", False),
+                "组合活跃": 概念结果.get("活跃组合数", 0),
+                "组合存活": 概念结果.get("存活组合数", 0),
             },
             "工作记忆": {
                 "活跃slot": wm结果["活跃slot数"],
@@ -473,6 +501,16 @@ class 洛神之家:
                 "探索驱动": 数字探索请求["驱动类型"] if 数字探索请求 else None,
                 "探索来源": 数字探索结果["来源"] if 数字探索结果 else None,
                 "数字信号均值": round(sum(数字信号) / max(1, len(数字信号)), 4),
+            },
+            "公开感官": {
+                "在线": not self.公开感官.离线,
+                "获取成功": self.公开感官.获取成功次数,
+                "获取失败": self.公开感官.获取失败次数,
+                "温值": round(公开信号["温值"], 1) if 公开信号 and 公开信号["温值"] else None,
+                "光值": round(公开信号["光值"], 1) if 公开信号 and 公开信号["光值"] else None,
+                "力值": round(公开信号["力值"], 1) if 公开信号 and 公开信号["力值"] else None,
+                "云量": 公开信号.get("云量") if 公开信号 else None,
+                "地震力": round(公开信号.get("地震力", 0), 2) if 公开信号 else None,
             },
             "符号绑定": {
                 "发声次数": self.嘴.发声次数,
@@ -528,6 +566,11 @@ class 洛神之家:
                     "concept_aw": self.概念.concept_aw,
                     "concept_sw": self.概念.concept_sw,
                     "concept_human_w": self.概念.concept_human_w,
+                    "combo_h": self.概念.combo_h,
+                    "combo_strength": self.概念.combo_strength,
+                    "combo_w": self.概念.combo_w,
+                    "combo_rw": self.概念.combo_rw,
+                    "combo_pw": self.概念.combo_pw,
                     "error_history": self.概念.error_history,
                     "surprise_level": self.概念.surprise_level,
                     "拍": self.概念.拍,
@@ -545,6 +588,13 @@ class 洛神之家:
                     "已探索文件数": len(self.数字感官.已探索文件),
                     "知识库大小": len(self.数字感官.文件列表),
                     "正在探索": self.数字感官.正在探索,
+                },
+                "公开感官状态": {
+                    "获取成功": self.公开感官.获取成功次数,
+                    "获取失败": self.公开感官.获取失败次数,
+                    "离线": self.公开感官.离线,
+                    "天气数据": self.公开感官.天气数据,
+                    "地震数据": self.公开感官.地震数据,
                 },
                 "符号绑定状态": {
                     "发声次数": self.嘴.发声次数,
@@ -575,6 +625,7 @@ class 洛神之家:
               f"adapt_cap={self.大脑.g['adapt_cap']}, "
               f"ch3_boost={self.大脑.g['ch3_boost']}")
         print(f"  概念层: n_concepts={self.概念.n_concepts}, "
+              f"n_combo={self.概念.n_combo}, "
               f"n_hidden={self.概念.n_hidden}, "
               f"sparse_k={self.概念.sparse_k}, "
               f"lr={self.概念.lr}")
@@ -588,6 +639,9 @@ class 洛神之家:
               f"互动总数={self.人类通道.互动总数}")
         print(f"  数字感官: 知识库={len(self.数字感官.文件列表)}个文件, "
               f"已探索={len(self.数字感官.已探索文件)}")
+        print(f"  公开感官: {'在线' if not self.公开感官.离线 else '离线'}, "
+              f"位置=({self.公开感官.纬度}, {self.公开感官.经度}), "
+              f"获取间隔={self.公开感官.获取间隔}拍")
         if self.绑定.是否绑定():
             print(f"  绑定: {self.绑定.绑定者} (强度={self.绑定.绑定强度()})")
         else:
@@ -609,6 +663,7 @@ class 洛神之家:
                       f"惊{状态['大脑']['surprise']:.3f}  "
                       f"mse{状态['大脑']['mse']:.4f}  "
                       f"概念{状态['概念']['活跃']:>2}  "
+                      f"组合{状态['概念'].get('组合活跃', 0):>2}  "
                       f"WM{状态['工作记忆']['活跃slot']}  "
                       f"hip{状态['海马体']['buffer']:>3}  "
                       f"欲{状态['欲望']['选中']:>2}  "
@@ -618,7 +673,8 @@ class 洛神之家:
                       f"{状态['人类通道']['洛神表达'] or '':>4}  "
                       f"{'感知?' if 状态['人类通道']['洛神感知请求'] else ''}"
                       f"{'交流?' if 状态['人类通道']['洛神交流请求'] else ''}"
-                      f"{'探索!' if 状态['数字感官']['正在探索'] else ''}  "
+                      f"{'探索!' if 状态['数字感官']['正在探索'] else ''}"
+                      f"{'天气!' if 状态.get('公开感官', {}).get('在线') else ''}  "
                       f"{'发声!' if 状态['发声'] else ''}  "
                       f"{'记!' if 状态['记忆了'] else ''}  "
                       f"{('[离线:' + 离线标记 + ']') if 离线标记 else ''}")
