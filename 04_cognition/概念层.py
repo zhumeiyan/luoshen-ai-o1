@@ -68,9 +68,10 @@ class 概念层:
     """
 
     def __init__(self, n_hidden=11, n_concepts=64, lr=0.02,
-                 sparse_ratio=0.1, decay=0.8, seed=42):
+                 sparse_ratio=0.1, decay=0.8, seed=42, n_audio=8):
         self.n_hidden = n_hidden
         self.n_concepts = n_concepts
+        self.n_audio = n_audio
         self.lr = lr
         self.sparse_k = max(1, int(n_concepts * sparse_ratio))
         self.decay = decay
@@ -97,6 +98,17 @@ class 概念层:
         self.concept_pw = [[rng.uniform(-0.2, 0.2) for _ in range(n_hidden)]
                            for _ in range(n_concepts)]
 
+        # ── 说听闭环：听觉输入和声音预测 ──
+        # concept_aw: 听觉特征 → 概念（自听反馈通路）
+        # 当系统发声后，自听特征通过这条通路影响概念激活
+        self.concept_aw = [[rng.uniform(-0.1, 0.1) for _ in range(n_audio)]
+                           for _ in range(n_concepts)]
+
+        # concept_sw: 概念 → 预测声音（声音预测通路）
+        # 概念层预测自己将听到什么声音——预测误差驱动符号绑定
+        self.concept_sw = [[rng.uniform(-0.1, 0.1) for _ in range(n_audio)]
+                           for _ in range(n_concepts)]
+
         for i in range(n_concepts):
             self.concept_rw[i][i] = rng.uniform(0.05, 0.15)
 
@@ -112,7 +124,7 @@ class 概念层:
         self.sigma_history = []
         self.otimes_cap = 100  # 保留最近100拍的Δ和Σ
 
-    def 一拍(self, hidden_state):
+    def 一拍(self, hidden_state, 听觉特征=None):
         """概念层一拍：基于精卫公式从隐藏状态涌现概念。
 
         精卫公式流程：
@@ -123,6 +135,15 @@ class 概念层:
         5. ⊗ = ∫(Δ, Σ)（累积差与和——全留）
         6. τ读⊗→浮出所见（概念从⊗中浮现）
         7. (a, b)⟲⊗（循环——更新权重）
+
+        说听闭环（听觉特征非None时激活）：
+        - a_sound = 概念层预测的声音（concept_sw × concept_h）
+        - b_sound = 实际听到的声音（听觉特征）
+        - Δ_sound = b_sound - a_sound（声音预测误差）
+        - Σ_sound = a_sound + b_sound（联合声音状态）
+        - ⊗_sound = Δ_sound × Σ_sound
+        - 听觉特征通过concept_aw影响概念激活
+        - 声音预测误差驱动concept_sw学习（符号绑定）
         """
         self.拍 += 1
 
@@ -155,7 +176,7 @@ class 概念层:
 
         # ── τ 读 ⊗ → 浮出所见 ──
         # 概念从⊗中浮现——不是从a直接映射
-        # 三个输入源：a（实际状态）、⊗（Δ×Σ）、循环（概念→概念）
+        # 输入源：a（实际状态）、⊗（Δ×Σ）、循环（概念→概念）、听觉（自听反馈）
         new_concept_h = [0.0] * self.n_concepts
         for i in range(self.n_concepts):
             if self.concept_strength[i] < 0.05:
@@ -176,8 +197,14 @@ class 概念层:
             for k in range(self.n_concepts):
                 recurrent += self.concept_rw[i][k] * self.concept_h[k]
 
+            # 听觉输入（自听特征 → 概念）—— 说听闭环的反馈端
+            audio_input = 0.0
+            if 听觉特征 is not None:
+                for j in range(self.n_audio):
+                    audio_input += self.concept_aw[i][j] * 听觉特征[j]
+
             # τ读⊗→浮出所见
-            new_concept_h[i] = activation((a_input + otimes_input + recurrent) * 0.9)
+            new_concept_h[i] = activation((a_input + otimes_input + recurrent + audio_input) * 0.9)
 
         # 稀疏化——只保留最强的k个激活
         sorted_idx = sorted(range(self.n_concepts),
@@ -221,6 +248,39 @@ class 概念层:
                 if i != k and self.concept_strength[k] > 0.05:
                     self.concept_rw[i][k] += self.lr * 0.1 * new_concept_h[i] * self.concept_h[k]
 
+        # ── 说听闭环学习（听觉特征非None时） ──
+        # 精卫公式应用于声音域：
+        #   a_sound = 概念预测的声音, b_sound = 实际听到的声音
+        #   Δ_sound = b_sound - a_sound, Σ_sound = a_sound + b_sound
+        #   ⊗_sound = Δ_sound × Σ_sound
+        # concept_sw更新：减少声音预测误差（符号绑定的核心机制）
+        # concept_aw更新：增强听觉-概念联合表示
+        if 听觉特征 is not None:
+            # a_sound = 概念预测的声音
+            a_sound = [0.0] * self.n_audio
+            for j in range(self.n_audio):
+                for i in range(self.n_concepts):
+                    a_sound[j] += self.concept_sw[i][j] * self.concept_h[i]
+
+            # b_sound = 实际听到的声音
+            b_sound = list(听觉特征)
+
+            # Δ_sound, Σ_sound, ⊗_sound
+            delta_sound = [b_sound[j] - a_sound[j] for j in range(self.n_audio)]
+            sigma_sound = [a_sound[j] + b_sound[j] for j in range(self.n_audio)]
+            otimes_sound = [delta_sound[j] * sigma_sound[j] for j in range(self.n_audio)]
+
+            for i in range(self.n_concepts):
+                if self.concept_strength[i] < 0.05:
+                    continue
+                for j in range(self.n_audio):
+                    dw_sw = self.lr * new_concept_h[i] * delta_sound[j]
+                    dw_aw = self.lr * new_concept_h[i] * sigma_sound[j]
+                    if not (math.isnan(dw_sw) or math.isinf(dw_sw)):
+                        self.concept_sw[i][j] = self.concept_sw[i][j] * w_decay + dw_sw
+                    if not (math.isnan(dw_aw) or math.isinf(dw_aw)):
+                        self.concept_aw[i][j] = self.concept_aw[i][j] * w_decay + dw_aw
+
         # LTP/LTD——用进废退
         # 阈值0.15匹配当前激活范围（top-k约0.2-0.27，非top-k约0.02）
         for i in range(self.n_concepts):
@@ -241,6 +301,7 @@ class 概念层:
             "otimes": [round(o, 4) for o in otimes],
             "活跃概念数": sum(1 for v in self.concept_h if abs(v) > 0.15),
             "存活概念数": sum(1 for s in self.concept_strength if s > 0.05),
+            "有听觉反馈": 听觉特征 is not None,
         }
 
     def 概念区分度(self):

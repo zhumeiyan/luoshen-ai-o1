@@ -158,6 +158,9 @@ class 洛神之家:
         # 概念不是人为设定的，是通过赫布学习自然涌现的
         self.概念 = 概念层(n_hidden=self.大脑.g['n'], n_concepts=64, lr=0.02)
 
+        # 说听闭环：上一拍的自听特征（延迟一拍反馈，模拟骨传导延迟）
+        self.上拍自听特征 = None
+
     def 一拍(self):
         """环境心跳一拍：真实感官 → 身体 → 它的发声 → 留痕。"""
         self.拍 += 1
@@ -216,7 +219,8 @@ class 洛神之家:
 
         # ── 概念层：从大脑隐藏状态涌现概念 ──
         # 高层预测编码：概念层预测隐藏状态的模式，预测误差驱动赫布学习
-        概念结果 = self.概念.一拍(self.大脑.wm.h)
+        # 说听闭环：上一拍的自听特征作为听觉反馈传入概念层
+        概念结果 = self.概念.一拍(self.大脑.wm.h, 听觉特征=self.上拍自听特征)
         概念激活 = 概念结果["concept_h"]
         概念mse = 概念结果["mse"]
         概念surprise = 概念结果["surprise"]
@@ -243,6 +247,10 @@ class 洛神之家:
                                 当前拍=self.拍)
         if 发了声:
             self.嘴.等待播完()
+            # 说听闭环：提取自听特征，下一拍反馈给概念层
+            self.上拍自听特征 = self.嘴.自听特征()
+        else:
+            self.上拍自听特征 = None
 
         # ── 记忆点创建：连续概率，无阈值 ──
         # 记忆概率 = surprise的连续函数——surprise高时几乎必记，低时很少记
@@ -308,6 +316,7 @@ class 洛神之家:
                 "surprise": round(概念surprise, 4),
                 "均值": round(sum(概念激活) / max(1, len(概念激活)), 4),
                 "最大": round(max((abs(v) for v in 概念激活), default=0), 4),
+                "听觉反馈": 概念结果.get("有听觉反馈", False),
             },
             "欲望": 欲望结果,
             "情感": 情感,
@@ -354,6 +363,9 @@ class 洛神之家:
                     "concept_w": self.概念.concept_w,
                     "concept_rw": self.概念.concept_rw,
                     "concept_pw": self.概念.concept_pw,
+                    "concept_otimes_w": self.概念.concept_otimes_w,
+                    "concept_aw": self.概念.concept_aw,
+                    "concept_sw": self.概念.concept_sw,
                     "error_history": self.概念.error_history,
                     "surprise_level": self.概念.surprise_level,
                     "拍": self.概念.拍,
