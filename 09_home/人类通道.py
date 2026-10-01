@@ -382,6 +382,8 @@ class 人类通道:
                 概念均值 = sum(活跃概念) / len(活跃概念)
                 概念最大 = max(活跃概念, key=abs)
                 概念方差 = sum((v - 概念均值) ** 2 for v in 活跃概念) / len(活跃概念)
+                if math.isnan(概念方差) or math.isinf(概念方差) or 概念方差 > 1e10:
+                    概念方差 = 0.0
 
                 # 表达意图向量——从概念激活的统计特征生成
                 for d in range(self.n_hidden):
