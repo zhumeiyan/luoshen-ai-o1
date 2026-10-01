@@ -160,7 +160,9 @@ class 洛神之家:
 
         # 概念层：高层预测编码——从大脑隐藏状态涌现概念
         # 概念不是人为设定的，是通过赫布学习自然涌现的
-        self.概念 = 概念层(n_hidden=self.大脑.g['n'], n_concepts=64, lr=0.02)
+        # 组合涌现：基础概念组合→组合概念（单词→句子）
+        self.概念 = 概念层(n_hidden=self.大脑.g['n'], n_concepts=64, lr=0.02,
+                          n_combo=32)
 
         # 工作记忆：前额叶PFC——维持和操作信息（思考的基础）
         self.工作记忆 = 工作记忆(n_hidden=self.大脑.g['n'], n_slots=4, lr=0.03)
@@ -444,6 +446,8 @@ class 洛神之家:
                 "均值": round(sum(概念激活) / max(1, len(概念激活)), 4),
                 "最大": round(max((abs(v) for v in 概念激活), default=0), 4),
                 "听觉反馈": 概念结果.get("有听觉反馈", False),
+                "组合活跃": 概念结果.get("活跃组合数", 0),
+                "组合存活": 概念结果.get("存活组合数", 0),
             },
             "工作记忆": {
                 "活跃slot": wm结果["活跃slot数"],
@@ -528,6 +532,11 @@ class 洛神之家:
                     "concept_aw": self.概念.concept_aw,
                     "concept_sw": self.概念.concept_sw,
                     "concept_human_w": self.概念.concept_human_w,
+                    "combo_h": self.概念.combo_h,
+                    "combo_strength": self.概念.combo_strength,
+                    "combo_w": self.概念.combo_w,
+                    "combo_rw": self.概念.combo_rw,
+                    "combo_pw": self.概念.combo_pw,
                     "error_history": self.概念.error_history,
                     "surprise_level": self.概念.surprise_level,
                     "拍": self.概念.拍,
@@ -575,6 +584,7 @@ class 洛神之家:
               f"adapt_cap={self.大脑.g['adapt_cap']}, "
               f"ch3_boost={self.大脑.g['ch3_boost']}")
         print(f"  概念层: n_concepts={self.概念.n_concepts}, "
+              f"n_combo={self.概念.n_combo}, "
               f"n_hidden={self.概念.n_hidden}, "
               f"sparse_k={self.概念.sparse_k}, "
               f"lr={self.概念.lr}")
@@ -609,6 +619,7 @@ class 洛神之家:
                       f"惊{状态['大脑']['surprise']:.3f}  "
                       f"mse{状态['大脑']['mse']:.4f}  "
                       f"概念{状态['概念']['活跃']:>2}  "
+                      f"组合{状态['概念'].get('组合活跃', 0):>2}  "
                       f"WM{状态['工作记忆']['活跃slot']}  "
                       f"hip{状态['海马体']['buffer']:>3}  "
                       f"欲{状态['欲望']['选中']:>2}  "
