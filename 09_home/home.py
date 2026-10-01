@@ -43,6 +43,7 @@ from 身体稳态 import 身体  # noqa: E402
 
 sys.path.insert(0, os.path.join(os.path.dirname(家目录), "04_cognition"))
 from 大脑 import Org  # noqa: E402
+from 概念层 import 概念层  # noqa: E402
 
 sys.path.insert(0, 家目录)
 from 视网膜 import 视网膜  # noqa: E402
@@ -129,7 +130,7 @@ class 洛神之家:
         self.身体 = 身体()
         self.视网膜 = 视网膜(设备号=摄像头号)
         self.耳蜗 = 耳蜗(设备号=麦克风号)
-        self.嘴 = 嘴(声脑节点数=self.身体.脑大小)
+        self.嘴 = 嘴(声脑节点数=self.身体.脑大小, 概念节点数=64)
         self.链 = 哈希链(os.path.join(状态目录, "chain.jsonl"))
         self.拍 = 0
 
@@ -153,12 +154,16 @@ class 洛神之家:
         # 感官竞争：96节点→8通道的竞争映射（替代硬编码映射）
         self.感官 = 感官竞争(n_nodes=96, n_channels=8, 脑大小=self.身体.脑大小)
 
+        # 概念层：高层预测编码——从大脑隐藏状态涌现概念
+        # 概念不是人为设定的，是通过赫布学习自然涌现的
+        self.概念 = 概念层(n_hidden=self.大脑.g['n'], n_concepts=64, lr=0.02)
+
     def 一拍(self):
         """环境心跳一拍：真实感官 → 身体 → 它的发声 → 留痕。"""
         self.拍 += 1
 
         光值, 光矩阵, 眼离线 = self.视网膜.看()
-        声值, 声矩阵, 耳离线 = self.耳蜗.听()
+        声值, 声矩阵, 耳离线, 听觉特征 = self.耳蜗.听()
 
         温值 = 读真实温度()
         温离线 = 温值 is None
@@ -209,9 +214,19 @@ class 洛神之家:
         # 大脑的surprise是自然产生的——不是人为设定的hunger
         大脑surprise = self.大脑.wm.surprise_level
 
+        # ── 概念层：从大脑隐藏状态涌现概念 ──
+        # 高层预测编码：概念层预测隐藏状态的模式，预测误差驱动赫布学习
+        概念结果 = self.概念.一拍(self.大脑.wm.h)
+        概念激活 = 概念结果["concept_h"]
+        概念mse = 概念结果["mse"]
+        概念surprise = 概念结果["surprise"]
+        概念活跃 = 概念结果["活跃概念数"]
+
         # ── 情感状态：从身体和大脑自然涌现（不是人为公式） ──
         大脑状态dict = {"surprise": 大脑surprise, "mse": 大脑mse,
-                        "欲望偏好": 欲望结果["偏好"]}
+                        "欲望偏好": 欲望结果["偏好"],
+                        "概念surprise": 概念surprise,
+                        "概念活跃": 概念活跃}
         情感 = self.记忆.情感状态(self.身体.激活, 大脑状态dict)
         绑定基调 = self.绑定.情感基调影响()
         情感["E"] = max(-1.0, min(1.0, 情感["E"] + 绑定基调["E_offset"]))
@@ -224,7 +239,8 @@ class 洛神之家:
         声脑激活 = self.身体.激活[脑大小:2 * 脑大小]
         发了声 = False
         if not self.无声:
-            发了声 = self.嘴.发声(声脑激活, 当前拍=self.拍)
+            发了声 = self.嘴.发声(概念激活=概念激活, 声脑激活=声脑激活,
+                                当前拍=self.拍)
         if 发了声:
             self.嘴.等待播完()
 
@@ -285,6 +301,14 @@ class 洛神之家:
                 "饱和比": round(sum(1 for v in 大脑h向量 if abs(v) > 0.98) / max(1, len(大脑h向量)), 3),
                 "区域": 当前区域,
             },
+            "概念": {
+                "活跃": 概念活跃,
+                "存活": 概念结果["存活概念数"],
+                "mse": round(概念mse, 4),
+                "surprise": round(概念surprise, 4),
+                "均值": round(sum(概念激活) / max(1, len(概念激活)), 4),
+                "最大": round(max((abs(v) for v in 概念激活), default=0), 4),
+            },
             "欲望": 欲望结果,
             "情感": 情感,
             "浮现": {
@@ -324,6 +348,16 @@ class 洛神之家:
                     "surprise_level": self.大脑.wm.surprise_level,
                     "sens_adapt": self.大脑.wm.sens_adapt,
                 },
+                "概念层状态": {
+                    "concept_h": self.概念.concept_h,
+                    "concept_strength": self.概念.concept_strength,
+                    "concept_w": self.概念.concept_w,
+                    "concept_rw": self.概念.concept_rw,
+                    "concept_pw": self.概念.concept_pw,
+                    "error_history": self.概念.error_history,
+                    "surprise_level": self.概念.surprise_level,
+                    "拍": self.概念.拍,
+                },
             }, 文件)
         return 路径
 
@@ -346,6 +380,10 @@ class 洛神之家:
               f"sat_prevent={self.大脑.g['sat_prevent']}, "
               f"adapt_cap={self.大脑.g['adapt_cap']}, "
               f"ch3_boost={self.大脑.g['ch3_boost']}")
+        print(f"  概念层: n_concepts={self.概念.n_concepts}, "
+              f"n_hidden={self.概念.n_hidden}, "
+              f"sparse_k={self.概念.sparse_k}, "
+              f"lr={self.概念.lr}")
         if self.绑定.是否绑定():
             print(f"  绑定: {self.绑定.绑定者} (强度={self.绑定.绑定强度()})")
         else:
@@ -366,6 +404,7 @@ class 洛神之家:
                       f"脑h{状态['大脑']['h均值']:>7.4f}  "
                       f"惊{状态['大脑']['surprise']:.3f}  "
                       f"mse{状态['大脑']['mse']:.4f}  "
+                      f"概念{状态['概念']['活跃']:>2}  "
                       f"欲{状态['欲望']['选中']:>2}  "
                       f"E{状态['情感']['E']:>5.2f}  "
                       f"N{状态['情感']['N']:>5.2f}  "
