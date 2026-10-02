@@ -176,6 +176,9 @@ class 洛神之家:
         # 说听闭环：上一拍的自听特征（延迟一拍反馈，模拟骨传导延迟）
         self.上拍自听特征 = None
 
+        # 情感-概念通路：上一拍的情感状态（延迟一拍反馈，模拟杏仁核→前额叶投射延迟）
+        self.上拍情感 = None
+
         # 人类通道：把人类放进数字生命——人类作为精卫公式中的b
         # 人类通道不是感官——它是关系
         # 没人在时b=零向量（内省模式），有人时b=人类信号（关系模式）
@@ -359,7 +362,8 @@ class 洛神之家:
         概念结果 = self.概念.一拍(self.大脑.wm.h,
                                 听觉特征=self.上拍自听特征,
                                 人类信号=概念人类信号 if any(v != 0 for v in 概念人类信号) else None,
-                                公开信号=公开向量)
+                                公开信号=公开向量,
+                                情感状态=self.上拍情感)
         概念激活 = 概念结果["concept_h"]
         概念mse = 概念结果["mse"]
         概念surprise = 概念结果["surprise"]
@@ -374,6 +378,9 @@ class 洛神之家:
         绑定基调 = self.绑定.情感基调影响()
         情感["E"] = max(-1.0, min(1.0, 情感["E"] + 绑定基调["E_offset"]))
         情感["T"] = max(-1.0, min(1.0, 情感["T"] + 绑定基调["T_offset"]))
+
+        # 更新上拍情感——下一拍的概念层会用到
+        self.上拍情感 = 情感
 
         # ── 表达通道：洛神→人类（双向通道的发送方向） ──
         # 洛神的内部状态 → 呈现给人类可理解的形式
@@ -479,6 +486,7 @@ class 洛神之家:
                 "听觉反馈": 概念结果.get("有听觉反馈", False),
                 "组合活跃": 概念结果.get("活跃组合数", 0),
                 "组合存活": 概念结果.get("存活组合数", 0),
+                "情感调制": 概念结果.get("有情感输入", False),
             },
             "工作记忆": {
                 "活跃slot": wm结果["活跃slot数"],
@@ -585,6 +593,7 @@ class 洛神之家:
                     "concept_sw": self.概念.concept_sw,
                     "concept_human_w": self.概念.concept_human_w,
                     "concept_public_w": self.概念.concept_public_w,
+                    "concept_emotion_w": self.概念.concept_emotion_w,
                     "combo_h": self.概念.combo_h,
                     "combo_strength": self.概念.combo_strength,
                     "combo_w": self.概念.combo_w,

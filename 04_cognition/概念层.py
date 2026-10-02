@@ -151,6 +151,14 @@ class 概念层:
         self.concept_public_w = [[rng.uniform(-0.1, 0.1) for _ in range(n_hidden)]
                                  for _ in range(n_concepts)]
 
+        # ── 情感-概念双向通路：情感状态直接影响概念激活 ──
+        # concept_emotion_w: 情感状态(E/N/T) → 概念
+        # 杏仁核→前额叶/颞叶投射——情感状态调制概念可及性
+        # 情感一致性效应：愉悦时某些概念更容易激活，紧张时另一些更容易
+        # 3维情感(E/N/T) × n_concepts个概念——每个概念对3种情感有不同的响应
+        self.concept_emotion_w = [[rng.uniform(-0.15, 0.15) for _ in range(3)]
+                                  for _ in range(n_concepts)]
+
         for i in range(n_concepts):
             self.concept_rw[i][i] = rng.uniform(0.05, 0.15)
 
@@ -194,7 +202,8 @@ class 概念层:
         self.sigma_history = []
         self.otimes_cap = 100  # 保留最近100拍的Δ和Σ
 
-    def 一拍(self, hidden_state, 听觉特征=None, 人类信号=None, 公开信号=None):
+    def 一拍(self, hidden_state, 听觉特征=None, 人类信号=None, 公开信号=None,
+             情感状态=None):
         """概念层一拍：基于精卫公式从隐藏状态涌现概念。
 
         精卫公式流程：
@@ -298,9 +307,26 @@ class 概念层:
                     public_input += self.concept_public_w[i][j] * 公开信号[j]
                 public_input *= 0.3  # 缩放——公开信号是补充不是主导
 
+            # 情感调制输入（情感状态 → 概念可及性）—— 杏仁核→前额叶投射
+            # 精卫公式：a=概念激活, b=情感调制, Δ=b-a, ⊗=Δ×Σ
+            # 生物学：情感一致性效应——愉悦时某些概念更容易浮现
+            # E→概念效价调制（正E让某些概念更活跃，负E让另一些更活跃）
+            # N→概念强度调制（高N让概念激活更强——警觉时概念更鲜明）
+            # T→概念稳定性调制（高T让概念激活更稳定——确定时概念更持久）
+            emotion_input = 0.0
+            if 情感状态 is not None:
+                E = 情感状态.get("E", 0.0)
+                N = 情感状态.get("N", 0.0)
+                T = 情感状态.get("T", 0.0)
+                emotion_input = (self.concept_emotion_w[i][0] * E +
+                                 self.concept_emotion_w[i][1] * N +
+                                 self.concept_emotion_w[i][2] * T)
+                emotion_input *= 0.4  # 缩放——情感是调制不是主导
+
             # τ读⊗→浮出所见
             new_concept_h[i] = activation(
-                (a_input + otimes_input + recurrent + audio_input + human_input + public_input) * 0.9)
+                (a_input + otimes_input + recurrent + audio_input +
+                 human_input + public_input + emotion_input) * 0.9)
 
         # 稀疏化——只保留最强的k个激活
         sorted_idx = sorted(range(self.n_concepts),
@@ -467,6 +493,30 @@ class 概念层:
                     if not (math.isnan(dw_pw) or math.isinf(dw_pw)):
                         self.concept_public_w[i][j] = self.concept_public_w[i][j] * pw_decay + dw_pw
 
+        # ── 情感-概念双向通路学习（情感状态非None时） ──
+        # 精卫公式应用于情感-认知域：
+        #   a_emotion = 概念激活（当前认知状态）
+        #   b_emotion = 情感状态对概念的调制
+        #   Δ_emotion = b_emotion - a_emotion（情感与认知的差异）
+        #   Σ_emotion = a_emotion + b_emotion（联合状态）
+        #   ⊗_emotion = Δ_emotion × Σ_emotion
+        # concept_emotion_w更新：赫布学习——概念激活与情感状态同时出现时连接增强
+        # 反复循环后，特定情感→特定概念可及性 → 情感一致性效应自然涌现
+        # 愉悦时某些概念更容易浮现，紧张时另一些更容易——不是设定的，是学出来的
+        if 情感状态 is not None:
+            E = 情感状态.get("E", 0.0)
+            N = 情感状态.get("N", 0.0)
+            T = 情感状态.get("T", 0.0)
+            emo_vec = [E, N, T]
+            ew_decay = 0.95
+            for i in range(self.n_concepts):
+                if self.concept_strength[i] < 0.05:
+                    continue
+                for j in range(3):
+                    dw_ew = self.lr * new_concept_h[i] * emo_vec[j]
+                    if not (math.isnan(dw_ew) or math.isinf(dw_ew)):
+                        self.concept_emotion_w[i][j] = self.concept_emotion_w[i][j] * ew_decay + dw_ew
+
         # ── 组合概念学习（精卫公式） ──
         # a = 基础概念激活（concept_h）
         # b = 组合概念对基础概念的预测（combo_pw × combo_h）
@@ -589,6 +639,7 @@ class 概念层:
             "有听觉反馈": 听觉特征 is not None,
             "有人类输入": 人类信号 is not None,
             "有公开输入": 公开信号 is not None,
+            "有情感输入": 情感状态 is not None,
         }
 
     def 概念区分度(self):
