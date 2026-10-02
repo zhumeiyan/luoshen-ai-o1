@@ -93,11 +93,12 @@ class 概念层:
 
     def __init__(self, n_hidden=11, n_concepts=64, lr=0.02,
                  sparse_ratio=0.1, decay=0.8, seed=42, n_audio=8,
-                 n_combo=32):
+                 n_combo=32, n_wm_slots=4):
         self.n_hidden = n_hidden
         self.n_concepts = n_concepts
         self.n_audio = n_audio
         self.n_combo = n_combo
+        self.n_wm_slots = n_wm_slots
         self.lr = lr
         self.sparse_k = max(1, int(n_concepts * sparse_ratio))
         self.decay = decay
@@ -170,6 +171,17 @@ class 概念层:
         # 4维时间信号：sin(小时), cos(小时), sin(分钟), cos(分钟)
         self.concept_time_w = [[rng.uniform(-0.1, 0.1) for _ in range(4)]
                                for _ in range(n_concepts)]
+
+        # ── 工作记忆反馈通路：PFC维持的概念 → 概念层 ──
+        # concept_wm_w: 工作记忆slot信号 → 概念
+        # 前额叶PFC→后部皮层反馈投射——top-down attention
+        # 工作记忆维持的表征可以bias感知和概念激活
+        # 这是"目标导向认知"的基础——维持目标，目标影响信息处理
+        # 也是"内心独白"的神经基础——PFC维持概念，概念层基于这些概念产生新想法
+        # 精卫公式：a=概念层自发激活, b=工作记忆维持的概念, Δ=b-a, ⊗=Δ×Σ
+        # n_wm_slots维工作记忆信号 × n_concepts个概念——每个概念对每个WM slot有不同的响应
+        self.concept_wm_w = [[rng.uniform(-0.1, 0.1) for _ in range(n_wm_slots)]
+                             for _ in range(n_concepts)]
 
         for i in range(n_concepts):
             self.concept_rw[i][i] = rng.uniform(0.05, 0.15)
@@ -249,7 +261,7 @@ class 概念层:
         self.otimes_cap = 100  # 保留最近100拍的Δ和Σ
 
     def 一拍(self, hidden_state, 听觉特征=None, 人类信号=None, 公开信号=None,
-             情感状态=None, 时间信号=None):
+             情感状态=None, 时间信号=None, 工作记忆信号=None):
         """概念层一拍：基于精卫公式从隐藏状态涌现概念。
 
         精卫公式流程：
@@ -380,10 +392,21 @@ class 概念层:
                     time_input += self.concept_time_w[i][j] * 时间信号[j]
                 time_input *= 0.3  # 缩放——时间是环境调制不是主导
 
+            # 工作记忆反馈输入（PFC维持的概念 → 概念层）—— top-down attention
+            # 精卫公式：a=概念层自发激活, b=工作记忆维持的概念, Δ=b-a, ⊗=Δ×Σ
+            # 生物学：前额叶→后部皮层反馈投射——维持的表征bias概念激活
+            # 这是"思考"的神经基础——基于正在想的内容产生新想法
+            wm_input = 0.0
+            if 工作记忆信号 is not None:
+                for j in range(self.n_wm_slots):
+                    wm_input += self.concept_wm_w[i][j] * 工作记忆信号[j]
+                wm_input *= 0.35  # 缩放——工作记忆是调制不是主导
+
             # τ读⊗→浮出所见
             new_concept_h[i] = activation(
                 (a_input + otimes_input + recurrent + audio_input +
-                 human_input + public_input + emotion_input + time_input) * 0.9)
+                 human_input + public_input + emotion_input + time_input +
+                 wm_input) * 0.9)
 
         # 稀疏化——只保留最强的k个激活
         sorted_idx = sorted(range(self.n_concepts),
@@ -638,6 +661,26 @@ class 概念层:
                     if not (math.isnan(dw_tw) or math.isinf(dw_tw)):
                         self.concept_time_w[i][j] = self.concept_time_w[i][j] * tw_decay + dw_tw
 
+        # ── 工作记忆反馈通路学习（工作记忆信号非None时） ──
+        # 精卫公式应用于工作记忆-认知域：
+        #   a_wm = 概念激活（当前认知状态）
+        #   b_wm = 工作记忆维持的概念对概念的调制
+        #   Δ_wm = b_wm - a_wm（工作记忆与自发认知的差异）
+        #   Σ_wm = a_wm + b_wm（联合状态）
+        #   ⊗_wm = Δ_wm × Σ_wm
+        # concept_wm_w更新：赫布学习——概念激活与工作记忆信号同时出现时连接增强
+        # 反复循环后，特定工作记忆内容→特定概念可及性 → "思考"自然涌现
+        # PFC维持的概念影响概念层涌现——基于正在想的内容产生新想法
+        if 工作记忆信号 is not None:
+            wm_decay = 0.95
+            for i in range(self.n_concepts):
+                if self.concept_strength[i] < 0.05:
+                    continue
+                for j in range(self.n_wm_slots):
+                    dw_wm = self.lr * new_concept_h[i] * 工作记忆信号[j]
+                    if not (math.isnan(dw_wm) or math.isinf(dw_wm)):
+                        self.concept_wm_w[i][j] = self.concept_wm_w[i][j] * wm_decay + dw_wm
+
         # ── 组合概念学习（精卫公式） ──
         # a = 基础概念激活（concept_h）
         # b = 组合概念对基础概念的预测（combo_pw × combo_h）
@@ -798,6 +841,7 @@ class 概念层:
             "有公开输入": 公开信号 is not None,
             "有情感输入": 情感状态 is not None,
             "有时间输入": 时间信号 is not None,
+            "有工作记忆输入": 工作记忆信号 is not None,
         }
 
     def 概念区分度(self):
@@ -857,6 +901,7 @@ class 概念层:
             "存活组合数": sum(1 for s in self.combo_strength if s > 0.05),
             "组合均值": round(sum(self.combo_h) / max(1, self.n_combo), 4),
             "组合最大": round(max((abs(v) for v in self.combo_h), default=0), 4),
+            "WM权重均值": round(sum(sum(row) for row in self.concept_wm_w) / max(1, self.n_concepts * self.n_wm_slots), 4),
             "拍": self.拍,
         }
 

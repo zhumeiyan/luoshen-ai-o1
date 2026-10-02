@@ -164,7 +164,7 @@ class 洛神之家:
         # 概念不是人为设定的，是通过赫布学习自然涌现的
         # 组合涌现：基础概念组合→组合概念（单词→句子）
         self.概念 = 概念层(n_hidden=self.大脑.g['n'], n_concepts=64, lr=0.02,
-                          n_combo=32)
+                          n_combo=32, n_wm_slots=4)
 
         # 工作记忆：前额叶PFC——维持和操作信息（思考的基础）
         self.工作记忆 = 工作记忆(n_hidden=self.大脑.g['n'], n_slots=4, lr=0.03)
@@ -384,12 +384,17 @@ class 洛神之家:
         概念人类信号 = 人类信号 if 有人在 else 数字信号
         公开向量 = self.公开感官.当前向量 if 公开信号 is not None else None
         时间向量 = self._计算时间信号()
+        # 工作记忆信号：4个slot的活跃强度——PFC维持的概念影响概念涌现
+        # 精卫公式：a=概念层自发激活, b=工作记忆维持的概念, Δ=b-a, ⊗=Δ×Σ
+        # 生物学：前额叶→后部皮层反馈投射——维持的表征bias概念激活 = "思考"
+        工作记忆信号 = wm结果["strength"] if wm结果.get("总强度", 0) > 0.05 else None
         概念结果 = self.概念.一拍(self.大脑.wm.h,
                                 听觉特征=self.上拍自听特征,
                                 人类信号=概念人类信号 if any(v != 0 for v in 概念人类信号) else None,
                                 公开信号=公开向量,
                                 情感状态=self.上拍情感,
-                                时间信号=时间向量)
+                                时间信号=时间向量,
+                                工作记忆信号=工作记忆信号)
         概念激活 = 概念结果["concept_h"]
         概念mse = 概念结果["mse"]
         概念surprise = 概念结果["surprise"]
@@ -518,6 +523,7 @@ class 洛神之家:
                 "高级组合存活": 概念结果.get("存活高级组合数", 0),
                 "情感调制": 概念结果.get("有情感输入", False),
                 "时间调制": 概念结果.get("有时间输入", False),
+                "工作记忆调制": 概念结果.get("有工作记忆输入", False),
             },
             "工作记忆": {
                 "活跃slot": wm结果["活跃slot数"],
@@ -628,6 +634,7 @@ class 洛神之家:
                     "concept_public_w": self.概念.concept_public_w,
                     "concept_emotion_w": self.概念.concept_emotion_w,
                     "concept_time_w": self.概念.concept_time_w,
+                    "concept_wm_w": self.概念.concept_wm_w,
                     "combo_h": self.概念.combo_h,
                     "combo_strength": self.概念.combo_strength,
                     "combo_w": self.概念.combo_w,
