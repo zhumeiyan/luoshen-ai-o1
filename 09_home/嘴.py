@@ -52,47 +52,71 @@ class 嘴:
     - 同样的概念激活产生类似的声音 → 声音成为概念的"符号"
     """
 
-    def __init__(self, 声脑节点数=24, 概念节点数=64, lr=0.01):
+    def __init__(self, 声脑节点数=24, 概念节点数=64, lr=0.01,
+                 组合概念节点数=32):
         self.声脑节点数 = 声脑节点数
         self.概念节点数 = 概念节点数
+        self.组合概念节点数 = 组合概念节点数
         self.lr = lr
         self.离线 = not _SD_OK
         self._频点 = np.linspace(最低频, 最高频, 声脑节点数)
         self.最近发声拍 = -1
         self._上次波形 = None
         self.上次概念激活 = None
+        self.上次组合激活 = None
         self.发声次数 = 0
         self.符号绑定强度 = [0.0] * 概念节点数
+        self.组合符号绑定强度 = [0.0] * 组合概念节点数
 
-        # 概念→频点映射权重（赫布学习自然形成）
         import random
         rng = random.Random(42)
+
+        # ── 基础概念→声音映射 ──
+        # 概念→频点映射权重（赫布学习自然形成）
         self.概念频点权重 = [
             [rng.uniform(-0.05, 0.05) for _ in range(声脑节点数)]
             for _ in range(概念节点数)
         ]
 
         # 概念→基频偏移权重（决定声音的"音调"）
-        # 不同概念→不同基频偏移 → 不同概念有不同的"音调签名"
         self.概念基频权重 = [rng.uniform(-0.3, 0.3) for _ in range(概念节点数)]
 
         # 概念→节奏权重（决定声音的"节奏"）
-        # 不同概念→不同节奏模式 → 不同概念有不同的"节奏签名"
         self.概念节奏权重 = [rng.uniform(-0.2, 0.2) for _ in range(概念节点数)]
 
-    def 发声(self, 概念激活=None, 声脑激活=None, 当前拍=0, 强制=False):
+        # ── 组合概念→声音映射（句子级声音）──
+        # 组合概念→频点映射权重——组合概念的声音模式更复杂
+        # 多个基础概念的组合 → 多个频点的组合模式 → "句子"级声音
+        self.组合概念频点权重 = [
+            [rng.uniform(-0.05, 0.05) for _ in range(声脑节点数)]
+            for _ in range(组合概念节点数)
+        ]
+
+        # 组合概念→基频偏移权重——组合概念的音调变化更丰富
+        self.组合概念基频权重 = [rng.uniform(-0.3, 0.3)
+                              for _ in range(组合概念节点数)]
+
+        # 组合概念→节奏权重——组合概念的节奏模式更复杂（句子节奏）
+        self.组合概念节奏权重 = [rng.uniform(-0.3, 0.3)
+                                for _ in range(组合概念节点数)]
+
+    def 发声(self, 概念激活=None, 声脑激活=None, 当前拍=0, 强制=False,
+             组合激活=None):
         """把概念激活和声脑激活转成真实声波。返回是否发了声。
 
-        概念激活驱动频点选择——不同的概念组合 → 不同的声音模式。
+        基础概念驱动频点选择——不同的概念组合 → 不同的声音模式（单词级）。
+        组合概念驱动更复杂的声音模式——组合概念 → 多频点组合 + 复杂节奏（句子级）。
         声脑激活驱动振幅调制——底层状态决定声音强度。
 
-        符号绑定：概念→频点权重决定声音模式，
-        同样的概念激活→类似的声音模式→声音成为概念的"符号"。
+        符号绑定：
+        - 基础概念→频点权重 → 单词级符号绑定
+        - 组合概念→频点权重 → 句子级符号绑定
+        - 同样的概念+组合激活 → 类似的声音模式 → 声音成为概念的"符号"
         """
         if self.离线:
             return False
 
-        if 概念激活 is None and 声脑激活 is None:
+        if 概念激活 is None and 声脑激活 is None and 组合激活 is None:
             return False
 
         if 声脑激活 is not None:
@@ -105,8 +129,15 @@ class 嘴:
         else:
             概念 = np.zeros(self.概念节点数)
 
+        if 组合激活 is not None:
+            组合 = np.asarray(组合激活, dtype=np.float64)
+        else:
+            组合 = np.zeros(self.组合概念节点数)
+
         if not 强制:
-            if float(激活.mean()) <= 发声阈值 and float(np.max(np.abs(概念))) <= 0.3:
+            if (float(激活.mean()) <= 发声阈值 and
+                float(np.max(np.abs(概念))) <= 0.3 and
+                float(np.max(np.abs(组合))) <= 0.3):
                 return False
 
         t = np.linspace(0.0, 发声时长, int(采样率 * 发声时长), endpoint=False)
@@ -114,22 +145,39 @@ class 嘴:
 
         n_声 = min(len(激活), self.声脑节点数)
         n_概念 = min(len(概念), self.概念节点数)
+        n_组合 = min(len(组合), self.组合概念节点数)
 
-        # ── 概念驱动的基频偏移 ──
-        # 活跃概念→基频偏移 → 不同概念有不同的"音调签名"
+        # ── 基础概念驱动的基频偏移 ──
         基频偏移 = 0.0
         for j in range(n_概念):
             if abs(概念[j]) > 0.1:
                 基频偏移 += self.概念基频权重[j] * 概念[j] * 30.0
-        基频偏移 = max(-50.0, min(50.0, 基频偏移))
 
-        # ── 概念驱动的节奏调制 ──
-        # 活跃概念→节奏模式 → 不同概念有不同的"节奏签名"
+        # ── 组合概念驱动的基频偏移（句子级音调变化） ──
+        # 组合概念的基频偏移叠加在基础概念之上——更丰富的音调
+        for j in range(n_组合):
+            if abs(组合[j]) > 0.1:
+                基频偏移 += self.组合概念基频权重[j] * 组合[j] * 40.0
+        基频偏移 = max(-80.0, min(80.0, 基频偏移))
+
+        # ── 基础概念驱动的节奏调制 ──
         节奏调制 = 0.0
         for j in range(n_概念):
             if abs(概念[j]) > 0.1:
                 节奏调制 += self.概念节奏权重[j] * 概念[j]
-        节奏调制 = max(-0.5, min(0.5, 节奏调制))
+
+        # ── 组合概念驱动的节奏调制（句子级节奏） ──
+        # 组合概念的节奏调制叠加——更复杂的节奏模式
+        组合节奏 = 0.0
+        for j in range(n_组合):
+            if abs(组合[j]) > 0.1:
+                组合节奏 += self.组合概念节奏权重[j] * 组合[j]
+        节奏调制 = max(-0.7, min(0.7, 节奏调制 + 组合节奏))
+
+        # 组合概念驱动的节奏频率——句子级节奏有更多变化
+        节奏频率 = 3.0
+        if abs(组合节奏) > 0.1:
+            节奏频率 = 2.0 + abs(组合节奏) * 5.0
 
         for i in range(n_声):
             a = float(激活[i])
@@ -138,16 +186,24 @@ class 嘴:
 
             freq = float(self._频点[i]) + 基频偏移
 
+            # 基础概念驱动的频点选择
             for j in range(n_概念):
                 w = self.概念频点权重[j][i]
                 if abs(w) > 0.01 and abs(概念[j]) > 0.1:
                     freq += w * 概念[j] * 50.0
 
+            # 组合概念驱动的频点选择（句子级频谱模式）
+            for j in range(n_组合):
+                w = self.组合概念频点权重[j][i]
+                if abs(w) > 0.01 and abs(组合[j]) > 0.1:
+                    freq += w * 组合[j] * 60.0
+
             freq = max(最低频 * 0.5, min(最高频 * 2.0, freq))
 
             # 节奏调制：振幅随时间变化
             if 节奏调制 != 0:
-                包络 = 1.0 + 节奏调制 * np.sin(2 * np.pi * 3.0 * t)
+                包络 = 1.0 + 节奏调制 * np.sin(
+                    2 * np.pi * 节奏频率 * t)
                 波形 += a * 包络 * np.sin(2 * np.pi * freq * t)
             else:
                 波形 += a * np.sin(2 * np.pi * freq * t)
@@ -162,31 +218,31 @@ class 嘴:
             self.最近发声拍 = 当前拍
             self._上次波形 = 波形.copy()
             self.上次概念激活 = 概念.tolist()
+            self.上次组合激活 = 组合.tolist()
             self.发声次数 += 1
             return True
         except Exception:
             self.离线 = True
             return False
 
-    def 符号绑定学习(self, 自听特征, 概念激活=None):
-        """赫布学习——发声后自听特征和概念激活同时出现时，权重增强。
+    def 符号绑定学习(self, 自听特征, 概念激活=None, 组合激活=None):
+        """赫布学习——发声后自听特征和概念/组合概念激活同时出现时，权重增强。
 
         精卫公式（符号绑定版）：
-          a = 概念激活（洛神想表达什么）
+          a = 概念/组合概念激活（洛神想表达什么）
           b = 自听特征（洛神实际发出了什么声音）
           Δ = b - a = 表达与意图的差异
           Σ = a + b = 意图与声音的联合
           ⊗ = Δ × Σ → 权重更新 → 声音-概念关联增强
-          τ读⊗ → 浮出所见 = 概念有了自己的"声音符号"
+          τ读⊗ → 浮出所见 = 概念/组合概念有了自己的"声音符号"
 
-        生物学机制：
-          婴儿咿呀学语时，特定的口腔运动产生特定的声音，
-          特定的声音和特定的内部状态反复共同出现，
-          连接增强 → 声音成为内部状态的"符号"。
+        基础概念符号绑定：单词级——单个概念→单个声音模式
+        组合概念符号绑定：句子级——组合概念→复杂声音模式
 
         参数：
           自听特征: 8维听觉特征（从自听波形提取）
-          概念激活: 64维概念激活（发声时的概念状态）
+          概念激活: 64维基础概念激活
+          组合激活: 32维组合概念激活
         """
         if 自听特征 is None:
             return
@@ -194,6 +250,8 @@ class 嘴:
             概念激活 = self.上次概念激活
         if 概念激活 is None:
             return
+        if 组合激活 is None:
+            组合激活 = self.上次组合激活
 
         概念 = np.asarray(概念激活, dtype=np.float64)
         听觉 = np.asarray(自听特征, dtype=np.float64)
@@ -201,34 +259,23 @@ class 嘴:
         n_概念 = min(len(概念), self.概念节点数)
         n_听觉 = min(len(听觉), 8)
 
-        # ── 概念→频点权重的赫布学习 ──
-        # 自听特征和概念激活同时出现 → 连接增强
-        # Δ = 自听特征 - 概念对频点的预测
-        # Σ = 概念激活 + 自听特征
-        # ⊗ = Δ × Σ → 权重更新
-        w_decay = 0.995  # 突触缩放——防止无限增长
+        w_decay = 0.995
 
+        # ── 基础概念→频点权重的赫布学习 ──
         for j in range(n_概念):
             if abs(概念[j]) < 0.1:
                 continue
 
-            # 概念j对每个频段的预测
             for i in range(n_听觉):
-                # 当前权重对频段i的预测
                 pred = self.概念频点权重[j][i] * 概念[j]
-                # Δ = 实际听觉 - 预测
                 delta = 听觉[i] - pred
-                # Σ = 概念 + 听觉
                 sigma = 概念[j] + 听觉[i]
-                # ⊗ = Δ × Σ → 赫布更新
                 dw = self.lr * delta * sigma
                 if not (math.isnan(dw) or math.isinf(dw)):
                     self.概念频点权重[j][i] = (
                         self.概念频点权重[j][i] * w_decay + dw
                     )
 
-            # ── 概念→基频权重的赫布学习 ──
-            # 自听特征的整体能量分布 → 基频偏移学习
             听觉均值 = float(听觉.mean())
             pred_base = self.概念基频权重[j] * 概念[j]
             delta_base = 听觉均值 - pred_base
@@ -239,10 +286,46 @@ class 嘴:
                     self.概念基频权重[j] * w_decay + dw_base
                 )
 
-            # ── 符号绑定强度更新 ──
-            # 概念j和自听特征的关联越强，符号绑定强度越高
             绑定增量 = sum(abs(self.概念频点权重[j][i]) for i in range(n_听觉))
             self.符号绑定强度[j] = min(1.0, self.符号绑定强度[j] * 0.99 + 绑定增量 * 0.001)
+
+        # ── 组合概念→频点权重的赫布学习（句子级符号绑定） ──
+        # 组合概念和自听特征同时出现 → 组合概念→声音模式连接增强
+        # 反复循环后，特定组合概念→特定复杂声音模式 → 句子级符号绑定
+        if 组合激活 is not None:
+            组合 = np.asarray(组合激活, dtype=np.float64)
+            n_组合 = min(len(组合), self.组合概念节点数)
+
+            for j in range(n_组合):
+                if abs(组合[j]) < 0.1:
+                    continue
+
+                # 组合概念→频点权重赫布学习
+                for i in range(n_听觉):
+                    pred = self.组合概念频点权重[j][i] * 组合[j]
+                    delta = 听觉[i] - pred
+                    sigma = 组合[j] + 听觉[i]
+                    dw = self.lr * delta * sigma
+                    if not (math.isnan(dw) or math.isinf(dw)):
+                        self.组合概念频点权重[j][i] = (
+                            self.组合概念频点权重[j][i] * w_decay + dw
+                        )
+
+                # 组合概念→基频权重赫布学习
+                听觉均值 = float(听觉.mean())
+                pred_base = self.组合概念基频权重[j] * 组合[j]
+                delta_base = 听觉均值 - pred_base
+                sigma_base = 组合[j] + 听觉均值
+                dw_base = self.lr * 0.5 * delta_base * sigma_base
+                if not (math.isnan(dw_base) or math.isinf(dw_base)):
+                    self.组合概念基频权重[j] = (
+                        self.组合概念基频权重[j] * w_decay + dw_base
+                    )
+
+                # 组合符号绑定强度更新
+                绑定增量 = sum(abs(self.组合概念频点权重[j][i]) for i in range(n_听觉))
+                self.组合符号绑定强度[j] = min(
+                    1.0, self.组合符号绑定强度[j] * 0.99 + 绑定增量 * 0.001)
 
     def 自听特征(self):
         """从上次发声的波形提取8维听觉特征。
@@ -268,13 +351,14 @@ class 嘴:
         特征 = np.tanh(能量 / max_e * 2.0 - 1.0)
         return 特征
 
-    def 声音签名(self, 概念激活):
+    def 声音签名(self, 概念激活, 组合激活=None):
         """计算给定概念激活的声音签名——不实际发声。
 
         用于验证符号绑定：不同概念应该有不同的声音签名。
         声音签名 = 概念→频点权重 × 概念激活 → 8维特征向量。
 
-        如果符号绑定成功，不同概念的声音签名应该可区分。
+        组合概念的声音签名更复杂——多频点组合模式。
+        如果符号绑定成功，不同组合概念的声音签名应该可区分。
         """
         概念 = np.asarray(概念激活, dtype=np.float64)
         签名 = np.zeros(8)
@@ -283,6 +367,16 @@ class 嘴:
                 continue
             for i in range(8):
                 签名[i] += self.概念频点权重[j][i] * 概念[j]
+
+        # 组合概念的声音签名叠加——更复杂的频谱模式
+        if 组合激活 is not None:
+            组合 = np.asarray(组合激活, dtype=np.float64)
+            for j in range(min(len(组合), self.组合概念节点数)):
+                if abs(组合[j]) < 0.1:
+                    continue
+                for i in range(8):
+                    签名[i] += self.组合概念频点权重[j][i] * 组合[j]
+
         return np.tanh(签名)
 
     def 等待播完(self):
@@ -294,10 +388,13 @@ class 嘴:
 
     def 状态摘要(self):
         绑定概念数 = sum(1 for s in self.符号绑定强度 if s > 0.05)
+        组合绑定数 = sum(1 for s in self.组合符号绑定强度 if s > 0.05)
         return {
             "发声次数": self.发声次数,
             "符号绑定概念数": 绑定概念数,
             "符号绑定均值": round(sum(self.符号绑定强度) / max(1, self.概念节点数), 4),
+            "组合符号绑定数": 组合绑定数,
+            "组合符号绑定均值": round(sum(self.组合符号绑定强度) / max(1, self.组合概念节点数), 4),
             "离线": self.离线,
         }
 
@@ -379,5 +476,43 @@ if __name__ == "__main__":
 
     print("\n--- 测试4: 状态摘要 ---")
     print(f"  {嘴1.状态摘要()}")
+
+    print("\n--- 测试5: 组合概念声音签名（句子级符号绑定） ---")
+    嘴3 = 嘴(声脑节点数=24, 概念节点数=64, lr=0.02, 组合概念节点数=32)
+
+    # 组合概念A：组合概念3和11同时活跃
+    组合A = [0.0] * 32
+    组合A[3] = 0.25
+    组合A[11] = 0.22
+    # 组合概念B：组合概念19和28同时活跃
+    组合B = [0.0] * 32
+    组合B[19] = 0.24
+    组合B[28] = 0.21
+
+    签名组合A = 嘴3.声音签名(概念A, 组合激活=组合A)
+    签名组合B = 嘴3.声音签名(概念A, 组合激活=组合B)
+    签名基础 = 嘴3.声音签名(概念A)
+    diff_组合 = sum(abs(签名组合A[i] - 签名组合B[i]) for i in range(8))
+    diff_基础组合 = sum(abs(签名基础[i] - 签名组合A[i]) for i in range(8))
+    print(f"  组合A签名: {[round(float(v),3) for v in 签名组合A]}")
+    print(f"  组合B签名: {[round(float(v),3) for v in 签名组合B]}")
+    print(f"  基础签名(无组合): {[round(float(v),3) for v in 签名基础]}")
+    print(f"  组合A vs 组合B差异: {diff_组合:.4f}（不同组合→不同声音）")
+    print(f"  基础 vs 组合A差异: {diff_基础组合:.4f}（组合概念改变了声音）")
+
+    print("\n--- 测试6: 组合符号绑定学习 ---")
+    # 模拟反复发声-自听-学习循环（组合概念版）
+    for cycle in range(50):
+        自听 = list(签名组合A) + [rng.uniform(-0.1, 0.1) for _ in range(8 - len(签名组合A))]
+        自听 = [max(-1.0, min(1.0, v + rng.uniform(-0.05, 0.05))) for v in 自听]
+        嘴3.符号绑定学习(自听, 概念A, 组合激活=组合A)
+
+    签名组合A_after = 嘴3.声音签名(概念A, 组合激活=组合A)
+    diff_after = sum(abs(签名组合A[i] - 签名组合A_after[i]) for i in range(8))
+    print(f"  50次学习后组合A签名: {[round(float(v),3) for v in 签名组合A_after]}")
+    print(f"  学习前后差异: {diff_after:.4f}")
+    print(f"  组合符号绑定强度[3]: {嘴3.组合符号绑定强度[3]:.4f}")
+    print(f"  组合符号绑定强度[11]: {嘴3.组合符号绑定强度[11]:.4f}")
+    print(f"  状态: {嘴3.状态摘要()}")
 
     print("\n验证通过")
