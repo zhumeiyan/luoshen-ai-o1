@@ -159,6 +159,18 @@ class 概念层:
         self.concept_emotion_w = [[rng.uniform(-0.15, 0.15) for _ in range(3)]
                                   for _ in range(n_concepts)]
 
+        # ── 时间感知通路：昼夜节律作为精卫公式中的b ──
+        # concept_time_w: 时间信号 → 概念
+        # 视交叉上核(SCN)是哺乳动物的生物钟——昼夜节律调制认知
+        # 时间是最基本的环境差异——白天和夜晚是不同的环境
+        # 不同的环境→不同的概念特化→概念之间的真正个体差异
+        # 某些概念在白天更活跃（"光概念"），某些在夜晚更活跃（"暗概念"）
+        # 这种特化不是设定的，是通过赫布学习自然形成的
+        # 时间信号用正弦/余弦编码——保持连续性，午夜和23点不会突然跳跃
+        # 4维时间信号：sin(小时), cos(小时), sin(分钟), cos(分钟)
+        self.concept_time_w = [[rng.uniform(-0.1, 0.1) for _ in range(4)]
+                               for _ in range(n_concepts)]
+
         for i in range(n_concepts):
             self.concept_rw[i][i] = rng.uniform(0.05, 0.15)
 
@@ -237,7 +249,7 @@ class 概念层:
         self.otimes_cap = 100  # 保留最近100拍的Δ和Σ
 
     def 一拍(self, hidden_state, 听觉特征=None, 人类信号=None, 公开信号=None,
-             情感状态=None):
+             情感状态=None, 时间信号=None):
         """概念层一拍：基于精卫公式从隐藏状态涌现概念。
 
         精卫公式流程：
@@ -357,10 +369,21 @@ class 概念层:
                                  self.concept_emotion_w[i][2] * T)
                 emotion_input *= 0.4  # 缩放——情感是调制不是主导
 
+            # 时间感知输入（昼夜节律 → 概念）—— 环境差异塑造个体差异
+            # 精卫公式：a=概念激活, b=时间信号, Δ=b-a, ⊗=Δ×Σ
+            # 生物学：视交叉上核(SCN)调制认知——昼夜节律影响概念可及性
+            # 白天和夜晚是不同的环境→不同的概念特化→个体差异
+            # 某些概念在白天更活跃，某些在夜晚更活跃——不是设定的，是学出来的
+            time_input = 0.0
+            if 时间信号 is not None:
+                for j in range(4):
+                    time_input += self.concept_time_w[i][j] * 时间信号[j]
+                time_input *= 0.3  # 缩放——时间是环境调制不是主导
+
             # τ读⊗→浮出所见
             new_concept_h[i] = activation(
                 (a_input + otimes_input + recurrent + audio_input +
-                 human_input + public_input + emotion_input) * 0.9)
+                 human_input + public_input + emotion_input + time_input) * 0.9)
 
         # 稀疏化——只保留最强的k个激活
         sorted_idx = sorted(range(self.n_concepts),
@@ -595,6 +618,26 @@ class 概念层:
                     if not (math.isnan(dw_ew) or math.isinf(dw_ew)):
                         self.concept_emotion_w[i][j] = self.concept_emotion_w[i][j] * ew_decay + dw_ew
 
+        # ── 时间感知通路学习（时间信号非None时） ──
+        # 精卫公式应用于时间-认知域：
+        #   a_time = 概念激活（当前认知状态）
+        #   b_time = 时间信号对概念的调制
+        #   Δ_time = b_time - a_time（时间与认知的差异）
+        #   Σ_time = a_time + b_time（联合状态）
+        #   ⊗_time = Δ_time × Σ_time
+        # concept_time_w更新：赫布学习——概念激活与时间信号同时出现时连接增强
+        # 反复循环后，特定时间→特定概念可及性 → 昼夜节律概念分化自然涌现
+        # 白天某些概念更容易浮现，夜晚另一些更容易——环境差异塑造个体差异
+        if 时间信号 is not None:
+            tw_decay = 0.95
+            for i in range(self.n_concepts):
+                if self.concept_strength[i] < 0.05:
+                    continue
+                for j in range(4):
+                    dw_tw = self.lr * new_concept_h[i] * 时间信号[j]
+                    if not (math.isnan(dw_tw) or math.isinf(dw_tw)):
+                        self.concept_time_w[i][j] = self.concept_time_w[i][j] * tw_decay + dw_tw
+
         # ── 组合概念学习（精卫公式） ──
         # a = 基础概念激活（concept_h）
         # b = 组合概念对基础概念的预测（combo_pw × combo_h）
@@ -754,6 +797,7 @@ class 概念层:
             "有人类输入": 人类信号 is not None,
             "有公开输入": 公开信号 is not None,
             "有情感输入": 情感状态 is not None,
+            "有时间输入": 时间信号 is not None,
         }
 
     def 概念区分度(self):
