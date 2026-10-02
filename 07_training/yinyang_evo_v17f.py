@@ -1,0 +1,328 @@
+#!/usr/bin/env python3
+"""
+v17f — Second-order dynamics + phase memory
+突破方向：当前架构的hidden state只携带"位置"信息，没有"速度"和"相位"记忆。
+给hidden state加上动量项(momentum)，类似弹簧-质量-阻尼系统。
+
+核心改动：
+1. 每个hidden node现在有位置(h)和速度(v)两个状态
+2. 更新律改为二阶ODE: 
+   v_new = decay_v * v + (1-decay_v) * tanh(Wx + Wrv)
+   h_new = clip(h + dt * v_new)
+3. bias不再固定per-region，而是h的线性函数: bias = Wb @ h
+4. 更大的网络: MAX_NODES=25
+"""
+import random, math, hashlib, copy
+
+N_CHANNELS = 8; MAX_NODES = 25; N_REGIONS = 9
+
+class Pool:
+    def __init__(self, seed=42):
+        self.seed=seed; self.r=self._mk(seed); self._r()
+    def _mk(self,s):
+        rng=random.Random(s); return [{'id':i,'sigma':round(0.05+0.64*i/8,2),
+            'proprio':round(i/8,2),'freq':round(0.03+0.12*rng.random(),3),
+            'phase':round(rng.uniform(0,2*math.pi),3),
+            'type':['sin','logistic','lorenz','vdP','saw','rossler','henon','tent','cubic'][i],
+            '_s':0.3,'_t':0,'_p':0.0} for i in range(N_REGIONS)]
+    def _r(self):
+        for r in self.r: r['_s']=0.3; r['_t']=0; r['_p']=0.0
+    def reset(self): self._r()
+    def step(self):
+        for r in self.r: r['_t']+=1; r['_p']+=r['freq']
+    def sense(self,rid):
+        r=self.r[rid]; t=r['_t']; ph=r['_p']
+        nv=random.Random(hash((self.seed,rid,t))%(2**31)).gauss(0,1)
+        n=r['sigma']*nv; s=r['_s']; rt=r['type']
+        if rt=='sin': v=math.sin(ph+r['phase'])
+        elif rt=='logistic': v=4*s*(1-s) if 0<s<1 else 0.5
+        elif rt=='lorenz': v=0.5+0.3*math.tanh(s)
+        elif rt=='vdP': v=s-0.1*(s**3-s)
+        elif rt=='saw': v=(ph+r['phase'])%1.0
+        elif rt=='rossler': v=0.5*math.sin(0.7*ph+s)
+        elif rt=='henon': v=1-1.4*s**2+0.3*s
+        elif rt=='tent': v=2*s if s<0.5 else 2*(1-s)
+        else: v=s**3-s
+        s2=max(-2,min(2,v+n)); r['_s']=s2
+        return [s2, math.sin(s2*2.5) if abs(s2)<1.5 else 0, math.tanh(s2),
+                s2**2*(1 if s2>0 else -1), abs(s2), math.cos(s2*1.7),
+                (1 if s2>0 else -1)*math.sqrt(abs(s2)) if abs(s2)<2 else 0, r['proprio']]
+
+class WM2:
+    """Second-order world model with momentum and adaptive bias"""
+    def __init__(self,g):
+        self.g=g; n=g['n']
+        self.h=[0.0]*n       # position state
+        self.v=[0.0]*n       # velocity (momentum)
+        self.prev=[0.0]*N_CHANNELS
+    def ri(self,p):
+        i=round(p*8); return max(0,min(8,i))
+    def fwd(self,sens,update=True):
+        g=self.g; n=g['n']; p=sens[7]; ri=self.ri(p)
+        # velocity feature
+        vel=[sens[j]-self.prev[j] for j in range(N_CHANNELS)]
+        x=sens+vel  # 16-dim
+        nn=min(len(g['sw']),len(x))
+        ah=[0.0]*n
+        for i in range(n):
+            a=0.0
+            for j in range(nn): a+=g['sw'][j][i]*x[j]
+            for k in range(n): a+=g['rw'][i][k]*self.h[k]
+            ah[i]=a
+        if update:
+            dv=g['dv'][ri]  # velocity decay per region
+            for i in range(n):
+                self.v[i]=dv*self.v[i]+(1-dv)*math.tanh(ah[i])
+                self.h[i]=max(-2,min(2,self.h[i]+g['dt']*self.v[i]))
+        # prediction: base weight + adaptive bias from hidden state
+        pred=[0.0]*N_CHANNELS
+        for i in range(n):
+            for c in range(N_CHANNELS):
+                pred[c]+=self.h[i]*g['pw'][i][c]
+            # adaptive bias: Wb @ h (learned)
+            for c in range(N_CHANNELS):
+                pred[c]+=g['bw'][i][c]*self.h[i]
+        self.prev=sens[:]
+        return pred
+    def learn(self,pred,actual):
+        g=self.g; n=g['n']; lr=g['plr']
+        errs=[actual[j]-pred[j] for j in range(N_CHANNELS)]
+        mse=sum(e*e for e in errs)/N_CHANNELS
+        for i in range(n):
+            for c in range(N_CHANNELS):
+                g['pw'][i][c]+=lr*self.h[i]*errs[c]
+                g['pw'][i][c]=max(-3,min(3,g['pw'][i][c]))
+                g['bw'][i][c]+=lr*0.8*self.h[i]*errs[c]
+                g['bw'][i][c]=max(-3,min(3,g['bw'][i][c]))
+        return mse
+
+class IM:
+    def __init__(self):
+        self.ef=self.es=self.efs=0.3; self.bor=0.0; self.drive=0.0; self.rh=[]
+    def upd(self,mse,sigma,rid,cr):
+        self.ef=0.7*self.ef+0.3*mse; self.efs=0.3*self.efs+0.7*mse
+        self.es=0.99*self.es+0.01*mse
+        if self.efs<self.es*0.7: self.bor+=0.003; lrm=0.5
+        else: self.bor*=0.97; lrm=1.0
+        self.bor=max(0,min(1,self.bor))
+        rw=0.02 if sigma>0.5 and mse>0.01 else 0
+        rw-=0.01 if self.bor>0.05 else 0
+        self.drive=self.drive*0.99+rw; self.drive=max(-3,min(5,self.drive))
+        self.rh.append(rid); return lrm
+    def bias(self):
+        b={}
+        if self.bor>0.05: b[2]=0.4; b[1]=0.2
+        elif self.efs>self.ef*1.2: b[0]=0.2
+        return b
+
+class Org:
+    def __init__(self,gn=None):
+        self.g=gn or self.rg()
+        self.wm=WM2(self.g); self.im=IM()
+        self.alive=True; self.age=0
+        self.lid=hashlib.sha256(str(random.random()).encode()).hexdigest()[:8]
+        self._ib=1.0; self._r=None
+    def rg(self):
+        n=random.randint(8,MAX_NODES)
+        return {'n':n,
+            'sw':[[random.uniform(-0.25,0.25) for _ in range(n)] for _ in range(N_CHANNELS*2)],
+            'pw':[[random.uniform(-0.25,0.25) for _ in range(N_CHANNELS)] for _ in range(n)],
+            'bw':[[random.uniform(-0.05,0.05) for _ in range(N_CHANNELS)] for _ in range(n)],
+            'rw':[[random.uniform(-0.08,0.08) for _ in range(n)] for _ in range(n)],
+            'plr':random.uniform(0.03,0.12),
+            'dt':random.uniform(0.05,0.3),
+            'dv':[random.uniform(0.3,0.9) for _ in range(N_REGIONS)]}
+
+def gdist(a,b):
+    n=min(a['n'],b['n']); d=abs(a['n']-b['n'])*0.3
+    for j in range(len(a['sw'])):
+        aj=a['sw'][j]; bj=b['sw'][j] if j<len(b['sw']) else []
+        for i in range(min(n,len(aj),len(bj))): d+=abs(aj[i]-bj[i])
+    for i in range(min(n,len(a['pw']),len(b['pw']))):
+        for c in range(N_CHANNELS): d+=abs(a['pw'][i][c]-b['pw'][i][c])
+    for i in range(min(n,len(a['bw']),len(b['bw']))):
+        for c in range(N_CHANNELS): d+=abs(a['bw'][i][c]-b['bw'][i][c])*0.5
+    nb=min(len(a['dv']),len(b['dv']))
+    for k in range(nb): d+=abs(a['dv'][k]-b['dv'][k])*0.3
+    NORM=N_CHANNELS*n*2+N_CHANNELS*n+N_CHANNELS*n//2+nb*0.3
+    return d/max(1,NORM)
+
+def xover(a,b):
+    cn=random.choice([a['n'],b['n']])
+    ch={'n':cn,
+        'sw':[[0.0]*cn for _ in range(N_CHANNELS*2)],
+        'pw':[[0.0]*N_CHANNELS for _ in range(cn)],
+        'bw':[[0.0]*N_CHANNELS for _ in range(cn)],
+        'rw':[[0.0]*cn for _ in range(cn)],
+        'plr':a['plr'],
+        'dt':a['dt'],
+        'dv':[0.0]*N_REGIONS}
+    for j in range(N_CHANNELS*2):
+        for i in range(cn):
+            src=a if random.random()<0.5 else b; si=min(i,src['n']-1)
+            if j<len(src['sw']) and si<len(src['sw'][j]): ch['sw'][j][i]=src['sw'][j][si]
+    for i in range(cn):
+        src=a if random.random()<0.5 else b; si=min(i,src['n']-1)
+        if si<len(src['pw']):
+            for c in range(N_CHANNELS): ch['pw'][i][c]=src['pw'][si][c]
+    for i in range(cn):
+        src=a if random.random()<0.5 else b; si=min(i,src['n']-1)
+        if si<len(src['bw']):
+            for c in range(N_CHANNELS): ch['bw'][i][c]=src['bw'][si][c]
+    for i in range(cn):
+        src=a if random.random()<0.5 else b; si=min(i,src['n']-1)
+        if si<len(src['rw']):
+            for k in range(cn):
+                sk=min(k,src['n']-1)
+                if sk<len(src['rw'][si]): ch['rw'][i][k]=src['rw'][si][sk]
+    # module swap for dv and dt
+    ip=a if random.random()<0.5 else b
+    ch['dv']=ip['dv'][:]
+    if random.random()<0.5: ch['dt']=b['dt']; ch['plr']=b['plr']
+    return ch
+
+def comp_pair(sv,sf):
+    i1=random.choices(range(len(sv)),weights=sf,k=1)[0]; p1=sv[i1]
+    ds=[]
+    for j,p2 in enumerate(sv):
+        if j==i1: ds.append(0)
+        else: ds.append(gdist(p1.g,p2.g))
+    i2=max(range(len(sv)),key=lambda j:ds[j]*sf[j])
+    return sv[i1],sv[i2]
+
+def mut(g,rate=0.05):
+    n=g['n']
+    for j in range(len(g['sw'])):
+        for i in range(len(g['sw'][j])):
+            if random.random()<rate: g['sw'][j][i]+=random.gauss(0,0.07); g['sw'][j][i]=max(-3,min(3,g['sw'][j][i]))
+    for i in range(len(g['pw'])):
+        for c in range(N_CHANNELS):
+            if random.random()<rate: g['pw'][i][c]+=random.gauss(0,0.07); g['pw'][i][c]=max(-3,min(3,g['pw'][i][c]))
+    for i in range(len(g['bw'])):
+        for c in range(N_CHANNELS):
+            if random.random()<rate: g['bw'][i][c]+=random.gauss(0,0.04); g['bw'][i][c]=max(-2,min(2,g['bw'][i][c]))
+    for i in range(len(g['rw'])):
+        for k in range(len(g['rw'][i])):
+            if random.random()<rate: g['rw'][i][k]+=random.gauss(0,0.03); g['rw'][i][k]=max(-1.5,min(1.5,g['rw'][i][k]))
+    if random.random()<0.3: g['plr']=max(0.02,min(0.15,g['plr']+random.gauss(0,0.02)))
+    if random.random()<0.2: g['dt']=max(0.01,min(0.5,g['dt']+random.gauss(0,0.05)))
+    for i in range(len(g['dv'])):
+        if random.random()<rate*0.3: g['dv'][i]=max(0.1,min(0.99,g['dv'][i]+random.gauss(0,0.04)))
+    return g
+
+class Engine:
+    def __init__(self,n_org=20,n_gen=500,seed=17):
+        self.n=n_org; self.ng=n_gen; self.pk=Pool(seed=seed)
+        self.ppl=[Org() for _ in range(n_org)]
+    def fit(self,org,ticks=350):
+        self.pk.reset(); org.wm.h=[0.0]*org.g['n']; org.wm.v=[0.0]*org.g['n']
+        org.wm.prev=[0.0]*N_CHANNELS
+        org.im=IM(); tm=0.0; ti=0; rc={}
+        for t in range(ticks):
+            # current region based on t (sweep through all) or random
+            cr=(t*7)%9  # systematic coverage
+            s=self.pk.sense(cr); p=org.wm.fwd(s)
+            mse=sum((s[j]-p[j])**2 for j in range(N_CHANNELS))/N_CHANNELS
+            org.im.upd(mse,self.pk.r[cr]['sigma'],cr,cr); org.wm.learn(p,s)
+            tm+=mse; rc[cr]=rc.get(cr,0)+1; self.pk.step()
+            org.age+=1
+            if 0.001<mse<0.5: ti+=1
+        return {'f':1/(1+tm/ticks),'m':tm/ticks,'info':ti,'div':len([c for c in rc.values() if c>0])}
+    def detect_wa(self,sp):
+        bh=sp[len(sp)//2:]
+        if len(bh)<3: return []
+        at=[]
+        for p in sp:
+            if p[0].im.rh:
+                f=[0]*N_REGIONS
+                for r in p[0].im.rh: f[r]+=1
+                t=sum(f)
+                if t>0: f=[x/t for x in f]
+                at.append(f)
+        if not at: return []
+        pa=[0]*N_REGIONS
+        for t in at:
+            for i in range(N_REGIONS): pa[i]+=t[i]
+        pa=[x/len(at) for x in pa]
+        wc=[]
+        for p in bh:
+            if not p[0].im.rh: continue
+            f=[0]*N_REGIONS
+            for r in p[0].im.rh: f[r]+=1
+            t=sum(f)
+            if t>0: f=[x/t for x in f]
+            d=sum((f[i]-pa[i])**2 for i in range(N_REGIONS))**0.5
+            dv=p[0].g['dv']
+            dss=(sum((x-sum(dv)/len(dv))**2 for x in dv)/len(dv))**0.5
+            wc.append((p[0],d+dss*0.1))
+        wc.sort(key=lambda x:x[1],reverse=True)
+        return [w[0] for w in wc[:max(2,len(bh)//3)]]
+    def evolve(self):
+        for gen in range(self.ng):
+            res=[]
+            for org in self.ppl:
+                r=self.fit(org); org._r=r; res.append(r)
+            sp=sorted(zip(self.ppl,res),key=lambda x:x[1]['f'],reverse=True)
+            af=sum(r['f'] for r in res)/len(res); am=sum(r['m'] for r in res)/len(res)
+            bf=sp[0][1]['f']; bm=sp[0][1]['m']
+            ab=sum(o.im.bor for o in self.ppl)/len(self.ppl)
+            div=sum(r['div'] for r in res)/len(res)
+            wa=self.detect_wa(sp)
+            if gen%10==0 or gen==self.ng-1:
+                print(f"Gen {gen:4d} fit={bf:.4f}/{af:.4f} mse={bm:.4f}/{am:.4f} bor={ab:.4f} div={div:.1f} WA={len(wa)}")
+            if gen==self.ng-1: break
+            elites=[p[0].g for p in sp[:2]]
+            sn=max(10,self.n//2)
+            surv=[p[0] for p in sp[:sn]]; sf=[p[1]['f'] for p in sp[:sn]]
+            fs=[f-min(sf)+0.01 for f in sf]; tot=sum(fs); sf=[f/tot for f in fs]
+            n_eh=max(1,int(self.n*0.4)); n_wh=max(1,int(self.n*0.25))
+            n_rd=max(1,int(self.n*0.15)); n_mt=self.n-2-n_eh-n_wh-n_rd
+            np2=[]
+            for eg in elites:
+                o=Org(gn=copy.deepcopy(eg)); o._ib=1.0; np2.append(o)
+            ehc=whc=rdc=mtc=0; att=0
+            while len(np2)<self.n and att<self.n*50:
+                att+=1
+                if not surv or sum(sf)<=0: np2.append(Org()); continue
+                if ehc<n_eh:
+                    t=max(4,len(surv)//3)
+                    p1,p2=comp_pair(surv[:t],sf[:t])
+                    cg=xover(p1.g,p2.g); mut(cg,0.05)
+                    o=Org(gn=cg); o._ib=1.0; ehc+=1; np2.append(o)
+                elif whc<n_wh and wa:
+                    wa_o=random.choice(wa)
+                    el=random.choices(surv[:5],weights=sf[:5],k=1)[0]
+                    cg=xover(wa_o.g,el.g); mut(cg,0.08)
+                    o=Org(gn=cg); o._ib=1.0; whc+=1; np2.append(o)
+                elif n_rd>0 and rdc<n_rd: np2.append(Org()); rdc+=1
+                elif mtc<n_mt:
+                    p=random.choices(surv,weights=sf,k=1)[0]; cg=mut(copy.deepcopy(p.g),0.05)
+                    o=Org(gn=cg); o._ib=1.0; mtc+=1; np2.append(o)
+            self.ppl=np2
+        for org in self.ppl:
+            r=self.fit(org,400); org._r=r
+        return self.ppl
+
+if __name__=='__main__':
+    print("yinyang_evo_v17f — Second-order WM with momentum")
+    eng=Engine(n_org=20,n_gen=500,seed=17)
+    pop=eng.evolve()
+    best=max(pop,key=lambda o:o._r['f'])
+    print(f"\n=== FINAL ===")
+    print(f"Best fit: {best._r['f']:.4f}")
+    print(f"Best mse: {best._r['m']:.4f}")
+    print(f"Nodes: {best.g['n']}")
+    print(f"LR: {best.g['plr']:.4f} dt: {best.g['dt']:.4f}")
+    print(f"DV: {[f'{x:.3f}' for x in best.g['dv']]}")
+    print("\nRegional Precision:")
+    for rid in range(N_REGIONS):
+        pk=Pool(seed=42); pk.reset(); best.wm.h=[0.0]*best.g['n']; best.wm.v=[0.0]*best.g['n']
+        best.wm.prev=[0.0]*N_CHANNELS
+        for _ in range(50): pk.sense(rid); pk.step()
+        ms=[]
+        for _ in range(30):
+            s=pk.sense(rid); p=best.wm.fwd(s,update=False)
+            mse=sum((s[j]-p[j])**2 for j in range(N_CHANNELS))/N_CHANNELS
+            ms.append(mse); pk.step()
+        am=sum(ms)/len(ms)
+        print(f"  R{rid} σ={pk.r[rid]['sigma']:.2f}: {am:.4f} |{'#'*max(1,int(am*6))}")

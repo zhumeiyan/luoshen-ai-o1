@@ -326,22 +326,23 @@ class 情感记忆:
         """躯体标记假说：情感 = 身体状态的整体映射。
 
         达马西奥：情感不是抽象维度，是身体状态的映射。
-        身体激活模式 + 大脑预测误差 → 情感状态。
+        身体激活模式 + 大脑预测误差 + 概念层活动 → 情感状态。
 
         返回的E/T/N只是为了兼容home.py的接口，
-        但它们直接从身体/大脑状态读出，不是公式。
+        但它们直接从身体/大脑/概念状态读出，不是公式。
         """
-        # E: 身体舒适度——身体激活离稳态越近越正
         body_mean = sum(身体激活) / max(1, len(身体激活))
         E = max(-1.0, min(1.0, -abs(body_mean) * 3.0))
 
-        # T: 大脑预测信心——surprise越低越开放
         surprise = 大脑状态.get("surprise", 0.0)
-        T = max(-1.0, min(1.0, 0.5 - surprise * 2.0))
+        概念surprise = 大脑状态.get("概念surprise", 0.0)
+        T = max(-1.0, min(1.0, 0.5 - (surprise + 概念surprise * 0.5) * 2.0))
 
-        # N: 激活强度——身体和大脑越活跃越高
         body_max = max(abs(v) for v in 身体激活) if 身体激活 else 0.0
-        N = max(0.0, min(1.0, surprise * 0.6 + min(1.0, body_max * 2.0) * 0.4))
+        概念活跃 = 大脑状态.get("概念活跃", 0)
+        N = max(0.0, min(1.0, surprise * 0.4
+                         + min(1.0, body_max * 2.0) * 0.3
+                         + min(1.0, 概念活跃 * 0.05) * 0.3))
 
         return {"E": round(E, 3), "T": round(T, 3), "N": round(N, 3)}
 
