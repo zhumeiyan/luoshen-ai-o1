@@ -93,12 +93,13 @@ class 概念层:
 
     def __init__(self, n_hidden=11, n_concepts=64, lr=0.02,
                  sparse_ratio=0.1, decay=0.8, seed=42, n_audio=8,
-                 n_combo=32, n_wm_slots=4):
+                 n_combo=32, n_wm_slots=4, n_hip=32):
         self.n_hidden = n_hidden
         self.n_concepts = n_concepts
         self.n_audio = n_audio
         self.n_combo = n_combo
         self.n_wm_slots = n_wm_slots
+        self.n_hip = n_hip
         self.lr = lr
         self.sparse_k = max(1, int(n_concepts * sparse_ratio))
         self.decay = decay
@@ -183,6 +184,16 @@ class 概念层:
         self.concept_wm_w = [[rng.uniform(-0.1, 0.1) for _ in range(n_wm_slots)]
                              for _ in range(n_concepts)]
 
+        # ── 海马体回忆通路：CA3模式完成 → 概念层 ──
+        # concept_hip_w: 海马体CA3输出 → 概念
+        # 海马体→新皮层投射——回忆时海马体重新激活皮层表征
+        # CA3的模式完成：从部分线索恢复完整记忆 → 重新激活相关概念组合
+        # 这是"想起"的神经基础——过去的经验让某些概念更容易浮现
+        # 精卫公式：a=概念层当前激活, b=海马体回忆信号, Δ=b-a, ⊗=Δ×Σ
+        # n_hip维CA3输出 × n_concepts个概念——每个概念对每个CA3模式有不同的响应
+        self.concept_hip_w = [[rng.uniform(-0.1, 0.1) for _ in range(n_hip)]
+                              for _ in range(n_concepts)]
+
         for i in range(n_concepts):
             self.concept_rw[i][i] = rng.uniform(0.05, 0.15)
 
@@ -261,7 +272,7 @@ class 概念层:
         self.otimes_cap = 100  # 保留最近100拍的Δ和Σ
 
     def 一拍(self, hidden_state, 听觉特征=None, 人类信号=None, 公开信号=None,
-             情感状态=None, 时间信号=None, 工作记忆信号=None):
+             情感状态=None, 时间信号=None, 工作记忆信号=None, 海马体信号=None):
         """概念层一拍：基于精卫公式从隐藏状态涌现概念。
 
         精卫公式流程：
@@ -402,11 +413,22 @@ class 概念层:
                     wm_input += self.concept_wm_w[i][j] * 工作记忆信号[j]
                 wm_input *= 0.35  # 缩放——工作记忆是调制不是主导
 
+            # 海马体回忆输入（CA3模式完成 → 概念层）—— "想起"
+            # 精卫公式：a=概念层当前激活, b=海马体回忆信号, Δ=b-a, ⊗=Δ×Σ
+            # 生物学：海马体→新皮层投射——回忆时重新激活皮层表征
+            # CA3模式完成：从部分线索恢复完整记忆 → 相关概念更容易浮现
+            # 这是"经验影响感知"的基础——过去的经验让某些概念更容易浮现
+            hip_input = 0.0
+            if 海马体信号 is not None:
+                for j in range(self.n_hip):
+                    hip_input += self.concept_hip_w[i][j] * 海马体信号[j]
+                hip_input *= 0.3  # 缩放——回忆是调制不是主导
+
             # τ读⊗→浮出所见
             new_concept_h[i] = activation(
                 (a_input + otimes_input + recurrent + audio_input +
                  human_input + public_input + emotion_input + time_input +
-                 wm_input) * 0.9)
+                 wm_input + hip_input) * 0.9)
 
         # 稀疏化——只保留最强的k个激活
         sorted_idx = sorted(range(self.n_concepts),
@@ -681,6 +703,26 @@ class 概念层:
                     if not (math.isnan(dw_wm) or math.isinf(dw_wm)):
                         self.concept_wm_w[i][j] = self.concept_wm_w[i][j] * wm_decay + dw_wm
 
+        # ── 海马体回忆通路学习（海马体信号非None时） ──
+        # 精卫公式应用于回忆-认知域：
+        #   a_hip = 概念激活（当前认知状态）
+        #   b_hip = 海马体回忆信号对概念的调制
+        #   Δ_hip = b_hip - a_hip（回忆与当前的差异）
+        #   Σ_hip = a_hip + b_hip（联合状态）
+        #   ⊗_hip = Δ_hip × Σ_hip
+        # concept_hip_w更新：赫布学习——概念激活与海马体回忆信号同时出现时连接增强
+        # 反复循环后，特定回忆→特定概念可及性 → "想起"自然涌现
+        # 过去的经验让某些概念更容易浮现——经验影响感知
+        if 海马体信号 is not None:
+            hip_decay = 0.95
+            for i in range(self.n_concepts):
+                if self.concept_strength[i] < 0.05:
+                    continue
+                for j in range(self.n_hip):
+                    dw_hip = self.lr * new_concept_h[i] * 海马体信号[j]
+                    if not (math.isnan(dw_hip) or math.isinf(dw_hip)):
+                        self.concept_hip_w[i][j] = self.concept_hip_w[i][j] * hip_decay + dw_hip
+
         # ── 组合概念学习（精卫公式） ──
         # a = 基础概念激活（concept_h）
         # b = 组合概念对基础概念的预测（combo_pw × combo_h）
@@ -842,6 +884,7 @@ class 概念层:
             "有情感输入": 情感状态 is not None,
             "有时间输入": 时间信号 is not None,
             "有工作记忆输入": 工作记忆信号 is not None,
+            "有海马体输入": 海马体信号 is not None,
         }
 
     def 概念区分度(self):
@@ -902,6 +945,7 @@ class 概念层:
             "组合均值": round(sum(self.combo_h) / max(1, self.n_combo), 4),
             "组合最大": round(max((abs(v) for v in self.combo_h), default=0), 4),
             "WM权重均值": round(sum(sum(row) for row in self.concept_wm_w) / max(1, self.n_concepts * self.n_wm_slots), 4),
+            "海马体权重均值": round(sum(sum(row) for row in self.concept_hip_w) / max(1, self.n_concepts * self.n_hip), 4),
             "拍": self.拍,
         }
 

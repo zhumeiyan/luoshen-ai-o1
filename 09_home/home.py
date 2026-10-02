@@ -164,7 +164,7 @@ class 洛神之家:
         # 概念不是人为设定的，是通过赫布学习自然涌现的
         # 组合涌现：基础概念组合→组合概念（单词→句子）
         self.概念 = 概念层(n_hidden=self.大脑.g['n'], n_concepts=64, lr=0.02,
-                          n_combo=32, n_wm_slots=4)
+                          n_combo=32, n_wm_slots=4, n_hip=32)
 
         # 工作记忆：前额叶PFC——维持和操作信息（思考的基础）
         self.工作记忆 = 工作记忆(n_hidden=self.大脑.g['n'], n_slots=4, lr=0.03)
@@ -388,13 +388,18 @@ class 洛神之家:
         # 精卫公式：a=概念层自发激活, b=工作记忆维持的概念, Δ=b-a, ⊗=Δ×Σ
         # 生物学：前额叶→后部皮层反馈投射——维持的表征bias概念激活 = "思考"
         工作记忆信号 = wm结果["strength"] if wm结果.get("总强度", 0) > 0.05 else None
+        # 海马体回忆信号：CA3模式完成输出——过去的经验影响概念涌现
+        # 精卫公式：a=概念层当前激活, b=海马体回忆信号, Δ=b-a, ⊗=Δ×Σ
+        # 生物学：海马体→新皮层投射——回忆时重新激活皮层表征 = "想起"
+        海马体信号 = hip结果.get("ca3") if hip结果.get("ca3活跃", 0) > 0 else None
         概念结果 = self.概念.一拍(self.大脑.wm.h,
                                 听觉特征=self.上拍自听特征,
                                 人类信号=概念人类信号 if any(v != 0 for v in 概念人类信号) else None,
                                 公开信号=公开向量,
                                 情感状态=self.上拍情感,
                                 时间信号=时间向量,
-                                工作记忆信号=工作记忆信号)
+                                工作记忆信号=工作记忆信号,
+                                海马体信号=海马体信号)
         概念激活 = 概念结果["concept_h"]
         概念mse = 概念结果["mse"]
         概念surprise = 概念结果["surprise"]
@@ -524,6 +529,7 @@ class 洛神之家:
                 "情感调制": 概念结果.get("有情感输入", False),
                 "时间调制": 概念结果.get("有时间输入", False),
                 "工作记忆调制": 概念结果.get("有工作记忆输入", False),
+                "海马体调制": 概念结果.get("有海马体输入", False),
             },
             "工作记忆": {
                 "活跃slot": wm结果["活跃slot数"],
@@ -635,6 +641,7 @@ class 洛神之家:
                     "concept_emotion_w": self.概念.concept_emotion_w,
                     "concept_time_w": self.概念.concept_time_w,
                     "concept_wm_w": self.概念.concept_wm_w,
+                    "concept_hip_w": self.概念.concept_hip_w,
                     "combo_h": self.概念.combo_h,
                     "combo_strength": self.概念.combo_strength,
                     "combo_w": self.概念.combo_w,
