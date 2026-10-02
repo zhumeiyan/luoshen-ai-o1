@@ -381,7 +381,11 @@ class 人类通道:
             if len(活跃概念) > 0:
                 概念均值 = sum(活跃概念) / len(活跃概念)
                 概念最大 = max(活跃概念, key=abs)
-                概念方差 = sum((v - 概念均值) ** 2 for v in 活跃概念) / len(活跃概念)
+                try:
+                    概念方差 = sum((min(abs(v - 概念均值), 1e6)) ** 2
+                                  for v in 活跃概念) / len(活跃概念)
+                except (OverflowError, ValueError):
+                    概念方差 = 0.0
                 if math.isnan(概念方差) or math.isinf(概念方差) or 概念方差 > 1e10:
                     概念方差 = 0.0
 

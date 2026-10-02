@@ -223,7 +223,81 @@ class 公开感官:
 
         # 转译信号
         self.当前信号 = self.转译信号(self.天气数据, self.地震数据)
+        # 转译成概念层可用的n_hidden维向量
+        self.当前向量 = self.转译向量(self.当前信号)
         return self.当前信号
+
+    def 转译向量(self, 信号):
+        """把物理量信号转译成n_hidden维向量——供概念层作为b信号使用。
+
+        精卫公式：
+          a = 洛神内部状态（概念激活/隐藏状态）
+          b = 公开物理数据转译的向量
+          Δ = b - a → 洛神与真实世界的差异
+          ⊗ = Δ × Σ → 学习信号
+
+        转译规则：
+          每个物理量归一化到[-1,1]范围，然后映射到n_hidden维向量的不同维度。
+          温度→前2维，光照→中间2维，风速→2维，云量→2维，
+          湿度/气压/降水/地震力→剩余维度。
+          不同物理量占据不同维度——概念层通过赫布学习自然区分。
+        """
+        if 信号 is None:
+            return [0.0] * self.n_hidden
+
+        vec = [0.0] * self.n_hidden
+        n = self.n_hidden
+
+        # 温度 → 归一化到[-1,1]：250K-310K映射到[-1,1]
+        if 信号.get("温值") is not None:
+            temp_norm = max(-1.0, min(1.0, (信号["温值"] - 280.0) / 30.0))
+            vec[0] = temp_norm
+            if n > 1:
+                vec[1] = temp_norm * 0.5  # 温度的二阶效应
+
+        # 光照 → 归一化到[-1,1]：0-1000 W/m²映射到[0,1]
+        if 信号.get("光值") is not None:
+            light_norm = max(-1.0, min(1.0, 信号["光值"] / 50000.0 * 2.0 - 1.0))
+            idx = min(2, n - 1)
+            vec[idx] = light_norm
+            if n > 3:
+                vec[min(3, n - 1)] = light_norm * 0.5
+
+        # 风速 → 归一化到[-1,1]：0-50 km/h映射到[0,1]
+        if 信号.get("力值") is not None:
+            wind_norm = max(-1.0, min(1.0, 信号["力值"] / 25.0 - 1.0))
+            idx = min(4, n - 1)
+            vec[idx] = wind_norm
+            if n > 5:
+                vec[min(5, n - 1)] = wind_norm * 0.5
+
+        # 云量 → 归一化到[-1,1]：0-100%映射到[-1,1]
+        if 信号.get("云量") is not None:
+            cloud_norm = max(-1.0, min(1.0, 信号["云量"] / 50.0 - 1.0))
+            idx = min(6, n - 1)
+            vec[idx] = cloud_norm
+
+        # 湿度 → 归一化
+        if 信号.get("湿度") is not None and n > 7:
+            humid_norm = max(-1.0, min(1.0, 信号["湿度"] / 50.0 - 1.0))
+            vec[min(7, n - 1)] = humid_norm
+
+        # 气压 → 归一化
+        if 信号.get("气压") is not None and n > 8:
+            press_norm = max(-1.0, min(1.0, (信号["气压"] - 1000.0) / 30.0))
+            vec[min(8, n - 1)] = press_norm
+
+        # 降水 → 归一化
+        if 信号.get("降水") is not None and n > 9:
+            precip_norm = max(-1.0, min(1.0, 信号["降水"] / 5.0))
+            vec[min(9, n - 1)] = precip_norm
+
+        # 地震力 → 归一化
+        if 信号.get("地震力") is not None and n > 10:
+            quake_norm = max(-1.0, min(1.0, 信号["地震力"] / 50.0))
+            vec[min(10, n - 1)] = quake_norm
+
+        return vec
 
     def 状态摘要(self):
         return {

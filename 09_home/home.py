@@ -135,7 +135,8 @@ class 洛神之家:
         self.身体 = 身体()
         self.视网膜 = 视网膜(设备号=摄像头号)
         self.耳蜗 = 耳蜗(设备号=麦克风号)
-        self.嘴 = 嘴(声脑节点数=self.身体.脑大小, 概念节点数=64)
+        self.嘴 = 嘴(声脑节点数=self.身体.脑大小, 概念节点数=64,
+                   组合概念节点数=32)
         self.链 = 哈希链(os.path.join(状态目录, "chain.jsonl"))
         self.拍 = 0
 
@@ -354,9 +355,11 @@ class 洛神之家:
         # 人类信号传入概念层——人类作为精卫公式中的b，通过赫布学习自然形成人类概念
         # 数字信号传入概念层——没人在时数字信号作为补充输入
         概念人类信号 = 人类信号 if 有人在 else 数字信号
+        公开向量 = self.公开感官.当前向量 if 公开信号 is not None else None
         概念结果 = self.概念.一拍(self.大脑.wm.h,
                                 听觉特征=self.上拍自听特征,
-                                人类信号=概念人类信号 if any(v != 0 for v in 概念人类信号) else None)
+                                人类信号=概念人类信号 if any(v != 0 for v in 概念人类信号) else None,
+                                公开信号=公开向量)
         概念激活 = 概念结果["concept_h"]
         概念mse = 概念结果["mse"]
         概念surprise = 概念结果["surprise"]
@@ -393,15 +396,18 @@ class 洛神之家:
         发了声 = False
         if not self.无声:
             发了声 = self.嘴.发声(概念激活=概念激活, 声脑激活=声脑激活,
-                                当前拍=self.拍)
+                                当前拍=self.拍,
+                                组合激活=概念结果.get("combo_h"))
         if 发了声:
             self.嘴.等待播完()
             # 说听闭环：提取自听特征，下一拍反馈给概念层
             self.上拍自听特征 = self.嘴.自听特征()
-            # 符号绑定学习：发声后自听特征和概念激活同时出现 → 赫布学习
-            # 反复循环后，特定概念→特定声音模式 → 符号绑定
+            # 符号绑定学习：发声后自听特征和概念/组合概念激活同时出现 → 赫布学习
+            # 基础概念符号绑定：单词级——特定概念→特定声音模式
+            # 组合概念符号绑定：句子级——特定组合概念→特定复杂声音模式
             if self.上拍自听特征 is not None:
-                self.嘴.符号绑定学习(self.上拍自听特征, 概念激活)
+                self.嘴.符号绑定学习(self.上拍自听特征, 概念激活,
+                                   组合激活=概念结果.get("combo_h"))
         else:
             self.上拍自听特征 = None
 
@@ -516,6 +522,8 @@ class 洛神之家:
                 "发声次数": self.嘴.发声次数,
                 "符号绑定概念数": sum(1 for s in self.嘴.符号绑定强度 if s > 0.05),
                 "符号绑定均值": round(sum(self.嘴.符号绑定强度) / max(1, self.嘴.概念节点数), 4),
+                "组合符号绑定数": sum(1 for s in self.嘴.组合符号绑定强度 if s > 0.05),
+                "组合符号绑定均值": round(sum(self.嘴.组合符号绑定强度) / max(1, self.嘴.组合概念节点数), 4),
             },
             "欲望": 欲望结果,
             "情感": 情感,
@@ -566,6 +574,7 @@ class 洛神之家:
                     "concept_aw": self.概念.concept_aw,
                     "concept_sw": self.概念.concept_sw,
                     "concept_human_w": self.概念.concept_human_w,
+                    "concept_public_w": self.概念.concept_public_w,
                     "combo_h": self.概念.combo_h,
                     "combo_strength": self.概念.combo_strength,
                     "combo_w": self.概念.combo_w,
@@ -601,6 +610,9 @@ class 洛神之家:
                     "符号绑定强度": self.嘴.符号绑定强度,
                     "概念频点权重": self.嘴.概念频点权重,
                     "概念基频权重": self.嘴.概念基频权重,
+                    "组合符号绑定强度": self.嘴.组合符号绑定强度,
+                    "组合概念频点权重": self.嘴.组合概念频点权重,
+                    "组合概念基频权重": self.嘴.组合概念基频权重,
                 },
             }, 文件)
         return 路径

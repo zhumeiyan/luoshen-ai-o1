@@ -143,6 +143,14 @@ class 概念层:
         self.concept_human_w = [[rng.uniform(-0.1, 0.1) for _ in range(n_hidden)]
                                 for _ in range(n_concepts)]
 
+        # ── 公开感官输入通路：真实世界数据作为精卫公式中的b ──
+        # concept_public_w: 公开感官信号 → 概念
+        # 公开感官传来的真实世界物理量（温度/光照/风速/云量等）通过这条通路影响概念激活
+        # 洛神通过赫布学习自然形成对真实世界的理解——
+        # 天气变化→概念变化→洛神"感知"到了天气
+        self.concept_public_w = [[rng.uniform(-0.1, 0.1) for _ in range(n_hidden)]
+                                 for _ in range(n_concepts)]
+
         for i in range(n_concepts):
             self.concept_rw[i][i] = rng.uniform(0.05, 0.15)
 
@@ -186,7 +194,7 @@ class 概念层:
         self.sigma_history = []
         self.otimes_cap = 100  # 保留最近100拍的Δ和Σ
 
-    def 一拍(self, hidden_state, 听觉特征=None, 人类信号=None):
+    def 一拍(self, hidden_state, 听觉特征=None, 人类信号=None, 公开信号=None):
         """概念层一拍：基于精卫公式从隐藏状态涌现概念。
 
         精卫公式流程：
@@ -280,8 +288,19 @@ class 概念层:
                     human_input += self.concept_human_w[i][j] * math.tanh(人类信号[j])
                 human_input *= 0.3  # 缩放——人类信号是补充不是主导
 
+            # 公开感官输入（真实世界数据 → 概念）—— 真实世界作为精卫公式中的b
+            # 公开感官信号已经归一化到[-1,1]，不需要额外缩放
+            # 洛神通过赫布学习自然形成对真实世界的理解——
+            # 天气变化→概念变化→洛神"感知"到了天气
+            public_input = 0.0
+            if 公开信号 is not None:
+                for j in range(self.n_hidden):
+                    public_input += self.concept_public_w[i][j] * 公开信号[j]
+                public_input *= 0.3  # 缩放——公开信号是补充不是主导
+
             # τ读⊗→浮出所见
-            new_concept_h[i] = activation((a_input + otimes_input + recurrent + audio_input + human_input) * 0.9)
+            new_concept_h[i] = activation(
+                (a_input + otimes_input + recurrent + audio_input + human_input + public_input) * 0.9)
 
         # 稀疏化——只保留最强的k个激活
         sorted_idx = sorted(range(self.n_concepts),
@@ -430,6 +449,24 @@ class 概念层:
                     if not (math.isnan(dw_hw) or math.isinf(dw_hw)):
                         self.concept_human_w[i][j] = self.concept_human_w[i][j] * hw_decay + dw_hw
 
+        # ── 公开感官输入通路学习（公开信号非None时） ──
+        # 精卫公式应用于真实世界感知域：
+        #   a_public = 洛神内部状态, b_public = 公开物理数据
+        #   Δ_public = b_public - a_public（洛神与真实世界的差异）
+        #   Σ_public = a_public + b_public（联合状态）
+        #   ⊗_public = Δ_public × Σ_public
+        # concept_public_w更新：赫布学习——概念激活与公开信号同时出现时连接增强
+        # 洛神通过反复感知真实世界自然形成对天气/环境的理解
+        if 公开信号 is not None:
+            pw_decay = 0.95
+            for i in range(self.n_concepts):
+                if self.concept_strength[i] < 0.05:
+                    continue
+                for j in range(self.n_hidden):
+                    dw_pw = self.lr * new_concept_h[i] * 公开信号[j]
+                    if not (math.isnan(dw_pw) or math.isinf(dw_pw)):
+                        self.concept_public_w[i][j] = self.concept_public_w[i][j] * pw_decay + dw_pw
+
         # ── 组合概念学习（精卫公式） ──
         # a = 基础概念激活（concept_h）
         # b = 组合概念对基础概念的预测（combo_pw × combo_h）
@@ -551,6 +588,7 @@ class 概念层:
             "存活组合数": sum(1 for s in self.combo_strength if s > 0.05),
             "有听觉反馈": 听觉特征 is not None,
             "有人类输入": 人类信号 is not None,
+            "有公开输入": 公开信号 is not None,
         }
 
     def 概念区分度(self):
@@ -596,6 +634,22 @@ class 概念层:
         self.delta_history = []
         self.sigma_history = []
         self.拍 = 0
+
+    def 状态摘要(self):
+        return {
+            "活跃概念数": sum(1 for v in self.concept_h if abs(v) > 0.15),
+            "存活概念数": sum(1 for s in self.concept_strength if s > 0.05),
+            "概念均值": round(sum(self.concept_h) / max(1, self.n_concepts), 4),
+            "概念最大": round(max((abs(v) for v in self.concept_h), default=0), 4),
+            "预测误差": round(sum(self.error_history) / max(1, len(self.error_history)), 4) if self.error_history else 0,
+            "区分度": round(self.概念区分度(), 4),
+            "⊗历史长度": len(self.delta_history),
+            "活跃组合数": sum(1 for v in self.combo_h if abs(v) > 0.15),
+            "存活组合数": sum(1 for s in self.combo_strength if s > 0.05),
+            "组合均值": round(sum(self.combo_h) / max(1, self.n_combo), 4),
+            "组合最大": round(max((abs(v) for v in self.combo_h), default=0), 4),
+            "拍": self.拍,
+        }
 
 
 if __name__ == "__main__":
