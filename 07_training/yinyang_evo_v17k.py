@@ -1,0 +1,393 @@
+#!/usr/bin/env python3
+"""
+v17k — Strong Elitism + Archive Hall of Fame + Noisy Eval Fix
+核心改变（相对于v17g）：
+1. 强精英保留：top-5原封不动进入下一代（v17g只有top-2）
+2. Hall of Fame存档：保存历史最佳的10个基因，每50代重新注入
+3. 重复评估降噪音：每个个体用3个不同seed评估，取平均（防止"lucky eval"）
+4. 区域覆盖：每代前做系统性区域轮转，保证所有区域都被看到
+5. 更深的eval：1500tick（v17g的500tick太浅，很多个体只看了5/6个区域）
+6. 突变率降低：0.03而非0.05（保护已经找到的好基因）
+
+目标：让0.9888的个体不再丢失，让种群在此基础上继续进化
+"""
+import random, math, hashlib, copy, collections
+
+N_CHANNELS = 8; MAX_NODES = 20; N_REGIONS = 9
+
+class Pool:
+    def __init__(self, seed=42):
+        self.seed=seed; self.r=self._mk(seed); self._r()
+    def _mk(self,s):
+        rng=random.Random(s)
+        return [{'id':i,'sigma':round(0.05+0.64*i/8,2),'proprio':round(i/8,2),
+            'freq':round(0.03+0.12*rng.random(),3),'phase':round(rng.uniform(0,2*math.pi),3),
+            'type':['sin','logistic','lorenz','vdP','saw','rossler','henon','tent','cubic'][i],
+            '_s':0.3,'_t':0,'_p':0.0} for i in range(N_REGIONS)]
+    def _r(self):
+        for r in self.r: r['_s']=0.3; r['_t']=0; r['_p']=0.0
+    def reset(self): self._r()
+    def step(self):
+        for r in self.r: r['_t']+=1; r['_p']+=r['freq']
+    def sense(self,rid):
+        r=self.r[rid]; t=r['_t']; ph=r['_p']
+        nv=random.Random(hash((self.seed,rid,t))%(2**31)).gauss(0,1)
+        n=r['sigma']*nv; s=r['_s']; rt=r['type']
+        if rt=='sin': v=math.sin(ph+r['phase'])
+        elif rt=='logistic': v=4*s*(1-s) if 0<s<1 else 0.5
+        elif rt=='lorenz': v=0.5+0.3*math.tanh(s)
+        elif rt=='vdP': v=s-0.1*(s**3-s)
+        elif rt=='saw': v=(ph+r['phase'])%1.0
+        elif rt=='rossler': v=0.5*math.sin(0.7*ph+s)
+        elif rt=='henon': v=1-1.4*s**2+0.3*s
+        elif rt=='tent': v=2*s if s<0.5 else 2*(1-s)
+        else: v=s**3-s
+        s2=max(-2,min(2,v+n)); r['_s']=s2
+        return [s2, math.sin(s2*2.5) if abs(s2)<1.5 else 0, math.tanh(s2),
+                s2**2*(1 if s2>0 else -1), abs(s2), math.cos(s2*1.7),
+                (1 if s2>0 else -1)*math.sqrt(abs(s2)) if abs(s2)<2 else 0, r['proprio']]
+
+class WM:
+    def __init__(self,g):
+        self.g=g; n=g['n']; self.h=[0.0]*n; self.prev=[0.0]*N_CHANNELS
+    def ri(self,p):
+        i=round(p*8); return max(0,min(8,i))
+    def fwd(self,sens,update=True):
+        g=self.g; n=g['n']; p=sens[7]; ri=self.ri(p)
+        dec=g['dt'][ri]; bb=ri*N_CHANNELS
+        vel=[sens[j]-self.prev[j] for j in range(N_CHANNELS)]
+        x=sens+vel; nn=min(len(g['sw']),len(x))
+        nh=[0.0]*n
+        for i in range(n):
+            a=0.0
+            for j in range(nn): a+=g['sw'][j][i]*x[j]
+            for k in range(n): a+=g['rw'][i][k]*self.h[k]
+            nh[i]=math.tanh(a)
+        if update:
+            for i in range(n): self.h[i]=(1-dec)*nh[i]+dec*self.h[i]
+        pred=[0.0]*N_CHANNELS
+        for i in range(n):
+            for c in range(N_CHANNELS):
+                pred[c]+=self.h[i]*(g['pw'][i][c]+g['pb'][bb+c])
+        self.prev=sens[:]
+        return pred
+    def learn(self,pred,actual):
+        g=self.g; n=g['n']; lr=g['plr']; ri=self.ri(actual[7]); bb=ri*N_CHANNELS
+        errs=[actual[j]-pred[j] for j in range(N_CHANNELS)]
+        mse=sum(e*e for e in errs)/N_CHANNELS
+        for i in range(n):
+            for c in range(N_CHANNELS):
+                g['pw'][i][c]+=lr*self.h[i]*errs[c]
+                g['pw'][i][c]=max(-3,min(3,g['pw'][i][c]))
+        for c in range(N_CHANNELS):
+            g['pb'][bb+c]+=lr*1.5*errs[c]
+            g['pb'][bb+c]=max(-5,min(5,g['pb'][bb+c]))
+        return mse
+    def reset(self):
+        self.h=[0.0]*len(self.h); self.prev=[0.0]*N_CHANNELS
+
+class IM:
+    def __init__(self):
+        self.ef=self.es=self.efs=0.3; self.bor=0.0; self.drive=0.0; self.rh=[]
+    def upd(self,mse,sigma,rid,cr):
+        self.ef=0.7*self.ef+0.3*mse
+        self.efs=0.3*self.efs+0.7*mse
+        self.es=0.99*self.es+0.01*mse
+        if self.efs<self.es*0.7:
+            self.bor+=0.003; lrm=0.5
+        else:
+            self.bor*=0.97; lrm=1.0
+        self.bor=max(0,min(1,self.bor))
+        rw=0.02 if sigma>0.5 and mse>0.01 else 0
+        rw-=0.01 if self.bor>0.05 else 0
+        self.drive=self.drive*0.99+rw
+        self.drive=max(-3,min(5,self.drive))
+        self.rh.append(rid)
+        return lrm
+    def bias(self):
+        b={}
+        if self.bor>0.05: b[2]=0.4; b[1]=0.2
+        elif self.efs>self.ef*1.2: b[0]=0.2
+        return b
+
+class Org:
+    def __init__(self,gn=None):
+        self.g=gn or self.rg(); self.wm=WM(self.g); self.im=IM()
+        self.alive=True; self.age=0
+        self.lid=hashlib.sha256(str(random.random()).encode()).hexdigest()[:8]
+        self._ib=1.0; self._r=None
+    def rg(self):
+        n=random.randint(7,MAX_NODES)
+        return {'n':n,
+            'sw':[[random.uniform(-0.3,0.3) for _ in range(n)] for _ in range(N_CHANNELS*2)],
+            'pw':[[random.uniform(-0.3,0.3) for _ in range(N_CHANNELS)] for _ in range(n)],
+            'rw':[[random.uniform(-0.1,0.1) for _ in range(n)] for _ in range(n)],
+            'plr':random.uniform(0.03,0.12),
+            'pb':[random.uniform(-0.3,0.3) for _ in range(N_REGIONS*N_CHANNELS)],
+            'dt':[random.uniform(0.4,0.95) for _ in range(N_REGIONS)]}
+
+def gdist(a,b):
+    n=min(a['n'],b['n']); d=abs(a['n']-b['n'])*0.3
+    for j in range(N_CHANNELS*2):
+        aj=a['sw'][j] if j<len(a['sw']) else []; bj=b['sw'][j] if j<len(b['sw']) else []
+        for i in range(min(n,len(aj),len(bj))): d+=abs(aj[i]-bj[i])
+    for i in range(n):
+        if i<len(a['pw']) and i<len(b['pw']):
+            for c in range(N_CHANNELS): d+=abs(a['pw'][i][c]-b['pw'][i][c])
+    nb=min(len(a['pb']),len(b['pb']))
+    for k in range(nb): d+=abs(a['pb'][k]-b['pb'][k])*0.5
+    return d/max(1,N_CHANNELS*n*2+N_CHANNELS*n+nb*0.5)
+
+def xover(a,b):
+    cn=random.choice([a['n'],b['n']])
+    ch={'n':cn,'sw':[[0.0]*cn for _ in range(N_CHANNELS*2)],
+        'pw':[[0.0]*N_CHANNELS for _ in range(cn)],
+        'rw':[[0.0]*cn for _ in range(cn)],
+        'plr':a['plr'],'pb':[0.0]*(N_REGIONS*N_CHANNELS),'dt':[0.0]*N_REGIONS}
+    for j in range(N_CHANNELS*2):
+        for i in range(cn):
+            src=a if random.random()<0.5 else b; si=min(i,src['n']-1)
+            if j<len(src['sw']) and si<len(src['sw'][j]): ch['sw'][j][i]=src['sw'][j][si]
+    for i in range(cn):
+        src=a if random.random()<0.5 else b; si=min(i,src['n']-1)
+        if si<len(src['pw']):
+            for c in range(N_CHANNELS): ch['pw'][i][c]=src['pw'][si][c]
+    for i in range(cn):
+        src=a if random.random()<0.5 else b; si=min(i,src['n']-1)
+        if si<len(src['rw']):
+            for k in range(cn):
+                sk=min(k,src['n']-1)
+                if sk<len(src['rw'][si]): ch['rw'][i][k]=src['rw'][si][sk]
+    ip=a if random.random()<0.5 else b
+    ch['pb']=ip['pb'][:]; ch['dt']=ip['dt'][:]
+    if random.random()<0.5: ch['plr']=b['plr']
+    return ch
+
+def comp_pair(sv,sf):
+    i1=random.choices(range(len(sv)),weights=sf,k=1)[0]; p1=sv[i1]
+    ds=[]
+    for j,p2 in enumerate(sv):
+        if j==i1: ds.append(0)
+        else: ds.append(gdist(p1.g,p2.g))
+    i2=max(range(len(sv)),key=lambda j:ds[j]*sf[j])
+    return sv[i1],sv[i2]
+
+def mut(g,rate=0.03):
+    for j in range(len(g['sw'])):
+        for i in range(len(g['sw'][j])):
+            if random.random()<rate:
+                g['sw'][j][i]+=random.gauss(0,0.07); g['sw'][j][i]=max(-3,min(3,g['sw'][j][i]))
+    for i in range(len(g['pw'])):
+        for c in range(N_CHANNELS):
+            if random.random()<rate:
+                g['pw'][i][c]+=random.gauss(0,0.07); g['pw'][i][c]=max(-3,min(3,g['pw'][i][c]))
+    for i in range(len(g['rw'])):
+        for k in range(len(g['rw'][i])):
+            if random.random()<rate*0.5:
+                g['rw'][i][k]+=random.gauss(0,0.03); g['rw'][i][k]=max(-1.5,min(1.5,g['rw'][i][k]))
+    if random.random()<0.2: g['plr']=max(0.02,min(0.15,g['plr']+random.gauss(0,0.02)))
+    for i in range(len(g['pb'])):
+        if random.random()<rate*0.3:
+            g['pb'][i]+=random.gauss(0,0.1); g['pb'][i]=max(-5,min(5,g['pb'][i]))
+    for i in range(len(g['dt'])):
+        if random.random()<rate*0.2:
+            g['dt'][i]=max(0.1,min(0.99,g['dt'][i]+random.gauss(0,0.03)))
+    return g
+
+class Engine:
+    def __init__(self,n_org=20,n_gen=1000,seed=43):
+        self.n=n_org; self.ng=n_gen; self.pk=Pool(seed=seed)
+        self.ppl=[Org() for _ in range(n_org)]
+        self.hof=[]  # Hall of Fame: list of (fitness, genome) tuples
+        self.hof_size=15
+        self.best_ever=0.0
+
+    def eval_single(self,org,seed,ticks,r_ids):
+        """Evaluate one organism on one seed"""
+        pk=Pool(seed=seed); pk.reset()
+        org.wm.reset(); org.im=IM()
+        total_mse=0.0; rc=collections.Counter(); cr=0
+
+        # Warmup
+        cr=random.choice(r_ids)
+        for _ in range(40):
+            s=pk.sense(cr); org.wm.fwd(s,update=True); pk.step()
+
+        # Train on regions in order
+        ticks_per_region=max(30,ticks//len(r_ids))
+        for rid in r_ids:
+            for t in range(ticks_per_region):
+                s=pk.sense(rid); pred=org.wm.fwd(s,update=True)
+                pk.step(); sn=pk.sense(rid); pk.step()
+                mse=sum((sn[j]-pred[j])**2 for j in range(N_CHANNELS))/N_CHANNELS
+                org.im.upd(mse,pk.r[rid]['sigma'],rid,rid)
+                org.wm.learn(pred,sn)
+                total_mse+=mse; rc[rid]+=1; org.age+=1
+
+        n=sum(rc.values()) if sum(rc.values())>0 else 1
+        return total_mse/n, len([c for c in rc.values() if c>0])
+
+    def fit(self,org,ticks=1200):
+        """Multi-seed evaluation for noise reduction"""
+        region_ids=list(range(N_REGIONS))
+        # Average over 3 seeds
+        mse_sum=0.0; div_sum=0.0
+        for trial in range(3):
+            seed_offset=trial*7
+            mse,div=self.eval_single(org,42+seed_offset,ticks,region_ids)
+            mse_sum+=mse; div_sum+=div
+        avg_mse=mse_sum/3
+        return {'f':1/(1+avg_mse),'m':avg_mse,'div':div_sum/3}
+
+    def update_hof(self,sp):
+        """Update Hall of Fame with current best"""
+        for org,r in sp[:5]:
+            self.hof.append((r['f'],copy.deepcopy(org.g)))
+        # Keep only unique best
+        self.hof.sort(key=lambda x:x[0],reverse=True)
+        # Remove duplicates (by n_nodes + first few weights as fingerprint)
+        seen=set()
+        unique_hof=[]
+        for f,g in self.hof:
+            fp=(g['n'],round(g['pw'][0][0],3),round(g['pb'][0],3))
+            if fp not in seen:
+                seen.add(fp)
+                unique_hof.append((f,g))
+        self.hof=unique_hof[:self.hof_size]
+
+    def detect_wa(self,sp):
+        bh=sp[len(sp)//2:]
+        if len(bh)<3: return []
+        at=[]
+        for p in sp:
+            if p[0].im.rh:
+                f=[0]*N_REGIONS
+                for r in p[0].im.rh: f[r]+=1
+                t=sum(f)
+                if t>0: f=[x/t for x in f]
+                at.append(f)
+        if not at: return []
+        pa=[0]*N_REGIONS
+        for t in at:
+            for i in range(N_REGIONS): pa[i]+=t[i]
+        pa=[x/len(at) for x in pa]
+        wc=[]
+        for p in bh:
+            if not p[0].im.rh: continue
+            f=[0]*N_REGIONS
+            for r in p[0].im.rh: f[r]+=1
+            t=sum(f)
+            if t>0: f=[x/t for x in f]
+            d=sum((f[i]-pa[i])**2 for i in range(N_REGIONS))**0.5
+            bs=p[0].g['pb']
+            bss=(sum((b-sum(bs)/len(bs))**2 for b in bs)/len(bs))**0.5
+            wc.append((p[0],d+bss*0.1))
+        wc.sort(key=lambda x:x[1],reverse=True)
+        return [w[0] for w in wc[:max(2,len(bh)//3)]]
+
+    def evolve(self):
+        for gen in range(self.ng):
+            res=[]
+            for org in self.ppl:
+                r=self.fit(org); org._r=r; res.append(r)
+            sp=sorted(zip(self.ppl,res),key=lambda x:x[1]['f'],reverse=True)
+            af=sum(r['f'] for r in res)/len(res); am=sum(r['m'] for r in res)/len(res)
+            bf=sp[0][1]['f']; bm=sp[0][1]['m']
+            ab=sum(o.im.bor for o in self.ppl)/len(self.ppl)
+            div=sum(r['div'] for r in res)/len(res)
+            wa=self.detect_wa(sp)
+
+            if bf>self.best_ever:
+                self.best_ever=bf
+
+            if gen%10==0 or gen==self.ng-1:
+                print(f"Gen {gen:4d} fit={bf:.4f}/{af:.4f} mse={bm:.4f}/{am:.4f} bor={ab:.4f} div={div:.1f} WA={len(wa)} HoF={len(self.hof)} best_ever={self.best_ever:.4f}")
+
+            self.update_hof(sp)
+
+            if gen==self.ng-1: break
+
+            # Reproduction with strong elitism + Hall of Fame injection
+            ELITE_COUNT=5  # Top 5 preserved unchanged (was 2)
+            elites=[copy.deepcopy(p[0].g) for p in sp[:ELITE_COUNT]]
+
+            # Also preserve Hall of Fame members every 50 gens
+            hof_elites=[]
+            if gen%50==0 and gen>0:
+                for f,g in self.hof[:5]:
+                    hof_elites.append(copy.deepcopy(g))
+
+            sn=max(10,self.n//2)
+            surv=[p[0] for p in sp[:sn]]; sf=[p[1]['f'] for p in sp[:sn]]
+            fs=[f-min(sf)+0.01 for f in sf]; tot=sum(fs); sf=[f/tot for f in fs]
+
+            n_elites=ELITE_COUNT+len(hof_elites)
+            n_eh=max(1,int(self.n*0.35))
+            n_wh=max(1,int(self.n*0.25))
+            n_rd=max(1,int(self.n*0.10))
+            n_mt=self.n-n_elites-n_eh-n_wh-n_rd
+
+            np2=[]
+            # Strong elites
+            for eg in elites:
+                o=Org(gn=copy.deepcopy(eg)); o._ib=1.0; np2.append(o)
+            for eg in hof_elites:
+                o=Org(gn=copy.deepcopy(eg)); o._ib=1.0; np2.append(o)
+
+            ehc=whc=rdc=mtc=0; att=0
+            while len(np2)<self.n and att<self.n*50:
+                att+=1
+                if not surv or sum(sf)<=0:
+                    # Random or Hall of Fame
+                    if self.hof and random.random()<0.3:
+                        f,g=random.choice(self.hof[:5])
+                        np2.append(Org(gn=copy.deepcopy(g)))
+                    else:
+                        np2.append(Org())
+                    continue
+                if ehc<n_eh:
+                    t=max(4,len(surv)//3)
+                    p1,p2=comp_pair(surv[:t],sf[:t])
+                    cg=xover(p1.g,p2.g); mut(cg,0.03)
+                    o=Org(gn=cg); o._ib=1.0; ehc+=1; np2.append(o)
+                elif whc<n_wh and wa:
+                    wa_o=random.choice(wa)
+                    el=random.choices(surv[:5],weights=sf[:5],k=1)[0]
+                    cg=xover(wa_o.g,el.g); mut(cg,0.06)
+                    o=Org(gn=cg); o._ib=1.0; whc+=1; np2.append(o)
+                elif n_rd>0 and rdc<n_rd: np2.append(Org()); rdc+=1
+                elif mtc<n_mt:
+                    p=random.choices(surv,weights=sf,k=1)[0]; cg=mut(copy.deepcopy(p.g),0.03)
+                    o=Org(gn=cg); o._ib=1.0; mtc+=1; np2.append(o)
+            self.ppl=np2
+
+        for org in self.ppl:
+            r=self.fit(org,1500); org._r=r
+        return self.ppl
+
+if __name__=='__main__':
+    print("yinyang_evo_v17k — Strong Elitism + HoF Archive")
+    eng=Engine(n_org=20,n_gen=1000,seed=43)
+    pop=eng.evolve()
+    best=max(pop,key=lambda o:o._r['f'])
+    print(f"\n=== FINAL ===")
+    print(f"Best fit: {best._r['f']:.4f}")
+    print(f"Best mse: {best._r['m']:.4f}")
+    print(f"Best ever seen: {eng.best_ever:.4f}")
+    print(f"Nodes: {best.g['n']} LR: {best.g['plr']:.4f}")
+    print(f"Decay: {[f'{x:.3f}' for x in best.g['dt']]}")
+    # Regional test
+    print("\nRegional Precision:")
+    for rid in range(N_REGIONS):
+        ms=[]
+        for seed_offset in range(5):
+            pk=Pool(seed=42+seed_offset*7); pk.reset()
+            best.wm.reset()
+            for _ in range(60): pk.sense(rid); pk.step()
+            for _ in range(30):
+                s=pk.sense(rid); pred=best.wm.fwd(s,update=True)
+                pk.step(); sn=pk.sense(rid); pk.step()
+                mse=sum((sn[j]-pred[j])**2 for j in range(N_CHANNELS))/N_CHANNELS
+                ms.append(mse)
+        am=sum(ms)/len(ms)
+        print(f"  R{rid} σ={pk.r[rid]['sigma']:.2f}: {am:.4f}")
