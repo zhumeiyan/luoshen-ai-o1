@@ -106,10 +106,6 @@ class 概念层:
         self.变异次数 = 0
         self.有利变异次数 = 0
         self.不利变异次数 = 0
-        self.概念重生次数 = 0
-        self.组合概念重生次数 = 0
-        self.高级组合概念重生次数 = 0
-        self.seed = seed
         self.sparse_k = max(1, int(n_concepts * sparse_ratio))
         self.decay = decay
         self.拍 = 0
@@ -865,40 +861,6 @@ class 概念层:
             else:
                 self.concept_strength[i] *= 0.999
 
-        # ── 神经发生+突触修剪：弱概念死亡→新概念重生 ──
-        # 生物学：成年神经发生（adult neurogenesis）——海马体齿状回持续产生新神经元
-        # 突触修剪（synaptic pruning）——弱连接被消除，强连接被保留
-        # 弱概念（strength<0.01）死亡→所有权重重置为随机值→strength恢复为1.0
-        # 这是结构进化——不是调整权重，是替换整个概念
-        # 新概念带着新的随机权重重新参与竞争——可能捕获到之前概念无法捕获的模式
-        rng_reborn = random.Random(self.seed + self.拍)
-        for i in range(self.n_concepts):
-            if self.concept_strength[i] < 0.01:
-                self.concept_w[i] = [rng_reborn.uniform(-0.2, 0.2) for _ in range(self.n_hidden)]
-                self.concept_otimes_w[i] = [rng_reborn.uniform(-0.15, 0.15) for _ in range(self.n_hidden)]
-                self.concept_rw[i] = [rng_reborn.uniform(-0.02, 0.02) for _ in range(self.n_concepts)]
-                self.concept_pw[i] = [rng_reborn.uniform(-0.1, 0.1) for _ in range(self.n_hidden)]
-                self.concept_rw[i][i] = rng_reborn.uniform(0.05, 0.15)
-                self.concept_strength[i] = 1.0
-                self.概念重生次数 += 1
-
-        for i in range(self.n_combo):
-            if self.combo_strength[i] < 0.01:
-                self.combo_w[i] = [rng_reborn.uniform(-0.3, 0.3) for _ in range(self.n_concepts)]
-                self.combo_rw[i] = [rng_reborn.uniform(-0.02, 0.02) for _ in range(self.n_combo)]
-                self.combo_pw[i] = [rng_reborn.uniform(-0.1, 0.1) for _ in range(self.n_concepts)]
-                self.combo_rw[i][i] = rng_reborn.uniform(0.05, 0.15)
-                self.combo_strength[i] = 1.0
-                self.组合概念重生次数 += 1
-
-        for i in range(self.n_meta):
-            if self.meta_combo_strength[i] < 0.01:
-                self.meta_combo_w[i] = [rng_reborn.uniform(-0.3, 0.3) for _ in range(self.n_combo)]
-                self.meta_combo_rw[i] = [rng_reborn.uniform(-0.02, 0.02) for _ in range(self.n_meta)]
-                self.meta_combo_rw[i][i] = rng_reborn.uniform(0.05, 0.15)
-                self.meta_combo_strength[i] = 1.0
-                self.高级组合概念重生次数 += 1
-
         # ── 突触缩放（homeostatic synaptic scaling）──
         # 真实生物学机制：当突触持续增强时，神经元缩放所有突触，
         # 保持总输入在合理范围内。这不是"防饱和"——这是稳态。
@@ -1034,9 +996,6 @@ class 概念层:
             "有利变异次数": self.有利变异次数,
             "不利变异次数": self.不利变异次数,
             "有利变异率": round(self.有利变异次数 / max(1, self.变异次数), 4),
-            "概念重生次数": self.概念重生次数,
-            "组合概念重生次数": self.组合概念重生次数,
-            "高级组合概念重生次数": self.高级组合概念重生次数,
             "拍": self.拍,
         }
 
