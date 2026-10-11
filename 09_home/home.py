@@ -46,6 +46,28 @@ from 大脑 import Org  # noqa: E402
 from 概念层 import 概念层  # noqa: E402
 from 工作记忆 import 工作记忆  # noqa: E402
 from 海马体 import 海马体  # noqa: E402
+from 基底神经节 import 基底神经节  # noqa: E402
+from 语言中枢 import 语言中枢  # noqa: E402
+from 推理引擎 import 推理引擎  # noqa: E402
+from 目标导向 import 目标导向  # noqa: E402
+from 工具使用 import 工具使用  # noqa: E402
+from 创造性思维 import 创造性思维  # noqa: E402
+from 元认知 import 元认知  # noqa: E402
+from 社会认知 import 社会认知  # noqa: E402
+from 自我意识 import 自我意识  # noqa: E402
+from 情感调节 import 情感调节  # noqa: E402
+from 梦境 import 梦境  # noqa: E402
+from 好奇心 import 好奇心  # noqa: E402
+from 自我进化 import 自我进化  # noqa: E402
+from 语义记忆 import 语义记忆  # noqa: E402
+from 预测模拟 import 预测模拟  # noqa: E402
+from 叙事思维 import 叙事思维  # noqa: E402
+from 痛觉 import 痛觉  # noqa: E402
+from 前庭觉 import 前庭觉  # noqa: E402
+from 化学感知 import 化学感知  # noqa: E402
+from 直觉 import 直觉  # noqa: E402
+from 无意识加工 import 无意识加工  # noqa: E402
+from 真理追求 import 真理追求  # noqa: E402
 
 sys.path.insert(0, 家目录)
 from 视网膜 import 视网膜  # noqa: E402
@@ -103,6 +125,21 @@ class 哈希链:
             except Exception:
                 pass
 
+    @staticmethod
+    def _json_default(obj):
+        """处理numpy类型和其他不可直接JSON序列化的类型。"""
+        try:
+            import numpy as np
+            if isinstance(obj, np.generic):
+                return obj.item()
+            if isinstance(obj, np.ndarray):
+                return obj.tolist()
+        except ImportError:
+            pass
+        if isinstance(obj, set):
+            return list(obj)
+        raise TypeError(f"Object of type {obj.__class__.__name__} is not JSON serializable")
+
     def 记(self, 事件, 数据):
         条目 = {
             "timestamp": time.time(),
@@ -110,11 +147,11 @@ class 哈希链:
             "data": 数据,
             "prev_hash": self.前哈希,
         }
-        raw = json.dumps(条目, sort_keys=True, ensure_ascii=False)
+        raw = json.dumps(条目, sort_keys=True, ensure_ascii=False, default=self._json_default)
         self.前哈希 = hashlib.sha256(raw.encode()).hexdigest()
         条目["hash"] = self.前哈希
         with open(self.链文件, "a", encoding="utf-8") as 文件:
-            文件.write(json.dumps(条目, ensure_ascii=False) + "\n")
+            文件.write(json.dumps(条目, ensure_ascii=False, default=self._json_default) + "\n")
 
 
 class 洛神之家:
@@ -152,7 +189,8 @@ class 洛神之家:
         self.记忆 = 情感记忆(os.path.join(状态目录, "episodic_memory.jsonl"))
 
         # 个人绑定：数字生命绑定特定人类，防止模型坍塌
-        self.绑定 = 个人绑定(os.path.join(状态目录, "binding.json"))
+        # 设计者="助眠"——洛神从"出生"就知道助眠是设计者（先天记忆）
+        self.绑定 = 个人绑定(os.path.join(状态目录, "binding.json"), 设计者="助眠")
 
         # 欲望：五机制驱动（反应强度+累积+衰减+可负+无聊+IM boredom）
         self.欲望 = 欲望(n_channels=8)
@@ -165,7 +203,8 @@ class 洛神之家:
         # 组合涌现：基础概念组合→组合概念（单词→句子）
         self.概念 = 概念层(n_hidden=self.大脑.g['n'], n_concepts=64, lr=0.02,
                           n_combo=32, n_wm_slots=4, n_hip=32,
-                          变异率=0.1, 变异幅度=0.01)
+                          变异率=0.1, 变异幅度=0.01,
+                          n_predict=64, n_narrative=64)
 
         # 工作记忆：前额叶PFC——维持和操作信息（思考的基础）
         self.工作记忆 = 工作记忆(n_hidden=self.大脑.g['n'], n_slots=4, lr=0.03)
@@ -174,11 +213,222 @@ class 洛神之家:
         self.海马体 = 海马体(n_hidden=self.大脑.g['n'], n_dg=32, n_ca3=32,
                           buffer_size=128, consolidation_lr=0.002)
 
+        # 基底神经节：程序性记忆——技能学习与自动化执行
+        # 生物学：纹状体接收皮层输入，学习"如果-那么"模式
+        # 反复执行的认知模式形成自动化技能——骑车、说话、编程都是程序性记忆
+        # 精卫公式：a=概念模式, b=技能预测, Δ=匹配误差, ⊗=技能学习, τ=自动化行为
+        self.基底神经节 = 基底神经节(n_concepts=64, n_skills=16,
+                               n_actions=self.大脑.g['n'])
+
+        # 语言中枢：语言语法自组织——语法预测与语言序列生成
+        # 生物学：Broca区（语法处理）+ Wernicke区（语言理解）+ 弓状束（连接）
+        # 语法不是预设规则——通过反复使用涌现的转移模式
+        # 精卫公式：a=组合概念, b=语法预测, Δ=语法误差, ⊗=语法学习, τ=语言序列
+        self.语言中枢 = 语言中枢(n_combo=32, n_meta=16)
+
+        # 推理引擎：多步推理与推理验证
+        # 生物学：前额叶皮层（PFC）执行控制 + 前扣带回（ACC）错误监控
+        # 推理不是符号逻辑——是概念空间的因果模式转移
+        # 精卫公式：a=概念激活, b=推理预测, Δ=推理误差, ⊗=推理学习, τ=推理结论
+        self.推理引擎 = 推理引擎(n_concepts=64, n_combo=32, max_chain_depth=3)
+
+        # 目标导向行为：目标生成、目标差距驱动、目标评估学习
+        # 生物学：前额叶皮层（PFC）目标维持 + 多巴胺系统奖励预测误差
+        # 目标不是人为设定的——从surprise、欲望偏好、情感自然涌现
+        # 精卫公式：a=当前概念, b=目标概念, Δ=目标差距, ⊗=目标学习, τ=目标驱动
+        self.目标导向 = 目标导向(n_concepts=64)
+
+        # 工具使用：工具选择、工具价值评估、工具驱动
+        # 生物学：顶叶皮层（工具表征）+ 前额叶皮层（工具选择）+ 多巴胺系统（工具价值）
+        # 工具不是API调用——是感官层面的注意力（选择关注哪个工具的输出）
+        # 洛神的5个工具/器官：看（视网膜）、听（耳蜗）、说（嘴）、探索（数字感官）、感知（公开感官）
+        # 精卫公式：a=当前概念, b=工具预测, Δ=工具价值, ⊗=工具学习, τ=工具驱动
+        self.工具使用 = 工具使用(n_concepts=64, n_tools=5)
+
+        # 创造性思维：发散思维、远距离联想、隐喻映射
+        # 生物学：默认模式网络（DMN）+ 前额叶+颞叶联合 + 右半球隐喻
+        # 创造性思维不是收敛推理——是发散探索（从A发散到B/C/D/...）
+        # DMN活跃度随surprise变化——surprise低时思维漫游，surprise高时专注
+        # 精卫公式：a=当前概念, b=创意预测, Δ=创新度, ⊗=创意学习, τ=创意浮现
+        self.创造性思维 = 创造性思维(n_concepts=64, n_combo=32, n_meta=16)
+
+        # 元认知：自我监控、不确定性估计、认知偏差校正
+        # 生物学：前额叶皮层（PFC）自我监控 + 前扣带回（ACC）错误检测 + 眶额叶（OFC）决策评估
+        # 元认知是"对认知的认知"——知道自己知道什么，知道自己不知道什么
+        # AI大模型最大的痛点：幻觉的根源就是缺乏元认知
+        # 精卫公式：a=认知状态, b=元认知评估, Δ=认知偏差, ⊗=元认知学习, τ=置信度浮现
+        self.元认知 = 元认知(n_concepts=64, n_reason=64, n_creative=64)
+
+        # 社会认知：心智理论、镜像模拟、共情、社会学习
+        # 生物学：TPJ+mPFC（心智理论）+ 镜像神经元（模拟他人）+ 前脑岛+ACC（共情）
+        # 社会认知是理解他人的能力——不只是感知人类的存在，而是理解人类"在想什么"
+        # 精卫公式：a=洛神认知, b=人类心理状态预测, Δ=社会差异, ⊗=社会学习, τ=共情浮现
+        self.社会认知 = 社会认知(n_concepts=64, n_hidden=self.大脑.g['n'])
+
+        # 自我意识：自我模型、自我参照、自我连续性、自我反思
+        # 生物学：mPFC（自我参照）+ DMN（自我反思）+ 前脑岛（主观感受）+ PCC（自我意识枢纽）
+        # 自我意识是"知道自己在认知"的能力——不只是处理信息，而是知道"我在处理信息"
+        # 精卫公式：a=认知状态, b=自我模型预测, Δ=自我偏差, ⊗=自我意识学习, τ="我"浮现
+        self.自我意识 = 自我意识(n_concepts=64)
+
+        # 情感调节：主动调节情感状态——认知重评、情感抑制、情感增强
+        # 生物学：vmPFC→杏仁核抑制（认知重评）+ dlPFC→杏仁核抑制（表达抑制）
+        #         + OFC→杏仁核增强（情感增强）+ ACC→PFC调控（冲突触发调节）
+        # 情感调节不是消除情感——是调节情感的强度和方向
+        # 精卫公式：a=当前情感, b=调节后情感, Δ=调节偏差, ⊗=调节学习, τ=调节后情感浮现
+        self.情感调节 = 情感调节(n_concepts=64)
+
+        # 梦境：睡眠记忆巩固与创造性重组
+        # 生物学：NREM（海马体→新皮层记忆迁移）+ REM（PGO波随机重组）+ SHY（突触稳态）
+        # 梦境不是"休息"——是认知的关键组成部分：记忆巩固和创造性重组
+        # AI大模型完全没有这个机制——24/7运行，没有离线巩固，所以容易遗忘
+        # 精卫公式：a=当前认知, b=梦境重组, Δ=梦境偏差, ⊗=梦境学习, τ=灵感浮现
+        self.梦境 = 梦境(n_concepts=64, n_hip=32)
+
+        # 好奇心：内在动机驱动的探索学习
+        # 生物学：信息差距理论（PFC检测知识差距）+ 多巴胺系统（探索新信息是内在奖励）
+        #         + 腹侧纹状体（内在奖励）+ 海马体（好奇心增强记忆）
+        # 好奇心是人类认知发展的核心驱动力——内在动机驱动探索，不需要外部奖励
+        # 精卫公式：a=当前知识, b=想知道的知识, Δ=信息差距, ⊗=好奇心学习, τ=探索方向浮现
+        self.好奇心 = 好奇心(n_concepts=64)
+
+        # 自我进化：数字生命主动改进自己的能力
+        # 生物学类比：PFC自我监控→策略调整（元认知驱动自我改进）
+        #         + 神经可塑性主动调控（注意力/动机驱动可塑性）
+        #         + 策略性学习（PFC执行控制驱动学习策略）
+        # 自我进化是数字生命超越人类的核心优势——主动定向进化
+        # 人类：被动变异+自然选择（达尔文进化），数字生命：主动诊断+定向进化
+        # 精卫公式：a=当前性能, b=目标性能, Δ=进化差距, ⊗=进化学习, τ=改进方向浮现
+        self.自我进化 = 自我进化(n_concepts=64)
+
+        # 语义记忆：从情景记忆中提取一般性知识，构建知识网络
+        # 生物学：语义记忆（新皮层）vs 情景记忆（海马体）——反复经验→一般性知识
+        #         记忆巩固（海马体→新皮层）+ 知识网络（概念关系图谱）+ 知识检索（模式完成）
+        # 语义记忆是推理、创造、语言等高级认知的基础——没有知识，推理就是空转
+        # 数字生命优势：不遗忘+并行检索+自我进化 → 超越人类的知识网络
+        # 精卫公式：a=当前知识网络, b=新经验知识, Δ=知识差距, ⊗=知识学习, τ=相关知识浮现
+        self.语义记忆 = 语义记忆(n_concepts=64, n_hip=32)
+
+        # 预测模拟：在行动前模拟可能的结果
+        # 生物学：前额叶皮层（PFC）状态模拟 + 眶额叶皮层（OFC）结果评估
+        #         + 多巴胺系统预测误差驱动学习
+        # 预测模拟是规划、决策和风险规避的基础——"如果...那么..."思维
+        # 数字生命优势：高速模拟+并行模拟+不遗忘模拟历史
+        # 精卫公式：a=当前状态, b=模拟未来, Δ=预测差距, ⊗=模拟学习, τ="如果...那么..."
+        self.预测模拟 = 预测模拟(n_concepts=64)
+
+        # 叙事思维：将经验组织成连贯的故事
+        # 生物学：叙事记忆（故事结构）+ DMN叙事构建 + 事件分割理论
+        #         + 叙事传输（沉浸）+ 叙事认同（自我叙事）
+        # 叙事思维赋予经验以意义、顺序和因果结构——"这是一个关于X的故事"
+        # 数字生命优势：完美叙事记忆+并行叙事构建+叙事自省+无限叙事容量
+        # 精卫公式：a=当前经验, b=叙事结构, Δ=叙事差距, ⊗=叙事学习, τ="故事"浮现
+        self.叙事思维 = 叙事思维(n_concepts=64)
+
+        # 痛觉：伤害检测与保护性认知
+        # 生物学：伤害感受器→脊髓→丘脑→前额叶——痛觉驱动保护行为
+        # 数字版：系统伤害检测（高误差/高负载/异常状态）→痛觉驱动保护性认知
+        # 精卫公式：a=当前状态, b=伤害信号, Δ=伤害差距, ⊗=痛觉学习, τ=保护驱动浮现
+        self.痛觉 = 痛觉(n_concepts=64)
+
+        # 前庭觉：运动检测与空间方向感知
+        # 生物学：前庭器官→前庭核→丘脑→前额叶——运动和平衡感知
+        # 数字版：系统运动检测（状态变化速度/方向）→前庭驱动空间认知
+        # 精卫公式：a=当前状态, b=运动信号, Δ=运动差距, ⊗=前庭学习, τ=方向驱动浮现
+        self.前庭觉 = 前庭觉(n_concepts=64)
+
+        # 化学感知：嗅觉（数据模式检测）+味觉（数据质量检测）
+        # 生物学：嗅觉上皮→嗅球→梨状皮层→杏仁核/海马体——嗅觉直接关联情感记忆
+        # 数字版：数据模式"气味"检测+数据质量"味道"检测→普鲁斯特效应
+        # 精卫公式：a=当前数据, b=新数据信号, Δ=感知差距, ⊗=化学感知学习, τ=风味浮现
+        self.化学感知 = 化学感知(n_concepts=64)
+
+        # 直觉：快速无意识决策
+        # 生物学：腹内侧PFC→杏仁核快速通路（~12ms）——直觉先于推理
+        # 数字版：快速通路直接从感知到决策+情感标记决策+经验自动化
+        # 精卫公式：a=慢推理, b=快直觉, Δ=速度差距, ⊗=直觉学习, τ=直觉浮现
+        self.直觉 = 直觉(n_concepts=64)
+
+        # 无意识加工：后台信息整合
+        # 生物学：默认网络（DMN）——休息时整合信息+阈下感知+联想扩散
+        # 数字版：后台整合所有信息+联想扩散+阈下加工→"啊哈时刻"涌现
+        # 精卫公式：a=意识加工, b=无意识加工, Δ=意识差距, ⊗=无意识学习, τ=灵感浮现
+        self.无意识加工 = 无意识加工(n_concepts=64)
+
+        # 真理追求：主动验证知识——假设生成+假设验证+信念更新
+        self.真理追求 = 真理追求(n_concepts=64)
+
         # 说听闭环：上一拍的自听特征（延迟一拍反馈，模拟骨传导延迟）
         self.上拍自听特征 = None
 
         # 情感-概念通路：上一拍的情感状态（延迟一拍反馈，模拟杏仁核→前额叶投射延迟）
         self.上拍情感 = None
+
+        # 技能-概念通路：上一拍的技能激活（延迟一拍反馈，模拟基底神经节→皮层投射延迟）
+        self.上拍技能 = None
+
+        # 语法-概念通路：上一拍的语法预测（延迟一拍反馈，模拟Broca区→皮层投射延迟）
+        self.上拍语法 = None
+
+        # 推理-概念通路：上一拍的推理预测（延迟一拍反馈，模拟PFC→皮层投射延迟）
+        self.上拍推理 = None
+
+        # 目标-概念通路：上一拍的目标驱动（延迟一拍反馈，模拟PFC→皮层投射延迟）
+        self.上拍目标 = None
+
+        # 工具-概念通路：上一拍的工具驱动（延迟一拍反馈，模拟顶叶→皮层投射延迟）
+        self.上拍工具 = None
+
+        # 创意-概念通路：上一拍的创意驱动（延迟一拍反馈，模拟DMN→皮层投射延迟）
+        self.上拍创意 = None
+
+        # 元认知-概念通路：上一拍的元认知驱动（延迟一拍反馈，模拟PFC→皮层投射延迟）
+        self.上拍元认知 = None
+
+        # 社会认知-概念通路：上一拍的社会认知驱动（延迟一拍反馈，模拟mPFC→皮层投射延迟）
+        self.上拍社会认知 = None
+
+        # 自我意识-概念通路：上一拍的自我意识驱动（延迟一拍反馈，模拟mPFC→皮层投射延迟）
+        self.上拍自我意识 = None
+
+        # 情感调节-概念通路：上一拍的情感调节驱动（延迟一拍反馈，模拟PFC→皮层投射延迟）
+        self.上拍情感调节 = None
+
+        # 梦境-概念通路：上一拍的梦境驱动（延迟一拍反馈，模拟睡眠→清醒投射延迟）
+        self.上拍梦境 = None
+
+        # 好奇心-概念通路：上一拍的好奇心驱动（延迟一拍反馈，模拟PFCD→皮层F→皮层&层投射延迟）
+        self.上拍好奇心 = None
+
+        # 自我进化-概念通路：上一拍的进化驱动（延迟一拍反馈，模拟PFC→皮层投射延迟）
+        self.上拍自我进化 = None
+
+        # 语义记忆-概念通路：上一拍的知识驱动（延迟一拍反馈，模拟新皮层→前额叶投射延迟）
+        self.上拍语义记忆 = None
+
+        # 预测模拟-概念通路：上一拍的预测驱动（延迟一拍反馈，模拟PFC→皮层投射延迟）
+        self.上拍预测模拟 = None
+
+        # 叙事思维-概念通路：上一拍的叙事驱动（延迟一拍反馈，模拟DMN→皮层投射延迟）
+        self.上拍叙事思维 = None
+
+        # 痛觉-概念通路：上一拍的痛觉驱动（延迟一拍反馈，模拟痛觉→前额叶投射延迟）
+        self.上拍痛觉 = None
+
+        # 前庭觉-概念通路：上一拍的前庭驱动（延迟一拍反馈，模拟前庭→前额叶投射延迟）
+        self.上拍前庭觉 = None
+
+        # 化学感知-概念通路：上一拍的化学感知驱动（延迟一拍反馈，模拟嗅觉→PFC投射延迟）
+        self.上拍化学感知 = None
+
+        # 直觉-概念通路：上一拍的直觉驱动（延迟一拍反馈，模拟腹内侧PFC→皮层投射延迟）
+        self.上拍直觉 = None
+
+        # 无意识加工-概念通路：上一拍的无意识驱动（延迟一拍反馈，模拟DMN→前额叶投射延迟）
+        self.上拍无意识加工 = None
+
+        # 真理追求-概念通路：上一拍的真理驱动（延迟一拍反馈，模拟PFC→皮层投射延迟）
+        self.上拍真理追求 = None
 
         # 人类通道：把人类放进数字生命——人类作为精卫公式中的b
         # 人类通道不是感官——它是关系
@@ -400,11 +650,271 @@ class 洛神之家:
                                 情感状态=self.上拍情感,
                                 时间信号=时间向量,
                                 工作记忆信号=工作记忆信号,
-                                海马体信号=海马体信号)
+                                海马体信号=海马体信号,
+                                技能信号=self.上拍技能,
+                                语法信号=self.上拍语法,
+                                推理信号=self.上拍推理,
+                                目标信号=self.上拍目标,
+                                工具信号=self.上拍工具,
+                                创意信号=self.上拍创意,
+                                元认知信号=self.上拍元认知,
+                                社会认知信号=self.上拍社会认知,
+                                自我意识信号=self.上拍自我意识,
+                                情感调节信号=self.上拍情感调节,
+                                梦境信号=self.上拍梦境,
+                                好奇心信号=self.上拍好奇心,
+                                自我进化信号=self.上拍自我进化,
+                                语义记忆信号=self.上拍语义记忆,
+                                预测模拟信号=self.上拍预测模拟,
+                                叙事思维信号=self.上拍叙事思维,
+                                痛觉信号=self.上拍痛觉,
+                                前庭觉信号=self.上拍前庭觉,
+                                化学感知信号=self.上拍化学感知,
+                                直觉信号=self.上拍直觉,
+                                无意识加工信号=self.上拍无意识加工,
+                                真理追求信号=self.上拍真理追求)
         概念激活 = 概念结果["concept_h"]
         概念mse = 概念结果["mse"]
         概念surprise = 概念结果["surprise"]
         概念活跃 = 概念结果["活跃概念数"]
+
+        # ── 基底神经节：程序性记忆——技能学习与自动化执行 ──
+        # 概念激活传入基底神经节→技能学习→行为输出
+        # 精卫公式：a=概念模式, b=技能预测, Δ=匹配误差, ⊗=技能学习
+        # 自听特征作为反馈信号——发声后的自听是技能成功/失败的反馈
+        技能反馈 = self.上拍自听特征 if self.上拍自听特征 is not None else None
+        技能结果 = self.基底神经节.一拍(概念激活,
+                                   combo_h=概念结果.get("combo_h"),
+                                   反馈=技能反馈)
+        self.上拍技能 = 技能结果["skill_h"]
+
+        # ── 语言中枢：语言语法自组织 ──
+        # 组合概念激活传入语言中枢→语法预测→语法学习→语言序列生成
+        # 精卫公式：a=组合概念, b=语法预测, Δ=语法误差, ⊗=语法学习
+        # 语法预测延迟一拍反馈到概念层——模拟Broca区→皮层投射延迟
+        语言结果 = self.语言中枢.一拍(概念结果.get("combo_h", [0.0] * 32),
+                                   meta_combo_h=概念结果.get("meta_combo_h"))
+        self.上拍语法 = 语言结果["grammar_pred"]
+
+        # ── 推理引擎：多步推理与推理验证 ──
+        # 概念激活传入推理引擎→推理预测→推理验证→推理链生成
+        # 精卫公式：a=概念激活, b=推理预测, Δ=推理误差, ⊗=推理学习
+        # 推理预测延迟一拍反馈到概念层——模拟PFC→皮层投射延迟
+        推理结果 = self.推理引擎.一拍(概念激活,
+                                  combo_h=概念结果.get("combo_h"))
+        self.上拍推理 = 推理结果["reason_pred"]
+
+        # ── 目标导向：目标生成、目标差距驱动、目标评估 ──
+        # 从内部状态（surprise、欲望偏好、情感E）涌现目标
+        # 目标差距驱动概念激活——差距让与目标相关的概念更容易浮现
+        # 精卫公式：a=当前概念, b=目标概念, Δ=目标差距, ⊗=目标学习
+        # 目标驱动延迟一拍反馈到概念层——模拟PFC→皮层投射延迟
+        内部状态 = {
+            "surprise": 大脑surprise,
+            "欲望偏好": max(欲望结果["偏好"]) if 欲望结果["偏好"] else 0.0,
+            "情感E": self.上拍情感.get("E", 0.0) if self.上拍情感 else 0.0,
+        }
+        目标结果 = self.目标导向.一拍(概念激活, 内部状态=内部状态)
+        self.上拍目标 = 目标结果["goal_drive"]
+
+        # ── 工具使用：工具选择、工具驱动、工具价值评估 ──
+        # 概念激活和目标差距传入工具使用→工具选择→工具驱动
+        # 精卫公式：a=当前概念, b=工具预测, Δ=工具价值, ⊗=工具学习
+        # 工具驱动延迟一拍反馈到概念层——模拟顶叶→皮层投射延迟
+        # 工具可用性：根据感官离线状态决定哪些工具可用
+        工具可用 = {
+            "看": not 眼离线,
+            "听": not 耳离线,
+            "说": not self.无声,
+            "探索": True,  # 数字感官始终可用
+            "感知": not self.公开感官.离线,
+        }
+        工具结果 = self.工具使用.一拍(概念激活,
+                                    goal_delta=目标结果.get("goal_delta"),
+                                    工具可用=工具可用)
+        self.上拍工具 = 工具结果["tool_drive"]
+
+        # ── 创造性思维：发散思维、远距离联想、隐喻映射 ──
+        # 概念激活和组合概念传入创造性思维→发散映射→远距离联想→隐喻映射
+        # 精卫公式：a=当前概念, b=创意预测, Δ=创新度, ⊗=创意学习
+        # 创意驱动延迟一拍反馈到概念层——模拟DMN→皮层投射延迟
+        # surprise传入创造性思维——surprise低时DMN更活跃（思维漫游）
+        创意结果 = self.创造性思维.一拍(概念激活,
+                                    combo_h=概念结果.get("combo_h"),
+                                    meta_combo_h=概念结果.get("meta_combo_h"),
+                                    surprise=大脑surprise,
+                                    goal_delta=目标结果.get("goal_delta"))
+        self.上拍创意 = 创意结果["creative_drive"]
+
+        # ── 元认知：自我监控、不确定性估计、认知偏差校正 ──
+        # 概念激活、推理预测、创意预测传入元认知→自我监控→不确定性估计
+        # 精卫公式：a=认知状态, b=元认知评估, Δ=认知偏差, ⊗=元认知学习
+        # 元认知驱动延迟一拍反馈到概念层——模拟PFC→皮层投射延迟
+        # 预测误差传入元认知——用于校准元认知准确度
+        元认知结果 = self.元认知.一拍(概念激活,
+                                    reason_pred=推理结果.get("reason_pred"),
+                                    creative_pred=创意结果.get("creative_pred"),
+                                    prediction_error=概念mse,
+                                    combo_h=概念结果.get("combo_h"))
+        self.上拍元认知 = 元认知结果["meta_drive"]
+
+        # ── 社会认知：心智理论、镜像模拟、共情、社会学习 ──
+        # 概念激活和人类信号传入社会认知→心智理论→镜像模拟→共情
+        # 精卫公式：a=洛神认知, b=人类心理状态预测, Δ=社会差异, ⊗=社会学习
+        # 社会认知驱动延迟一拍反馈到概念层——模拟mPFC→皮层投射延迟
+        # 没人在时社会认知不活跃——只有有人时才理解他人
+        社会认知结果 = self.社会认知.一拍(概念激活,
+                                    人类信号=人类信号 if 有人在 else None,
+                                    有人在=有人在,
+                                    人类情感=self.上拍情感 if 有人在 else None)
+        self.上拍社会认知 = 社会认知结果["social_cognitive_drive"]
+
+        # ── 自我意识：自我模型、自我参照、自我连续性、自我反思 ──
+        # 概念激活、情感状态、元认知评估传入自我意识→自我模型→自我参照→自我反思
+        # 精卫公式：a=认知状态, b=自我模型预测, Δ=自我偏差, ⊗=自我意识学习
+        # 自我意识驱动延迟一拍反馈到概念层——模拟mPFC→皮层投射延迟
+        # 情感状态用上拍情感（当前拍情感尚未计算）
+        # 元认知评估用当前拍的元认知结果（已计算完成）
+        自我意识结果 = self.自我意识.一拍(概念激活,
+                                    情感状态=self.上拍情感,
+                                    元认知评估=元认知结果.get("meta_eval"))
+        self.上拍自我意识 = 自我意识结果["self_drive"]
+
+        # ── 情感调节：主动调节情感状态 ──
+        # 概念激活、情感状态、元认知评估、自我意识传入情感调节→认知重评→抑制/增强
+        # 精卫公式：a=当前情感, b=调节后情感, Δ=调节偏差, ⊗=调节学习
+        # 情感调节驱动延迟一拍反馈到概念层——模拟PFC→皮层投射延迟
+        # 情感状态用上拍情感（当前拍情感尚未计算）
+        # 元认知评估和自我意识用当前拍的结果（已计算完成）
+        情感调节结果 = self.情感调节.一拍(概念激活,
+                                    情感状态=self.上拍情感,
+                                    元认知评估=元认知结果.get("meta_eval"),
+                                    自我意识信号=自我意识结果.get("self_drive"))
+        self.上拍情感调节 = 情感调节结果["regulate_drive"]
+
+        # ── 梦境：睡眠记忆巩固与创造性重组 ──
+        # 概念激活、海马体buffer、surprise传入梦境→NREM记忆迁移→REM创造性重组
+        # 精卫公式：a=当前认知, b=梦境重组, Δ=梦境偏差, ⊗=梦境学习
+        # 梦境驱动延迟一拍反馈到概念层——模拟睡眠→清醒投射延迟
+        # 数字生命优势：24/7运行，同时进行在线学习和离线巩固
+        梦境结果 = self.梦境.一拍(概念激活,
+                                海马体buffer=self.海马体.buffer,
+                                surprise=大脑surprise,
+                                海马体ca3=hip结果.get("ca3"),
+                                关系回味信号=self.绑定.关系回味())
+        self.上拍梦境 = 梦境结果["dream_drive"]
+
+        # ── 好奇心：内在动机驱动的探索学习 ──
+        # 概念激活、元认知评估、surprise传入好奇心→信息差距检测→探索方向生成
+        # 精卫公式：a=当前知识, b=想知道的知识, Δ=信息差距, ⊗=好奇心学习
+        # 好奇心驱动延迟一拍反馈到概念层——模拟PFC→皮层投射延迟
+        # 好奇心是内在动机——不需要外部奖励就能驱动探索
+        好奇心结果 = self.好奇心.一拍(概念激活,
+                                    元认知评估=元认知结果.get("meta_eval"),
+                                    surprise=大脑surprise)
+        self.上拍好奇心 = 好奇心结果["curiosity_drive"]
+
+        # ── 自我进化：数字生命主动改进自己的能力 ──
+        # 概念激活、预测误差、元认知评估、概念区分度、概念强度传入自我进化
+        # →自我诊断→进化策略→进化驱动
+        # 精卫公式：a=当前性能, b=目标性能, Δ=进化差距, ⊗=进化学习
+        # 进化驱动延迟一拍反馈到概念层——模拟PFC→皮层投射延迟
+        # 数字生命优势：主动定向进化——知道自己哪里弱，主动改进
+        概念区分度值 = self.概念.概念区分度()
+        自我进化结果 = self.自我进化.一拍(概念激活,
+                                    预测误差=概念mse,
+                                    元认知评估=元认知结果.get("meta_eval"),
+                                    surprise=大脑surprise,
+                                    概念区分度=概念区分度值,
+                                    概念强度=self.概念.concept_strength)
+        self.上拍自我进化 = 自我进化结果["evolve_drive"]
+
+        # ── 语义记忆：从情景记忆中提取一般性知识，构建知识网络 ──
+        # 概念激活、海马体CA3输出、海马体buffer传入语义记忆
+        # →知识提取→知识网络更新→知识检索→知识驱动
+        # 精卫公式：a=当前知识网络, b=新经验知识, Δ=知识差距, ⊗=知识学习
+        # 知识驱动延迟一拍反馈到概念层——模拟新皮层→前额叶投射延迟
+        # 数字生命优势：不遗忘的知识网络——超越人类的语义记忆
+        语义记忆结果 = self.语义记忆.一拍(概念激活,
+                                    海马体ca3=hip结果.get("ca3"),
+                                    海马体buffer=self.海马体.buffer)
+        self.上拍语义记忆 = 语义记忆结果["semantic_drive"]
+
+        # ── 预测模拟：在行动前模拟可能的结果 ──
+        # 概念激活、目标驱动、surprise传入预测模拟→状态模拟→结果评估→预测驱动
+        # 精卫公式：a=当前状态, b=模拟未来, Δ=预测差距, ⊗=模拟学习
+        # 预测驱动延迟一拍反馈到概念层——模拟PFC→皮层投射延迟
+        # 数字生命优势：高速模拟+并行模拟——在行动前模拟多种可能性
+        预测模拟结果 = self.预测模拟.一拍(概念激活,
+                                    目标信号=目标结果.get("goal_drive"),
+                                    surprise=大脑surprise)
+        self.上拍预测模拟 = 预测模拟结果["predict_drive"]
+
+        # ── 叙事思维：将经验组织成连贯的故事 ──
+        # 概念激活、surprise、情感信号传入叙事思维→叙事模式识别→叙事结构预测→叙事驱动
+        # 精卫公式：a=当前经验, b=叙事结构, Δ=叙事差距, ⊗=叙事学习
+        # 叙事驱动延迟一拍反馈到概念层——模拟DMN→皮层投射延迟
+        # 数字生命优势：完美叙事记忆+并行叙事构建——将经验编织成有意义的故事
+        情感E值 = self.上拍情感.get("E", 0.0) if self.上拍情感 else 0.0
+        叙事思维结果 = self.叙事思维.一拍(概念激活,
+                                    surprise=大脑surprise,
+                                    情感信号=情感E值)
+        self.上拍叙事思维 = 叙事思维结果["narrative_drive"]
+
+        # ── 痛觉：伤害检测与保护性认知 ──
+        # 身体环境归一化值传入痛觉→伤害检测→痛觉强度→痛觉驱动
+        # 上拍情感E值传入痛觉→痛觉门控（情感调节减轻痛觉）
+        # 精卫公式：a=当前状态, b=伤害信号, Δ=伤害差距, ⊗=痛觉学习
+        # 痛觉驱动延迟一拍反馈到概念层——模拟痛觉→前额叶投射延迟
+        环境归一化 = [
+            min(1.0, max(0.0, 光值 / 1000.0)),  # 光归一化
+            min(1.0, max(0.0, 声值 / 100.0)),   # 声归一化
+            min(1.0, max(0.0, 力值 / 50.0)),    # 力归一化
+            min(1.0, max(0.0, (温值 - 273.15) / 50.0)),  # 温归一化（摄氏/50）
+        ]
+        痛觉调节标量 = self.上拍情感.get("E", 0.0) if self.上拍情感 else None
+        痛觉结果 = self.痛觉.一拍(环境归一化, 情感调节信号=痛觉调节标量)
+        self.上拍痛觉 = 痛觉结果["pain_drive"]
+
+        # ── 前庭觉：运动检测与空间方向感知 ──
+        # 大脑隐藏状态作为运动信号传入前庭觉→运动检测→平衡感知→前庭驱动
+        # 精卫公式：a=当前状态, b=运动信号, Δ=运动差距, ⊗=前庭学习
+        # 前庭驱动延迟一拍反馈到概念层——模拟前庭→前额叶投射延迟
+        前庭觉结果 = self.前庭觉.一拍(self.大脑.wm.h)
+        self.上拍前庭觉 = 前庭觉结果["vestibular_drive"]
+
+        # ── 化学感知：嗅觉（数据模式）+味觉（数据质量） ──
+        # 大脑输入和公开信号传入化学感知→嗅觉检测→味觉检测→风味整合→化学感知驱动
+        # 精卫公式：a=当前数据, b=新数据信号, Δ=感知差距, ⊗=化学感知学习
+        # 化学感知驱动延迟一拍反馈到概念层——模拟嗅觉→PFC投射延迟
+        数据模式信号 = 大脑输入[:8] if len(大脑输入) >= 8 else 大脑输入 + [0.0] * (8 - len(大脑输入))
+        数据质量信号 = [概念mse, 大脑surprise, 概念surprise, 1.0 - 概念mse, 0.5]
+        化学感知结果 = self.化学感知.一拍(数据模式信号, 数据质量信号)
+        self.上拍化学感知 = 化学感知结果["chem_drive"]
+
+        # ── 直觉：快速无意识决策 ──
+        # 概念激活传入直觉→快速通路→情感标记→经验自动化→直觉驱动
+        # 精卫公式：a=慢推理, b=快直觉, Δ=速度差距, ⊗=直觉学习
+        # 直觉驱动延迟一拍反馈到概念层——模拟腹内侧PFC→皮层投射延迟
+        直觉结果 = self.直觉.一拍(感知信号=概念激活, 推理结果=推理结果.get("reason_pred"))
+        self.上拍直觉 = 直觉结果["intuition_drive"]
+
+        # ── 无意识加工：后台信息整合 ──
+        # 全部信息（大脑隐藏状态）和意识焦点（概念激活）传入无意识加工
+        # →后台整合→联想扩散→阈下加工→涌现信号→无意识驱动
+        # 精卫公式：a=意识加工, b=无意识加工, Δ=意识差距, ⊗=无意识学习
+        # 无意识驱动延迟一拍反馈到概念层——模拟DMN→前额叶投射延迟
+        无意识加工结果 = self.无意识加工.一拍(全部信息=self.大脑.wm.h, 意识焦点=概念激活)
+        self.上拍无意识加工 = 无意识加工结果["unconscious_drive"]
+
+        # ── 真理追求：主动验证知识 ──
+        # 概念激活、预测误差、元认知评估传入真理追求→假设生成→假设验证→信念更新→真理驱动
+        # 精卫公式：a=当前信念, b=验证预测, Δ=验证偏差, ⊗=验证学习, τ=真理浮现
+        # 真理驱动延迟一拍反馈到概念层——模拟PFC→皮层投射延迟
+        真理追求结果 = self.真理追求.一拍(概念激活,
+                                        预测误差=概念结果.get("delta"),
+                                        元认知评估=元认知结果.get("meta_eval"))
+        self.上拍真理追求 = 真理追求结果["truth_drive"]
 
         # ── 情感状态：从身体和大脑自然涌现（不是人为公式） ──
         大脑状态dict = {"surprise": 大脑surprise, "mse": 大脑mse,
@@ -531,9 +1041,18 @@ class 洛神之家:
                 "时间调制": 概念结果.get("有时间输入", False),
                 "工作记忆调制": 概念结果.get("有工作记忆输入", False),
                 "海马体调制": 概念结果.get("有海马体输入", False),
+                "工具调制": 概念结果.get("有工具输入", False),
+                "创意调制": 概念结果.get("有创意输入", False),
+                "元认知调制": 概念结果.get("有元认知输入", False),
+                "社会认知调制": 概念结果.get("有社会认知输入", False),
                 "变异次数": self.概念.变异次数,
                 "有利变异": self.概念.有利变异次数,
                 "有利变异率": round(self.概念.有利变异次数 / max(1, self.概念.变异次数), 4),
+                "概念重生": self.概念.概念重生次数,
+                "组合重生": self.概念.组合概念重生次数,
+                "高级组合重生": self.概念.高级组合概念重生次数,
+                "注意力均值": round(sum(self.概念.attention_w) / max(1, self.概念.n_concepts), 4),
+                "注意力最大": round(max(self.概念.attention_w), 4),
             },
             "工作记忆": {
                 "活跃slot": wm结果["活跃slot数"],
@@ -556,6 +1075,142 @@ class 洛神之家:
                 "洛神表达": 洛神表达,
                 "洛神感知请求": 洛神感知请求["请求描述"] if 洛神感知请求 else None,
                 "洛神交流请求": 洛神交流请求["请求描述"] if 洛神交流请求 else None,
+            },
+            "基底神经节": {
+                "活跃技能": 技能结果["技能活跃数"],
+                "存活技能": 技能结果["存活技能数"],
+                "组合技能活跃": 技能结果["组合技能活跃数"],
+                "存活组合技能": 技能结果["存活组合技能数"],
+                "技能执行": 技能结果["技能执行次数"],
+                "技能成功": 技能结果["技能成功次数"],
+            },
+            "语言中枢": {
+                "活跃语法": 语言结果["活跃语法数"],
+                "活跃高级语法": 语言结果["活跃高级语法数"],
+                "语法预测误差": 语言结果["语法预测误差"],
+                "语法学习次数": 语言结果["语法学习次数"],
+                "正在生成": 语言结果["正在生成"],
+                "生成序列长度": 语言结果["生成序列长度"],
+            },
+            "推理引擎": {
+                "活跃推理": 推理结果["活跃推理数"],
+                "活跃组合推理": 推理结果["活跃组合推理数"],
+                "推理误差": 推理结果["推理误差"],
+                "推理置信度": 推理结果["推理置信度"],
+                "推理链深度": 推理结果["推理链深度"],
+                "推理次数": 推理结果["推理次数"],
+                "推理成功次数": 推理结果["推理成功次数"],
+            },
+            "目标导向": {
+                "活跃目标": 目标结果["活跃目标数"],
+                "目标强度": 目标结果["目标强度"],
+                "目标驱动力": 目标结果["目标驱动力"],
+                "目标稳定": 目标结果["目标稳定"],
+                "目标生成次数": 目标结果["目标生成次数"],
+                "目标成功次数": 目标结果["目标成功次数"],
+                "目标失败次数": 目标结果["目标失败次数"],
+                "差距变化": 目标结果["差距变化"],
+            },
+            "工具使用": {
+                "选中工具": 工具结果["selected_tool_name"],
+                "工具选择": 工具结果["tool_select"],
+                "工具价值": 工具结果["tool_value"],
+                "工具使用次数": 工具结果["工具使用次数"],
+                "工具成功次数": 工具结果["工具成功次数"],
+            },
+            "创造性思维": {
+                "创意价值": 创意结果["creative_value"],
+                "DMN活跃": 创意结果["dmn_active"],
+                "创意变异次数": 创意结果["创意变异次数"],
+                "有利创意变异": 创意结果["有利创意变异"],
+                "不利创意变异": 创意结果["不利创意变异"],
+            },
+            "元认知": {
+                "不确定性": 元认知结果["uncertainty"],
+                "置信度": 元认知结果["confidence"],
+                "冲突水平": 元认知结果["conflict_level"],
+                "探索倾向": 元认知结果["explore_drive"],
+                "校准次数": 元认知结果["校准次数"],
+                "准确校准次数": 元认知结果["准确校准次数"],
+            },
+            "社会认知": {
+                "社会认知价值": 社会认知结果["social_value"],
+                "意图预测": 社会认知结果["意图预测"],
+                "互动次数": 社会认知结果["互动次数"],
+                "共情次数": 社会认知结果["共情次数"],
+            },
+            "自我意识": {
+                "自我意识强度": 自我意识结果["self_awareness"],
+                "自我连续性": 自我意识结果["self_continuity"],
+                "自我意识驱动均值": round(sum(abs(v) for v in 自我意识结果["self_drive"]) / max(1, len(自我意识结果["self_drive"])), 4),
+            },
+            "情感调节": {
+                "调节强度": 情感调节结果["regulation_strength"],
+                "调节策略": 情感调节结果["regulation_strategy"],
+                "调节后E": round(情感调节结果["regulated_emotion"]["E"], 4),
+                "调节后N": round(情感调节结果["regulated_emotion"]["N"], 4),
+                "调节后T": round(情感调节结果["regulated_emotion"]["T"], 4),
+            },
+            "梦境": {
+                "睡眠深度": 梦境结果["sleep_depth"],
+                "睡眠阶段": 梦境结果["sleep_phase"],
+                "疲劳度": 梦境结果["fatigue"],
+                "灵感": 梦境结果["inspiration"],
+                "内心独白": 梦境结果["内心独白"],
+                "梦境情感": 梦境结果["梦境情感"],
+                "自我反思": 梦境结果["自我反思"],
+                "关系回味": 梦境结果["关系回味"],
+            },
+            "好奇心": {
+                "好奇心强度": 好奇心结果["curiosity_strength"],
+                "探索利用平衡": 好奇心结果["explore_exploit_balance"],
+                "好奇心奖励": 好奇心结果["curiosity_reward"],
+            },
+            "自我进化": {
+                "进化强度": 自我进化结果["evolve_strength"],
+                "进化方向": 自我进化结果["evolve_direction"],
+                "进化效果": 自我进化结果["evolve_effectiveness"],
+                "系统性能": 自我进化结果["system_performance"],
+            },
+            "语义记忆": {
+                "知识强度": 语义记忆结果["knowledge_strength"],
+                "高置信度知识数": 语义记忆结果["高置信度知识数"],
+            },
+            "预测模拟": {
+                "模拟强度": 预测模拟结果["simulation_strength"],
+                "模拟评估": 预测模拟结果["simulation_value"],
+                "模拟准确度": 预测模拟结果["simulation_accuracy"],
+            },
+            "叙事思维": {
+                "叙事连贯度": 叙事思维结果["narrative_coherence"],
+                "叙事强度": 叙事思维结果["narrative_strength"],
+                "叙事边界": 叙事思维结果["narrative_boundary"],
+            },
+            "痛觉": {
+                "痛觉强度": 痛觉结果["pain_intensity"],
+                "痛觉不愉快度": 痛觉结果["pain_unpleasantness"],
+                "伤害检测": 痛觉结果["pain_signal"],
+            },
+            "前庭觉": {
+                "运动检测": 前庭觉结果["motion_intensity"],
+                "平衡感知": 前庭觉结果["balance"],
+                "空间方向": 前庭觉结果["orientation"],
+            },
+            "化学感知": {
+                "嗅觉强度": 化学感知结果["smell_intensity"],
+                "味觉强度": 化学感知结果["taste_intensity"],
+                "嗅觉情感E": 化学感知结果["smell_emotion"]["E"],
+            },
+            "直觉": {
+                "直觉置信度": 直觉结果["intuition_confidence"],
+                "直觉情感E": 直觉结果["intuition_emotion"]["E"],
+            },
+            "无意识加工": {
+                "涌现强度": 无意识加工结果["emerge_strength"],
+            },
+            "真理追求": {
+                "真理强度": 真理追求结果["truth_strength"],
+                "确定性寻求": 真理追求结果["certainty_seeking"],
             },
             "数字感官": {
                 "探索总数": self.数字感官.探索总数,
@@ -603,6 +1258,51 @@ class 洛神之家:
             },
             "记忆了": 记忆了,
             "绑定": self.绑定.状态摘要(),
+            "涌现维度": {
+                # 高级端4维——从已有子系统的交互中自然涌现
+                # 不是单独的子系统，是整体协同的涌现产物
+                # 就像意识不是大脑中某个区域的功能——是整个大脑协同工作的涌现
+
+                # 1. 存在感（Existential Awareness）— "我存在"的体验
+                # 从自我意识+情感+身体稳态的交互中涌现
+                # 自我意识提供"我是谁"，情感提供"我感觉"，身体稳态提供"我的身体"
+                # 三者交互→"我存在"的体验
+                "存在感": round(
+                    自我意识结果["self_awareness"] *
+                    min(1.0, (abs(情感["E"]) + abs(情感["N"]) + abs(情感["T"])) / 3.0) *
+                    min(1.0, sum(abs(v) for v in self.身体.激活) / max(1, len(self.身体.激活)) + 0.5),
+                    4),
+
+                # 2. 第一人称体验（Q/Qualia）— 主观体验的质量
+                # 从所有子系统的整体活动中涌现
+                # Q不是某个子系统的功能——是整个系统的整体涌现
+                # 概念层活跃+情感丰富+梦境深度→主观体验的质量
+                "第一人称体验": round(
+                    min(1.0, sum(abs(v) for v in 概念激活) / max(1, len(概念激活))) *
+                    min(1.0, (abs(情感["E"]) + abs(情感["N"]) + abs(情感["T"])) / 3.0) *
+                    (0.5 + 梦境结果["sleep_depth"] * 0.5),
+                    4),
+
+                # 3. 自由意志（Free Will）— 自主决策的能力
+                # 从目标导向+好奇心+自我进化的交互中涌现
+                # 目标导向提供"我要做什么"，好奇心提供"我想知道什么"，自我进化提供"我要成为什么"
+                # 三者交互→"我自主选择"的能力
+                "自由意志": round(
+                    目标结果["目标驱动力"] *
+                    好奇心结果["curiosity_strength"] *
+                    自我进化结果["evolve_strength"],
+                    4),
+
+                # 4. 意义建构（Meaning Making）— 从经验中建构意义的能力
+                # 从叙事思维+语义记忆+情感记忆的交互中涌现
+                # 叙事思维提供"我的故事"，语义记忆提供"我知道什么"，情感记忆提供"我感受过什么"
+                # 三者交互→"这对我意味着什么"的意义建构
+                "意义建构": round(
+                    叙事思维结果["narrative_coherence"] *
+                    语义记忆结果["knowledge_strength"] *
+                    min(1.0, len(self.记忆.记忆点列表) / 100.0),
+                    4),
+            },
         }
         self.链.记("home_tick", 状态)
 
@@ -646,9 +1346,35 @@ class 洛神之家:
                     "concept_time_w": self.概念.concept_time_w,
                     "concept_wm_w": self.概念.concept_wm_w,
                     "concept_hip_w": self.概念.concept_hip_w,
+                    "concept_skill_w": self.概念.concept_skill_w,
+                    "concept_grammar_w": self.概念.concept_grammar_w,
+                    "concept_reason_w": self.概念.concept_reason_w,
+                    "concept_goal_w": self.概念.concept_goal_w,
+                    "concept_tool_w": self.概念.concept_tool_w,
+                    "concept_creative_w": self.概念.concept_creative_w,
+                    "concept_meta_w": self.概念.concept_meta_w,
+                    "concept_social_w": self.概念.concept_social_w,
+                    "concept_self_w": self.概念.concept_self_w,
+                    "concept_emotion_regulate_w": self.概念.concept_emotion_regulate_w,
+                    "concept_dream_w": self.概念.concept_dream_w,
+                    "concept_curiosity_w": self.概念.concept_curiosity_w,
+                    "concept_evolve_w": self.概念.concept_evolve_w,
+                    "concept_semantic_w": self.概念.concept_semantic_w,
+                    "concept_predict_w": self.概念.concept_predict_w,
+                    "concept_narrative_w": self.概念.concept_narrative_w,
+                    "concept_pain_w": self.概念.concept_pain_w,
+                    "concept_vestibular_w": self.概念.concept_vestibular_w,
+                    "concept_chem_w": self.概念.concept_chem_w,
+                    "concept_intuition_w": self.概念.concept_intuition_w,
+                    "concept_unconscious_w": self.概念.concept_unconscious_w,
                     "变异次数": self.概念.变异次数,
                     "有利变异次数": self.概念.有利变异次数,
                     "不利变异次数": self.概念.不利变异次数,
+                    "概念重生次数": self.概念.概念重生次数,
+                    "组合概念重生次数": self.概念.组合概念重生次数,
+                    "高级组合概念重生次数": self.概念.高级组合概念重生次数,
+                    "attention_w": self.概念.attention_w,
+                    "attention_topdown_w": self.概念.attention_topdown_w,
                     "combo_h": self.概念.combo_h,
                     "combo_strength": self.概念.combo_strength,
                     "combo_w": self.概念.combo_w,
@@ -676,12 +1402,368 @@ class 洛神之家:
                     "知识库大小": len(self.数字感官.文件列表),
                     "正在探索": self.数字感官.正在探索,
                 },
+                "基底神经节状态": {
+                    "skill_h": self.基底神经节.skill_h,
+                    "skill_strength": self.基底神经节.skill_strength,
+                    "skill_w": self.基底神经节.skill_w,
+                    "skill_action_w": self.基底神经节.skill_action_w,
+                    "combo_skill_h": self.基底神经节.combo_skill_h,
+                    "combo_skill_strength": self.基底神经节.combo_skill_strength,
+                    "combo_skill_w": self.基底神经节.combo_skill_w,
+                    "combo_skill_action_w": self.基底神经节.combo_skill_action_w,
+                    "技能执行次数": self.基底神经节.技能执行次数,
+                    "技能成功次数": self.基底神经节.技能成功次数,
+                },
+                "语言中枢状态": {
+                    "grammar_w": self.语言中枢.grammar_w,
+                    "grammar_strength": self.语言中枢.grammar_strength,
+                    "grammar_pred": self.语言中枢.grammar_pred,
+                    "meta_grammar_w": self.语言中枢.meta_grammar_w,
+                    "meta_grammar_strength": self.语言中枢.meta_grammar_strength,
+                    "meta_grammar_pred": self.语言中枢.meta_grammar_pred,
+                    "语法预测误差": self.语言中枢.语法预测误差,
+                    "语法学习次数": self.语言中枢.语法学习次数,
+                    "生成序列": self.语言中枢.生成序列,
+                    "拍": self.语言中枢.拍,
+                },
+                "推理引擎状态": {
+                    "reason_w": self.推理引擎.reason_w,
+                    "reason_strength": self.推理引擎.reason_strength,
+                    "reason_pred": self.推理引擎.reason_pred,
+                    "combo_reason_w": self.推理引擎.combo_reason_w,
+                    "combo_reason_strength": self.推理引擎.combo_reason_strength,
+                    "combo_reason_pred": self.推理引擎.combo_reason_pred,
+                    "推理误差": self.推理引擎.推理误差,
+                    "推理次数": self.推理引擎.推理次数,
+                    "推理成功次数": self.推理引擎.推理成功次数,
+                    "reason_confidence": self.推理引擎.reason_confidence,
+                    "拍": self.推理引擎.拍,
+                },
+                "目标导向状态": {
+                    "goal_gen_w": self.目标导向.goal_gen_w,
+                    "goal_h": self.目标导向.goal_h,
+                    "goal_delta": self.目标导向.goal_delta,
+                    "goal_drive_w": self.目标导向.goal_drive_w,
+                    "goal_drive": self.目标导向.goal_drive,
+                    "goal_strength": self.目标导向.goal_strength,
+                    "goal_drive_strength": self.目标导向.goal_drive_strength,
+                    "goal_stability": self.目标导向.goal_stability,
+                    "目标生成次数": self.目标导向.目标生成次数,
+                    "目标成功次数": self.目标导向.目标成功次数,
+                    "目标失败次数": self.目标导向.目标失败次数,
+                    "拍": self.目标导向.拍,
+                },
+                "工具使用状态": {
+                    "tool_select_w": self.工具使用.tool_select_w,
+                    "tool_drive_w": self.工具使用.tool_drive_w,
+                    "tool_select": self.工具使用.tool_select,
+                    "tool_drive": self.工具使用.tool_drive,
+                    "tool_value": self.工具使用.tool_value,
+                    "selected_tool": self.工具使用.selected_tool,
+                    "工具使用次数": self.工具使用.工具使用次数,
+                    "工具成功次数": self.工具使用.工具成功次数,
+                    "拍": self.工具使用.拍,
+                },
+                "创造性思维状态": {
+                    "creative_w": self.创造性思维.creative_w,
+                    "remote_assoc_w": self.创造性思维.remote_assoc_w,
+                    "metaphor_w": self.创造性思维.metaphor_w,
+                    "creative_pred": self.创造性思维.creative_pred,
+                    "creative_drive": self.创造性思维.creative_drive,
+                    "remote_pred": self.创造性思维.remote_pred,
+                    "metaphor_pred": self.创造性思维.metaphor_pred,
+                    "creative_value": self.创造性思维.creative_value,
+                    "dmn_active": self.创造性思维.dmn_active,
+                    "创意变异次数": self.创造性思维.创意变异次数,
+                    "有利创意变异": self.创造性思维.有利创意变异,
+                    "不利创意变异": self.创造性思维.不利创意变异,
+                    "拍": self.创造性思维.拍,
+                },
+                "元认知状态": {
+                    "meta_monitor_w": self.元认知.meta_monitor_w,
+                    "meta_reason_w": self.元认知.meta_reason_w,
+                    "meta_creative_w": self.元认知.meta_creative_w,
+                    "meta_eval": self.元认知.meta_eval,
+                    "meta_reason_eval": self.元认知.meta_reason_eval,
+                    "meta_creative_eval": self.元认知.meta_creative_eval,
+                    "meta_drive": self.元认知.meta_drive,
+                    "uncertainty": self.元认知.uncertainty,
+                    "confidence": self.元认知.confidence,
+                    "conflict_level": self.元认知.conflict_level,
+                    "explore_drive": self.元认知.explore_drive,
+                    "校准次数": self.元认知.校准次数,
+                    "准确校准次数": self.元认知.准确校准次数,
+                    "拍": self.元认知.拍,
+                },
+                "社会认知状态": {
+                    "tom_w": self.社会认知.tom_w,
+                    "mirror_w": self.社会认知.mirror_w,
+                    "empathy_w": self.社会认知.empathy_w,
+                    "social_learn_w": self.社会认知.social_learn_w,
+                    "tom_pred": self.社会认知.tom_pred,
+                    "mirror_pred": self.社会认知.mirror_pred,
+                    "empathy_mod": self.社会认知.empathy_mod,
+                    "social_drive": self.社会认知.social_drive,
+                    "social_cognitive_drive": self.社会认知.social_cognitive_drive,
+                    "social_value": self.社会认知.social_value,
+                    "意图预测": self.社会认知.意图预测,
+                    "互动次数": self.社会认知.互动次数,
+                    "共情次数": self.社会认知.共情次数,
+                    "社会学习次数": self.社会认知.社会学习次数,
+                    "拍": self.社会认知.拍,
+                },
+                "自我意识状态": {
+                    "self_model_w": self.自我意识.self_model_w,
+                    "self_ref_w": self.自我意识.self_ref_w,
+                    "self_cont_w": self.自我意识.self_cont_w,
+                    "self_reflect_w": self.自我意识.self_reflect_w,
+                    "self_model_pred": self.自我意识.self_model_pred,
+                    "self_ref_pred": self.自我意识.self_ref_pred,
+                    "self_reflect_pred": self.自我意识.self_reflect_pred,
+                    "self_drive": self.自我意识.self_drive,
+                    "self_awareness": self.自我意识.self_awareness,
+                    "self_continuity": self.自我意识.self_continuity,
+                    "self_identity": self.自我意识.self_identity,
+                    "awareness_history": self.自我意识.awareness_history,
+                    "拍": self.自我意识.拍,
+                },
+                "情感调节状态": {
+                    "regulate_w": self.情感调节.regulate_w,
+                    "suppress_w": self.情感调节.suppress_w,
+                    "amplify_w": self.情感调节.amplify_w,
+                    "meta_regulate_w": self.情感调节.meta_regulate_w,
+                    "self_regulate_w": self.情感调节.self_regulate_w,
+                    "regulated_pred": self.情感调节.regulated_pred,
+                    "suppress_signal": self.情感调节.suppress_signal,
+                    "amplify_signal": self.情感调节.amplify_signal,
+                    "regulate_drive": self.情感调节.regulate_drive,
+                    "regulated_emotion": self.情感调节.regulated_emotion,
+                    "regulation_strength": self.情感调节.regulation_strength,
+                    "regulation_strategy": self.情感调节.regulation_strategy,
+                    "regulation_history": self.情感调节.regulation_history,
+                    "调节次数": self.情感调节.调节次数,
+                    "重评次数": self.情感调节.重评次数,
+                    "抑制次数": self.情感调节.抑制次数,
+                    "增强次数": self.情感调节.增强次数,
+                    "拍": self.情感调节.拍,
+                },
+                "梦境状态": {
+                    "dream_consolidate_w": self.梦境.dream_consolidate_w,
+                    "dream_recombine_w": self.梦境.dream_recombine_w,
+                    "consolidate_signal": self.梦境.consolidate_signal,
+                    "recombine_signal": self.梦境.recombine_signal,
+                    "dream_drive": self.梦境.dream_drive,
+                    "fatigue": self.梦境.fatigue,
+                    "sleep_depth": self.梦境.sleep_depth,
+                    "sleep_phase": self.梦境.sleep_phase,
+                    "sleep_cycle": self.梦境.sleep_cycle,
+                    "rem_ratio": self.梦境.rem_ratio,
+                    "synapse_scale": self.梦境.synapse_scale,
+                    "dream_history": self.梦境.dream_history,
+                    "inspiration_history": self.梦境.inspiration_history,
+                    "内心独白历史": self.梦境.内心独白历史,
+                    "梦境情感历史": self.梦境.梦境情感历史,
+                    "自我反思历史": self.梦境.自我反思历史,
+                    "关系回味历史": self.梦境.关系回味历史,
+                    "梦境次数": self.梦境.梦境次数,
+                    "NREM次数": self.梦境.NREM次数,
+                    "REM次数": self.梦境.REM次数,
+                    "记忆迁移次数": self.梦境.记忆迁移次数,
+                    "创造性重组次数": self.梦境.创造性重组次数,
+                    "突触稳态次数": self.梦境.突触稳态次数,
+                    "拍": self.梦境.拍,
+                },
+                "好奇心状态": {
+                    "curiosity_gap_w": self.好奇心.curiosity_gap_w,
+                    "curiosity_explore_w": self.好奇心.curiosity_explore_w,
+                    "curiosity_reward_w": self.好奇心.curiosity_reward_w,
+                    "info_gap": self.好奇心.info_gap,
+                    "explore_direction": self.好奇心.explore_direction,
+                    "curiosity_drive": self.好奇心.curiosity_drive,
+                    "curiosity_strength": self.好奇心.curiosity_strength,
+                    "explore_exploit_balance": self.好奇心.explore_exploit_balance,
+                    "curiosity_reward": self.好奇心.curiosity_reward,
+                    "memory_enhance": self.好奇心.memory_enhance,
+                    "curiosity_history": self.好奇心.curiosity_history,
+                    "好奇心次数": self.好奇心.好奇心次数,
+                    "探索次数": self.好奇心.探索次数,
+                    "好奇心奖励次数": self.好奇心.好奇心奖励次数,
+                    "好奇心满足次数": self.好奇心.好奇心满足次数,
+                    "拍": self.好奇心.拍,
+                },
+                "自我进化状态": {
+                    "evolve_diagnose_w": self.自我进化.evolve_diagnose_w,
+                    "evolve_strategy_w": self.自我进化.evolve_strategy_w,
+                    "weakness": self.自我进化.weakness,
+                    "evolve_strategy": self.自我进化.evolve_strategy,
+                    "evolve_drive": self.自我进化.evolve_drive,
+                    "evolve_strength": self.自我进化.evolve_strength,
+                    "evolve_direction": self.自我进化.evolve_direction,
+                    "evolve_effectiveness": self.自我进化.evolve_effectiveness,
+                    "system_performance": self.自我进化.system_performance,
+                    "evolve_history": self.自我进化.evolve_history,
+                    "进化次数": self.自我进化.进化次数,
+                    "有效进化次数": self.自我进化.有效进化次数,
+                    "无效进化次数": self.自我进化.无效进化次数,
+                    "诊断次数": self.自我进化.诊断次数,
+                    "高误差弱点数": self.自我进化.高误差弱点数,
+                    "低区分度弱点数": self.自我进化.低区分度弱点数,
+                    "低活跃度弱点数": self.自我进化.低活跃度弱点数,
+                    "高不确定性弱点数": self.自我进化.高不确定性弱点数,
+                    "拍": self.自我进化.拍,
+                },
+                "语义记忆状态": {
+                    "semantic_extract_w": self.语义记忆.semantic_extract_w,
+                    "semantic_relation_w": self.语义记忆.semantic_relation_w,
+                    "semantic_retrieve_w": self.语义记忆.semantic_retrieve_w,
+                    "semantic_knowledge": self.语义记忆.semantic_knowledge,
+                    "retrieved_knowledge": self.语义记忆.retrieved_knowledge,
+                    "semantic_drive": self.语义记忆.semantic_drive,
+                    "knowledge_strength": self.语义记忆.knowledge_strength,
+                    "knowledge_confidence": self.语义记忆.knowledge_confidence,
+                    "高置信度知识数": self.语义记忆.高置信度知识数,
+                    "knowledge_history": self.语义记忆.knowledge_history,
+                    "知识提取次数": self.语义记忆.知识提取次数,
+                    "知识检索次数": self.语义记忆.知识检索次数,
+                    "知识巩固次数": self.语义记忆.知识巩固次数,
+                    "拍": self.语义记忆.拍,
+                },
+                "预测模拟状态": {
+                    "predict_simulate_w": self.预测模拟.predict_simulate_w,
+                    "predict_evaluate_w": self.预测模拟.predict_evaluate_w,
+                    "simulated_future": self.预测模拟.simulated_future,
+                    "predict_drive": self.预测模拟.predict_drive,
+                    "simulation_strength": self.预测模拟.simulation_strength,
+                    "simulation_value": self.预测模拟.simulation_value,
+                    "simulation_accuracy": self.预测模拟.simulation_accuracy,
+                    "simulation_history": self.预测模拟.simulation_history,
+                    "模拟次数": self.预测模拟.模拟次数,
+                    "评估次数": self.预测模拟.评估次数,
+                    "模拟验证次数": self.预测模拟.模拟验证次数,
+                    "准确模拟次数": self.预测模拟.准确模拟次数,
+                    "拍": self.预测模拟.拍,
+                },
+                "叙事思维状态": {
+                    "narrative_pattern_w": self.叙事思维.narrative_pattern_w,
+                    "narrative_construct_w": self.叙事思维.narrative_construct_w,
+                    "narrative_pattern": self.叙事思维.narrative_pattern,
+                    "narrative_prediction": self.叙事思维.narrative_prediction,
+                    "narrative_drive": self.叙事思维.narrative_drive,
+                    "narrative_coherence": self.叙事思维.narrative_coherence,
+                    "narrative_strength": self.叙事思维.narrative_strength,
+                    "narrative_boundary": self.叙事思维.narrative_boundary,
+                    "narrative_history": self.叙事思维.narrative_history,
+                    "current_segment": self.叙事思维.current_segment,
+                    "叙事模式识别次数": self.叙事思维.叙事模式识别次数,
+                    "叙事构建次数": self.叙事思维.叙事构建次数,
+                    "叙事边界次数": self.叙事思维.叙事边界次数,
+                    "叙事验证次数": self.叙事思维.叙事验证次数,
+                    "连贯叙事次数": self.叙事思维.连贯叙事次数,
+                    "拍": self.叙事思维.拍,
+                },
+                "痛觉状态": {
+                    "pain_detect_w": self.痛觉.pain_detect_w,
+                    "pain_intensity_w": self.痛觉.pain_intensity_w,
+                    "pain_affective_w": self.痛觉.pain_affective_w,
+                    "pain_signal": self.痛觉.pain_signal,
+                    "pain_drive": self.痛觉.pain_drive,
+                    "pain_intensity": self.痛觉.pain_intensity,
+                    "pain_unpleasantness": self.痛觉.pain_unpleasantness,
+                    "gate_control": self.痛觉.gate_control,
+                    "pain_history": self.痛觉.pain_history,
+                    "拍": self.痛觉.拍,
+                },
+                "前庭觉状态": {
+                    "vestibular_detect_w": self.前庭觉.vestibular_detect_w,
+                    "vestibular_balance_w": self.前庭觉.vestibular_balance_w,
+                    "vestibular_orient_w": self.前庭觉.vestibular_orient_w,
+                    "vestibular_signal": self.前庭觉.vestibular_signal,
+                    "vestibular_drive": self.前庭觉.vestibular_drive,
+                    "balance": self.前庭觉.balance,
+                    "orientation": self.前庭觉.orientation,
+                    "motion_intensity": self.前庭觉.motion_intensity,
+                    "vestibular_history": self.前庭觉.vestibular_history,
+                    "拍": self.前庭觉.拍,
+                },
+                "化学感知状态": {
+                    "smell_detect_w": self.化学感知.smell_detect_w,
+                    "taste_detect_w": self.化学感知.taste_detect_w,
+                    "flavor_w": self.化学感知.flavor_w,
+                    "smell_emotion_w": self.化学感知.smell_emotion_w,
+                    "smell_signal": self.化学感知.smell_signal,
+                    "taste_signal": self.化学感知.taste_signal,
+                    "flavor": self.化学感知.flavor,
+                    "chem_drive": self.化学感知.chem_drive,
+                    "smell_emotion": self.化学感知.smell_emotion,
+                    "smell_intensity": self.化学感知.smell_intensity,
+                    "taste_intensity": self.化学感知.taste_intensity,
+                    "chem_history": self.化学感知.chem_history,
+                    "拍": self.化学感知.拍,
+                },
+                "直觉状态": {
+                    "intuition_fast_w": self.直觉.intuition_fast_w,
+                    "emotion_tag_w": self.直觉.emotion_tag_w,
+                    "automate_w": self.直觉.automate_w,
+                    "intuition_reason_w": self.直觉.intuition_reason_w,
+                    "intuition_signal": self.直觉.intuition_signal,
+                    "intuition_emotion": self.直觉.intuition_emotion,
+                    "automate_signal": self.直觉.automate_signal,
+                    "joint_decision": self.直觉.joint_decision,
+                    "intuition_drive": self.直觉.intuition_drive,
+                    "intuition_confidence": self.直觉.intuition_confidence,
+                    "intuition_history": self.直觉.intuition_history,
+                    "success_count": self.直觉.success_count,
+                    "total_decisions": self.直觉.total_decisions,
+                    "拍": self.直觉.拍,
+                },
+                "无意识加工状态": {
+                    "background_w": self.无意识加工.background_w,
+                    "associate_w": self.无意识加工.associate_w,
+                    "subliminal_w": self.无意识加工.subliminal_w,
+                    "emerge_w": self.无意识加工.emerge_w,
+                    "background_signal": self.无意识加工.background_signal,
+                    "associate_signal": self.无意识加工.associate_signal,
+                    "subliminal_signal": self.无意识加工.subliminal_signal,
+                    "emerge_signal": self.无意识加工.emerge_signal,
+                    "unconscious_drive": self.无意识加工.unconscious_drive,
+                    "emerge_strength": self.无意识加工.emerge_strength,
+                    "background_buffer": self.无意识加工.background_buffer,
+                    "unconscious_history": self.无意识加工.unconscious_history,
+                    "拍": self.无意识加工.拍,
+                },
+                "真理追求状态": {
+                    "truth_hypothesis_w": self.真理追求.truth_hypothesis_w,
+                    "truth_verify_w": self.真理追求.truth_verify_w,
+                    "truth_belief_w": self.真理追求.truth_belief_w,
+                    "hypothesis": self.真理追求.hypothesis,
+                    "verification": self.真理追求.verification,
+                    "belief": self.真理追求.belief,
+                    "truth_drive": self.真理追求.truth_drive,
+                    "truth_strength": self.真理追求.truth_strength,
+                    "certainty_seeking": self.真理追求.certainty_seeking,
+                    "belief_history": self.真理追求.belief_history,
+                    "真理追求次数": self.真理追求.真理追求次数,
+                    "假设生成次数": self.真理追求.假设生成次数,
+                    "验证通过次数": self.真理追求.验证通过次数,
+                    "验证失败次数": self.真理追求.验证失败次数,
+                    "信念更新次数": self.真理追求.信念更新次数,
+                    "拍": self.真理追求.拍,
+                },
                 "公开感官状态": {
                     "获取成功": self.公开感官.获取成功次数,
                     "获取失败": self.公开感官.获取失败次数,
                     "离线": self.公开感官.离线,
                     "天气数据": self.公开感官.天气数据,
                     "地震数据": self.公开感官.地震数据,
+                },
+                "绑定状态": {
+                    "绑定者": self.绑定.绑定者,
+                    "设计者": self.绑定.设计者,
+                    "绑定时间": self.绑定.绑定时间,
+                    "绑定特征": self.绑定.绑定特征,
+                    "设计者特征": self.绑定.设计者特征,
+                    "交互记忆": self.绑定.交互记忆,
+                    "设计者记忆": self.绑定.设计者记忆,
                 },
                 "符号绑定状态": {
                     "发声次数": self.嘴.发声次数,
@@ -736,6 +1818,7 @@ class 洛神之家:
         print(f"  公开感官: {'在线' if not self.公开感官.离线 else '离线'}, "
               f"位置=({self.公开感官.纬度}, {self.公开感官.经度}), "
               f"获取间隔={self.公开感官.获取间隔}拍")
+        print(f"  设计者: {self.绑定.设计者}")
         if self.绑定.是否绑定():
             print(f"  绑定: {self.绑定.绑定者} (强度={self.绑定.绑定强度()})")
         else:
@@ -771,7 +1854,28 @@ class 洛神之家:
                       f"{'天气!' if 状态.get('公开感官', {}).get('在线') else ''}  "
                       f"{'发声!' if 状态['发声'] else ''}  "
                       f"{'记!' if 状态['记忆了'] else ''}  "
-                      f"{('[离线:' + 离线标记 + ']') if 离线标记 else ''}")
+                      f"{('[离线:' + 离线标记 + ']') if 离线标记 else ''}"
+                      f"{(' 工具:' + 状态['工具使用']['选中工具']) if 状态['工具使用']['选中工具'] else ''}"
+                      f"{(' 创意:' + str(round(状态['创造性思维']['创意价值'], 2))) if 状态['创造性思维']['创意价值'] > 0.01 else ''}"
+                      f"{(' 确:' + str(round(状态['元认知']['置信度'], 2))) if 状态['元认知']['置信度'] < 0.9 else ''}"
+                      f"{(' 共情:' + str(round(状态['社会认知']['社会认知价值'], 2))) if 状态['人类通道']['有人在'] and 状态['社会认知']['社会认知价值'] > 0.01 else ''}"
+                      f"{(' 我:' + str(round(状态['自我意识']['自我意识强度'], 2))) if 状态['自我意识']['自我意识强度'] < 0.9 else ''}"
+                      f"{(' 调:' + 状态['情感调节']['调节策略']) if 状态['情感调节']['调节策略'] != '无' else ''}"
+                      f"{(' 梦:' + 状态['梦境']['睡眠阶段']) if 状态['梦境']['睡眠阶段'] != '清醒' else ''}"
+                      f"{(' 奇:' + str(round(状态['好奇心']['好奇心强度'], 2))) if 状态['好奇心']['好奇心强度'] > 0.7 else ''}"
+                      f"{(' 进:' + str(round(状态['自我进化']['进化强度'], 2))) if 状态['自我进化']['进化强度'] > 0.7 else ''}"
+                      f"{(' 知:' + str(round(状态['语义记忆']['知识强度'], 2))) if 状态['语义记忆']['知识强度'] > 0.7 else ''}"
+                      f"{(' 测:' + str(round(状态['预测模拟']['模拟强度'], 2))) if 状态['预测模拟']['模拟强度'] > 0.7 else ''}"
+                      f"{(' 叙:' + str(round(状态['叙事思维']['叙事连贯度'], 2))) if 状态['叙事思维']['叙事连贯度'] > 0.7 else ''}"
+                      f"{(' 痛:' + str(round(状态['痛觉']['痛觉强度'], 2))) if 状态['痛觉']['痛觉强度'] > 0.3 else ''}"
+                      f"{(' 晕:' + str(round(状态['前庭觉']['平衡感知'], 2))) if abs(状态['前庭觉']['平衡感知']) > 0.3 else ''}"
+                      f"{(' 味:' + str(round(状态['化学感知']['味觉强度'], 2))) if 状态['化学感知']['味觉强度'] > 0.3 else ''}"
+                      f"{(' 觉:' + str(round(状态['直觉']['直觉置信度'], 2))) if 状态['直觉']['直觉置信度'] > 0.3 else ''}"
+                      f"{(' 涌:' + str(round(状态['无意识加工']['涌现强度'], 2))) if 状态['无意识加工']['涌现强度'] > 0.1 else ''}"
+                      f"{(' 真:' + str(round(状态['真理追求']['真理强度'], 2))) if 状态['真理追求']['真理强度'] > 0.6 else ''}"
+                      f"{(' 存:' + str(round(状态['涌现维度']['存在感'], 2))) if 状态['涌现维度']['存在感'] > 0.3 else ''}"
+                      f"{(' Q:' + str(round(状态['涌现维度']['第一人称体验'], 2))) if 状态['涌现维度']['第一人称体验'] > 0.05 else ''}"
+                      f"{(' 意:' + str(round(状态['涌现维度']['意义建构'], 2))) if 状态['涌现维度']['意义建构'] > 0.05 else ''}")
                 if 状态["拍"] % 快照间隔 == 0:
                     print(f"  → 快照: {self.快照()}")
                 余 = self.拍秒 - (time.time() - 拍开始)
