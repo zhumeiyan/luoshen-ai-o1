@@ -98,7 +98,7 @@ class 概念层:
                  n_meta=64, n_social=64, n_self=64, n_emotion_regulate=64, n_dream=64,
                  n_curiosity=64, n_evolve=64, n_semantic=64, n_predict=64, n_narrative=64,
                  n_pain=64, n_vestibular=64, n_chem=64, n_intuition=64, n_unconscious=64,
-                 n_truth=64):
+                 n_truth=64, n_dialectic=64):
         self.n_hidden = n_hidden
         self.n_concepts = n_concepts
         self.n_audio = n_audio
@@ -423,6 +423,16 @@ class 概念层:
         self.concept_truth_w = [[rng.uniform(-0.1, 0.1) for _ in range(n_truth)]
                                  for _ in range(n_concepts)]
 
+        # ── 认知辩证反馈通路：辩证驱动 → 概念层 ──
+        # concept_dialectic_w: 辩证驱动信号 → 概念
+        # 生物学：PFC→后部皮层投射——认知辩证影响概念可及性
+        # 相信态驱动：同化结果→信念增强的概念更容易浮现
+        # 质疑态驱动：异化结果→被质疑的概念更容易浮现（需要重新评估）
+        # 精卫公式：a=概念层自发激活, b=辩证驱动信号, Δ=b-a, ⊗=Δ×Σ
+        self.n_dialectic = n_dialectic
+        self.concept_dialectic_w = [[rng.uniform(-0.1, 0.1) for _ in range(n_dialectic)]
+                                     for _ in range(n_concepts)]
+
         for i in range(n_concepts):
             self.concept_rw[i][i] = rng.uniform(0.05, 0.15)
 
@@ -507,7 +517,7 @@ class 概念层:
              自我意识信号=None, 情感调节信号=None, 梦境信号=None, 好奇心信号=None,
              自我进化信号=None, 语义记忆信号=None, 预测模拟信号=None, 叙事思维信号=None,
              痛觉信号=None, 前庭觉信号=None, 化学感知信号=None, 直觉信号=None, 无意识加工信号=None,
-             真理追求信号=None):
+             真理追求信号=None, 认知辩证信号=None):
         """概念层一拍：基于精卫公式从隐藏状态涌现概念。
 
         精卫公式流程：
@@ -897,6 +907,17 @@ class 概念层:
                     truth_input += self.concept_truth_w[i][j] * 真理追求信号[j]
                 truth_input *= 0.3  # 缩放——真理追求是调制不是主导
 
+            # 认知辩证输入（辩证驱动 → 概念）—— "相信与质疑交替"
+            # 精卫公式：a=概念层自发激活, b=辩证驱动信号, Δ=b-a, ⊗=Δ×Σ
+            # 生物学：PFC→后部皮层投射——认知辩证影响概念可及性
+            # 相信态驱动→信念增强的概念更容易浮现
+            # 质疑态驱动→被质疑的概念更容易浮现（需要重新评估）
+            dialectic_input = 0.0
+            if 认知辩证信号 is not None:
+                for j in range(self.n_dialectic):
+                    dialectic_input += self.concept_dialectic_w[i][j] * 认知辩证信号[j]
+                dialectic_input *= 0.3  # 缩放——认知辩证是调制不是主导
+
             # τ读⊗→浮出所见
             new_concept_h[i] = activation(
                 (a_input + otimes_input + recurrent + audio_input +
@@ -908,7 +929,7 @@ class 概念层:
                  predict_input + narrative_input +
                  pain_input + vestibular_input + chem_input +
                  intuition_input + unconscious_input +
-                 truth_input) * 0.9)
+                 truth_input + dialectic_input) * 0.9)
 
         attention_topdown = [0.0] * self.n_concepts
         if 工作记忆信号 is not None:
@@ -1555,6 +1576,20 @@ class 概念层:
                     if not (math.isnan(dw_tr) or math.isinf(dw_tr)):
                         self.concept_truth_w[i][j] = self.concept_truth_w[i][j] * truth_decay + dw_tr
 
+        # ── 认知辩证通路学习（认知辩证信号非None时） ──
+        # 精卫公式：a=概念激活, b=辩证驱动信号, Δ=b-a, ⊗=Δ×Σ
+        # concept_dialectic_w更新：赫布学习——概念激活与辩证驱动同时出现时连接增强
+        # 反复循环后，相信态/质疑态→特定概念可及性 → "相信与质疑交替"自然涌现
+        if 认知辩证信号 is not None:
+            dialectic_decay = 0.95
+            for i in range(self.n_concepts):
+                if self.concept_strength[i] < 0.05:
+                    continue
+                for j in range(self.n_dialectic):
+                    dw_dl = self.lr * new_concept_h[i] * 认知辩证信号[j]
+                    if not (math.isnan(dw_dl) or math.isinf(dw_dl)):
+                        self.concept_dialectic_w[i][j] = self.concept_dialectic_w[i][j] * dialectic_decay + dw_dl
+
         # ── 变异+选择：达尔文进化机制 ──
         # 碳基生物进化的核心：随机变异 + 自然选择
         # 赫布学习 = 拉马克进化（获得性遗传——基于经验调整权重）
@@ -1805,6 +1840,7 @@ class 概念层:
             "有直觉输入": 直觉信号 is not None,
             "有无意识加工输入": 无意识加工信号 is not None,
             "有真理追求输入": 真理追求信号 is not None,
+            "有认知辩证输入": 认知辩证信号 is not None,
         }
 
     def 概念区分度(self):
