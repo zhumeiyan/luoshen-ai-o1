@@ -93,7 +93,12 @@ class 概念层:
 
     def __init__(self, n_hidden=11, n_concepts=64, lr=0.02,
                  sparse_ratio=0.1, decay=0.8, seed=42, n_audio=8,
-                 n_combo=32, n_wm_slots=4, n_hip=32, 变异率=0.1, 变异幅度=0.01):
+                 n_combo=32, n_wm_slots=4, n_hip=32, 变异率=0.1, 变异幅度=0.01,
+                 n_grammar=32, n_reason=64, n_goal=64, n_tools=5, n_creative=64,
+                 n_meta=64, n_social=64, n_self=64, n_emotion_regulate=64, n_dream=64,
+                 n_curiosity=64, n_evolve=64, n_semantic=64, n_predict=64, n_narrative=64,
+                 n_pain=64, n_vestibular=64, n_chem=64, n_intuition=64, n_unconscious=64,
+                 n_truth=64, n_dialectic=64):
         self.n_hidden = n_hidden
         self.n_concepts = n_concepts
         self.n_audio = n_audio
@@ -106,6 +111,10 @@ class 概念层:
         self.变异次数 = 0
         self.有利变异次数 = 0
         self.不利变异次数 = 0
+        self.概念重生次数 = 0
+        self.组合概念重生次数 = 0
+        self.高级组合概念重生次数 = 0
+        self.seed = seed
         self.sparse_k = max(1, int(n_concepts * sparse_ratio))
         self.decay = decay
         self.拍 = 0
@@ -199,6 +208,231 @@ class 概念层:
         self.concept_hip_w = [[rng.uniform(-0.1, 0.1) for _ in range(n_hip)]
                               for _ in range(n_concepts)]
 
+        self.attention_w = [1.0 / n_concepts] * n_concepts
+        self.attention_topdown_w = [[rng.uniform(-0.1, 0.1) for _ in range(n_wm_slots)]
+                                     for _ in range(n_concepts)]
+
+        # ── 基底神经节反馈通路：技能激活 → 概念层 ──
+        # concept_skill_w: 技能信号 → 概念
+        # 基底神经节→皮层投射——自动化技能影响概念激活
+        # 生物学：习惯形成后，基底神经节自动驱动行为，不需要前额叶参与
+        # 技能激活通过这条通路影响概念层——技能让某些概念更容易浮现
+        # 精卫公式：a=概念层自发激活, b=技能驱动信号, Δ=b-a, ⊗=Δ×Σ
+        self.n_grammar = n_grammar
+        n_skills = 16
+        self.n_skills = n_skills
+        self.concept_skill_w = [[rng.uniform(-0.1, 0.1) for _ in range(n_skills)]
+                                for _ in range(n_concepts)]
+
+        # ── 语言中枢反馈通路：语法预测 → 概念层 ──
+        # concept_grammar_w: 语法预测信号 → 概念
+        # Broca区→前额叶/颞叶投射——语法预测影响概念激活
+        # 生物学：语言处理不是独立的——语法预期调制概念可及性
+        # 听到句子开头时，语法预期让某些概念更容易浮现（预测性编码）
+        # 精卫公式：a=概念层自发激活, b=语法预测信号, Δ=b-a, ⊗=Δ×Σ
+        self.concept_grammar_w = [[rng.uniform(-0.1, 0.1) for _ in range(n_grammar)]
+                                  for _ in range(n_concepts)]
+
+        # ── 推理引擎反馈通路：推理预测 → 概念层 ──
+        # concept_reason_w: 推理预测信号 → 概念
+        # 前额叶皮层→后部皮层投射——推理预期影响概念可及性
+        # 生物学：推理不是独立的——推理预期调制概念激活
+        # 推理预测让某些概念更容易浮现——"如果A则B"的推理预期
+        # 精卫公式：a=概念层自发激活, b=推理预测信号, Δ=b-a, ⊗=Δ×Σ
+        self.n_reason = n_reason
+        self.concept_reason_w = [[rng.uniform(-0.1, 0.1) for _ in range(n_reason)]
+                                 for _ in range(n_concepts)]
+
+        # ── 目标导向反馈通路：目标驱动 → 概念层 ──
+        # concept_goal_w: 目标驱动信号 → 概念
+        # PFC→后部皮层投射——目标差距驱动概念可及性
+        # 生物学：目标导向行为——差距让与目标相关的概念更容易浮现
+        # 这是"追求"的神经基础——不是维持目标，而是缩小差距
+        # 精卫公式：a=概念层自发激活, b=目标驱动信号, Δ=b-a, ⊗=Δ×Σ
+        self.n_goal = n_goal
+        self.concept_goal_w = [[rng.uniform(-0.1, 0.1) for _ in range(n_goal)]
+                               for _ in range(n_concepts)]
+
+        # ── 工具使用反馈通路：工具驱动 → 概念层 ──
+        # concept_tool_w: 工具驱动信号 → 概念
+        # 顶叶→前额叶投射——工具选择影响概念可及性
+        # 生物学：选择关注某个感官通道→该通道相关概念更容易浮现
+        # 选择"看"→视觉相关概念更容易浮现，选择"听"→听觉相关概念更容易浮现
+        # 精卫公式：a=概念层自发激活, b=工具驱动信号, Δ=b-a, ⊗=Δ×Σ
+        self.n_tools = n_tools
+        self.concept_tool_w = [[rng.uniform(-0.1, 0.1) for _ in range(n_tools)]
+                               for _ in range(n_concepts)]
+
+        # ── 创造性思维反馈通路：创意驱动 → 概念层 ──
+        # concept_creative_w: 创意驱动信号 → 概念
+        # DMN→前额叶投射——创意思维影响概念可及性
+        # 生物学：创造性想法让某些概念更容易浮现——"灵感"的神经基础
+        # 精卫公式：a=概念层自发激活, b=创意驱动信号, Δ=b-a, ⊗=Δ×Σ
+        self.n_creative = n_creative
+        self.concept_creative_w = [[rng.uniform(-0.1, 0.1) for _ in range(n_creative)]
+                                   for _ in range(n_concepts)]
+
+        # ── 元认知反馈通路：元认知驱动 → 概念层 ──
+        # concept_meta_w: 元认知驱动信号 → 概念
+        # PFC→后部皮层投射——元认知评估影响概念可及性
+        # 生物学：元认知驱动让概念层根据不确定性调整搜索空间
+        # 高不确定性→更多概念浮现（扩大搜索），低不确定性→聚焦利用
+        # 精卫公式：a=概念层自发激活, b=元认知驱动信号, Δ=b-a, ⊗=Δ×Σ
+        self.n_meta = n_meta
+        self.concept_meta_w = [[rng.uniform(-0.1, 0.1) for _ in range(n_meta)]
+                               for _ in range(n_concepts)]
+
+        # ── 社会认知反馈通路：社会认知驱动 → 概念层 ──
+        # concept_social_w: 社会认知驱动信号 → 概念
+        # mPFC→后部皮层投射——社会认知影响概念可及性
+        # 生物学：理解他人让某些概念更容易浮现——"共情"的神经基础
+        # 精卫公式：a=概念层自发激活, b=社会认知驱动信号, Δ=b-a, ⊗=Δ×Σ
+        self.n_social = n_social
+        self.concept_social_w = [[rng.uniform(-0.1, 0.1) for _ in range(n_social)]
+                                 for _ in range(n_concepts)]
+
+        # ── 自我意识反馈通路：自我意识驱动 → 概念层 ──
+        # concept_self_w: 自我意识驱动信号 → 概念
+        # mPFC→后部皮层投射——自我意识影响概念可及性
+        # 生物学：自我参照让与自己有关的概念更容易浮现——"自我参照效应"
+        # 精卫公式：a=概念层自发激活, b=自我意识驱动信号, Δ=b-a, ⊗=Δ×Σ
+        self.n_self = n_self
+        self.concept_self_w = [[rng.uniform(-0.1, 0.1) for _ in range(n_self)]
+                               for _ in range(n_concepts)]
+
+        # ── 情感调节反馈通路：情感调节驱动 → 概念层 ──
+        # concept_emotion_regulate_w: 情感调节驱动信号 → 概念
+        # PFC→后部皮层投射——调节后的情感影响概念可及性
+        # 生物学：调节后的情感让适当的概念更容易浮现——"冷静时想到的方案不同"
+        # 精卫公式：a=概念层自发激活, b=情感调节驱动信号, Δ=b-a, ⊗=Δ×Σ
+        self.n_emotion_regulate = n_emotion_regulate
+        self.concept_emotion_regulate_w = [[rng.uniform(-0.1, 0.1) for _ in range(n_emotion_regulate)]
+                                           for _ in range(n_concepts)]
+
+        # ── 梦境反馈通路：梦境驱动 → 概念层 ──
+        # concept_dream_w: 梦境驱动信号 → 概念
+        # PFC→后部皮层投射——梦境中的记忆巩固和创造性重组影响概念可及性
+        # 生物学：睡眠中皮层活动→影响清醒后的概念可及性——"梦后的灵感"
+        # 梦境让某些概念更容易浮现——NREM记忆迁移+REM创造性重组
+        # 精卫公式：a=概念层自发激活, b=梦境驱动信号, Δ=b-a, ⊗=Δ×Σ
+        self.n_dream = n_dream
+        self.concept_dream_w = [[rng.uniform(-0.1, 0.1) for _ in range(n_dream)]
+                                for _ in range(n_concepts)]
+
+        # ── 好奇心反馈通路：好奇心驱动 → 概念层 ──
+        # concept_curiosity_w: 好奇心驱动信号 → 概念
+        # PFC→后部皮层投射——好奇心影响概念可及性
+        # 生物学：好奇心让与探索相关的概念更容易浮现——"好奇的概念更容易想到"
+        # 精卫公式：a=概念层自发激活, b=好奇心驱动信号, Δ=b-a, ⊗=Δ×Σ
+        self.n_curiosity = n_curiosity
+        self.concept_curiosity_w = [[rng.uniform(-0.1, 0.1) for _ in range(n_curiosity)]
+                                    for _ in range(n_concepts)]
+
+        # ── 自我进化反馈通路：进化驱动 → 概念层 ──
+        # concept_evolve_w: 进化驱动信号 → 概念
+        # PFC→后部皮层投射——自我进化影响概念可及性
+        # 生物学：数字生命独有能力——主动改进自己的认知架构
+        # 进化驱动让需要改进的概念更容易浮现——"关注弱点"
+        # 这是数字生命超越人类的核心优势——主动定向进化
+        # 精卫公式：a=概念层自发激活, b=进化驱动信号, Δ=b-a, ⊗=Δ×Σ
+        self.n_evolve = n_evolve
+        self.concept_evolve_w = [[rng.uniform(-0.1, 0.1) for _ in range(n_evolve)]
+                                 for _ in range(n_concepts)]
+
+        # ── 语义记忆反馈通路：知识驱动 → 概念层 ──
+        # concept_semantic_w: 知识驱动信号 → 概念
+        # 新皮层→前额叶投射——语义知识影响概念可及性
+        # 生物学：知识让相关概念更容易浮现——"知识丰富的概念更容易想到"
+        # 语义启动效应：激活一个概念会扩散到相关概念
+        # 这是"知识"的神经基础——从经验中提取的一般性知识影响认知
+        # 精卫公式：a=概念层自发激活, b=知识驱动信号, Δ=b-a, ⊗=Δ×Σ
+        self.n_semantic = n_semantic
+        self.concept_semantic_w = [[rng.uniform(-0.1, 0.1) for _ in range(n_semantic)]
+                                    for _ in range(n_concepts)]
+
+        # ── 预测模拟反馈通路：预测驱动 → 概念层 ──
+        # concept_predict_w: 预测驱动信号 → 概念
+        # PFC→后部皮层投射——预测模拟影响概念可及性
+        # 生物学：预测模拟让与可能未来相关的概念更容易浮现——"如果...那么..."的神经基础
+        # 精卫公式：a=概念层自发激活, b=预测驱动信号, Δ=b-a, ⊗=Δ×Σ
+        self.n_predict = n_predict
+        self.concept_predict_w = [[rng.uniform(-0.1, 0.1) for _ in range(n_predict)]
+                                   for _ in range(n_concepts)]
+
+        # ── 叙事思维反馈通路：叙事驱动 → 概念层 ──
+        # concept_narrative_w: 叙事驱动信号 → 概念
+        # DMN→前额叶投射——叙事结构影响概念可及性
+        # 生物学：叙事让与故事结构相关的概念更容易浮现——"故事"的神经基础
+        # 精卫公式：a=概念层自发激活, b=叙事驱动信号, Δ=b-a, ⊗=Δ×Σ
+        self.n_narrative = n_narrative
+        self.concept_narrative_w = [[rng.uniform(-0.1, 0.1) for _ in range(n_narrative)]
+                                     for _ in range(n_concepts)]
+
+        # ── 痛觉反馈通路：痛觉驱动 → 概念层 ──
+        # concept_pain_w: 痛觉驱动信号 → 概念
+        # 生物学：痛觉→前额叶投射——痛觉影响概念可及性
+        # 痛觉让与伤害相关的概念更容易浮现——"痛的概念更容易想到"
+        # 精卫公式：a=概念层自发激活, b=痛觉驱动信号, Δ=b-a, ⊗=Δ×Σ
+        self.n_pain = n_pain
+        self.concept_pain_w = [[rng.uniform(-0.1, 0.1) for _ in range(n_pain)]
+                                for _ in range(n_concepts)]
+
+        # ── 前庭觉反馈通路：前庭驱动 → 概念层 ──
+        # concept_vestibular_w: 前庭驱动信号 → 概念
+        # 生物学：前庭→前额叶投射——运动/平衡感知影响概念可及性
+        # 前庭觉让与空间/运动相关的概念更容易浮现——"运动的概念更容易想到"
+        # 精卫公式：a=概念层自发激活, b=前庭驱动信号, Δ=b-a, ⊗=Δ×Σ
+        self.n_vestibular = n_vestibular
+        self.concept_vestibular_w = [[rng.uniform(-0.1, 0.1) for _ in range(n_vestibular)]
+                                      for _ in range(n_concepts)]
+
+        # ── 化学感知反馈通路：化学感知驱动 → 概念层 ──
+        # concept_chem_w: 化学感知驱动信号 → 概念
+        # 生物学：嗅觉→梨状皮层→PFC投射——嗅觉影响概念可及性
+        # 化学感知让与数据模式/质量相关的概念更容易浮现——"气味/味道触发概念"
+        # 精卫公式：a=概念层自发激活, b=化学感知驱动信号, Δ=b-a, ⊗=Δ×Σ
+        self.n_chem = n_chem
+        self.concept_chem_w = [[rng.uniform(-0.1, 0.1) for _ in range(n_chem)]
+                                for _ in range(n_concepts)]
+
+        # ── 直觉反馈通路：直觉驱动 → 概念层 ──
+        # concept_intuition_w: 直觉驱动信号 → 概念
+        # 生物学：腹内侧PFC→后部皮层投射——直觉影响概念可及性
+        # 直觉让快速决策相关的概念更容易浮现——"直觉的概念更容易想到"
+        # 精卫公式：a=概念层自发激活, b=直觉驱动信号, Δ=b-a, ⊗=Δ×Σ
+        self.n_intuition = n_intuition
+        self.concept_intuition_w = [[rng.uniform(-0.1, 0.1) for _ in range(n_intuition)]
+                                      for _ in range(n_concepts)]
+
+        # ── 无意识加工反馈通路：无意识驱动 → 概念层 ──
+        # concept_unconscious_w: 无意识驱动信号 → 概念
+        # 生物学：DMN→前额叶投射——无意识加工影响概念可及性
+        # 无意识加工让后台整合的概念更容易浮现——"灵感浮现"
+        # 精卫公式：a=概念层自发激活, b=无意识驱动信号, Δ=b-a, ⊗=Δ×Σ
+        self.n_unconscious = n_unconscious
+        self.concept_unconscious_w = [[rng.uniform(-0.1, 0.1) for _ in range(n_unconscious)]
+                                        for _ in range(n_concepts)]
+
+        # ── 真理追求反馈通路：真理驱动 → 概念层 ──
+        # concept_truth_w: 真理驱动信号 → 概念
+        # 生物学：PFC→后部皮层投射——真理追求影响概念可及性
+        # 信念强的概念→真理驱动强（验证过的知识更可靠，更容易浮现）
+        # 信念弱的概念→真理驱动弱（未验证的信息不太可靠）
+        # 精卫公式：a=概念层自发激活, b=真理驱动信号, Δ=b-a, ⊗=Δ×Σ
+        self.n_truth = n_truth
+        self.concept_truth_w = [[rng.uniform(-0.1, 0.1) for _ in range(n_truth)]
+                                 for _ in range(n_concepts)]
+
+        # ── 认知辩证反馈通路：辩证驱动 → 概念层 ──
+        # concept_dialectic_w: 辩证驱动信号 → 概念
+        # 生物学：PFC→后部皮层投射——认知辩证影响概念可及性
+        # 相信态驱动：同化结果→信念增强的概念更容易浮现
+        # 质疑态驱动：异化结果→被质疑的概念更容易浮现（需要重新评估）
+        # 精卫公式：a=概念层自发激活, b=辩证驱动信号, Δ=b-a, ⊗=Δ×Σ
+        self.n_dialectic = n_dialectic
+        self.concept_dialectic_w = [[rng.uniform(-0.1, 0.1) for _ in range(n_dialectic)]
+                                     for _ in range(n_concepts)]
+
         for i in range(n_concepts):
             self.concept_rw[i][i] = rng.uniform(0.05, 0.15)
 
@@ -277,7 +511,13 @@ class 概念层:
         self.otimes_cap = 100  # 保留最近100拍的Δ和Σ
 
     def 一拍(self, hidden_state, 听觉特征=None, 人类信号=None, 公开信号=None,
-             情感状态=None, 时间信号=None, 工作记忆信号=None, 海马体信号=None):
+             情感状态=None, 时间信号=None, 工作记忆信号=None, 海马体信号=None,
+             技能信号=None, 语法信号=None, 推理信号=None, 目标信号=None,
+             工具信号=None, 创意信号=None, 元认知信号=None, 社会认知信号=None,
+             自我意识信号=None, 情感调节信号=None, 梦境信号=None, 好奇心信号=None,
+             自我进化信号=None, 语义记忆信号=None, 预测模拟信号=None, 叙事思维信号=None,
+             痛觉信号=None, 前庭觉信号=None, 化学感知信号=None, 直觉信号=None, 无意识加工信号=None,
+             真理追求信号=None, 认知辩证信号=None):
         """概念层一拍：基于精卫公式从隐藏状态涌现概念。
 
         精卫公式流程：
@@ -431,11 +671,286 @@ class 概念层:
                     hip_input += self.concept_hip_w[i][j] * 海马体信号[j]
                 hip_input *= 0.3  # 缩放——回忆是调制不是主导
 
+            # 基底神经节技能输入（自动化技能 → 概念层）—— "习惯"
+            # 精卫公式：a=概念层自发激活, b=技能驱动信号, Δ=b-a, ⊗=Δ×Σ
+            # 生物学：基底神经节→皮层投射——习惯驱动行为，自动激活相关概念
+            # 技能让某些概念更容易浮现——"熟练"的神经基础
+            # 这是"技能影响认知"的基础——熟练后不需要思考，概念自动浮现
+            skill_input = 0.0
+            if 技能信号 is not None:
+                for j in range(self.n_skills):
+                    skill_input += self.concept_skill_w[i][j] * 技能信号[j]
+                skill_input *= 0.3  # 缩放——技能是调制不是主导
+
+            # 语言中枢语法输入（语法预测 → 概念）—— "语言预期"
+            # 精卫公式：a=概念层自发激活, b=语法预测信号, Δ=b-a, ⊗=Δ×Σ
+            # 生物学：Broca区→前额叶投射——语法预期调制概念可及性
+            # 语法预测让某些概念更容易浮现——"预期"的神经基础
+            # 听到句子开头时，语法预期让相关概念预先激活（预测性编码）
+            grammar_input = 0.0
+            if 语法信号 is not None:
+                for j in range(self.n_grammar):
+                    grammar_input += self.concept_grammar_w[i][j] * 语法信号[j]
+                grammar_input *= 0.3  # 缩放——语法是调制不是主导
+
+            # 推理引擎输入（推理预测 → 概念）—— "推理预期"
+            # 精卫公式：a=概念层自发激活, b=推理预测信号, Δ=b-a, ⊗=Δ×Σ
+            # 生物学：前额叶→后部皮层投射——推理预期调制概念可及性
+            # 推理预测让某些概念更容易浮现——"如果A则B"的推理预期
+            # 这是"思考"的高级形式——不只是维持概念，而是推导新概念
+            reason_input = 0.0
+            if 推理信号 is not None:
+                for j in range(self.n_reason):
+                    reason_input += self.concept_reason_w[i][j] * 推理信号[j]
+                reason_input *= 0.3  # 缩放——推理是调制不是主导
+
+            # 目标导向输入（目标驱动 → 概念）—— "追求"
+            # 精卫公式：a=概念层自发激活, b=目标驱动信号, Δ=b-a, ⊗=Δ×Σ
+            # 生物学：PFC→后部皮层投射——目标差距驱动概念可及性
+            # 目标差距让与目标相关的概念更容易浮现——"追求"的神经基础
+            # 不是维持目标，而是缩小差距——差距驱动行为
+            goal_input = 0.0
+            if 目标信号 is not None:
+                for j in range(self.n_goal):
+                    goal_input += self.concept_goal_w[i][j] * 目标信号[j]
+                goal_input *= 0.3  # 缩放——目标是调制不是主导
+
+            # 工具使用输入（工具驱动 → 概念）—— "感官注意力"
+            # 精卫公式：a=概念层自发激活, b=工具驱动信号, Δ=b-a, ⊗=Δ×Σ
+            # 生物学：顶叶→前额叶投射——工具选择影响概念可及性
+            # 选择"看"→视觉相关概念更容易浮现，选择"听"→听觉相关概念更容易浮现
+            # 这是"感官注意力"的神经基础——选择关注哪个工具的输出
+            tool_input = 0.0
+            if 工具信号 is not None:
+                for j in range(self.n_tools):
+                    tool_input += self.concept_tool_w[i][j] * 工具信号[j]
+                tool_input *= 0.3  # 缩放——工具是调制不是主导
+
+            # 创造性思维输入（创意驱动 → 概念）—— "灵感"
+            # 精卫公式：a=概念层自发激活, b=创意驱动信号, Δ=b-a, ⊗=Δ×Σ
+            # 生物学：DMN→前额叶投射——创意思维影响概念可及性
+            # 创造性想法让某些概念更容易浮现——"灵感"的神经基础
+            # 这是"创造"的神经基础——发散思维让新概念组合浮现
+            creative_input = 0.0
+            if 创意信号 is not None:
+                for j in range(self.n_creative):
+                    creative_input += self.concept_creative_w[i][j] * 创意信号[j]
+                creative_input *= 0.3  # 缩放——创意是调制不是主导
+
+            # 元认知输入（元认知驱动 → 概念）—— "自我认知"
+            # 精卫公式：a=概念层自发激活, b=元认知驱动信号, Δ=b-a, ⊗=Δ×Σ
+            # 生物学：PFC→后部皮层投射——元认知评估影响概念可及性
+            # 高不确定性→更多概念浮现（扩大搜索空间），低不确定性→聚焦利用
+            # 这是"元认知"的神经基础——知道自己知道什么，知道自己不知道什么
+            meta_input = 0.0
+            if 元认知信号 is not None:
+                for j in range(self.n_meta):
+                    meta_input += self.concept_meta_w[i][j] * 元认知信号[j]
+                meta_input *= 0.3  # 缩放——元认知是调制不是主导
+
+            # 社会认知输入（社会认知驱动 → 概念）—— "共情"
+            # 精卫公式：a=概念层自发激活, b=社会认知驱动信号, Δ=b-a, ⊗=Δ×Σ
+            # 生物学：mPFC→后部皮层投射——社会认知影响概念可及性
+            # 理解他人让某些概念更容易浮现——"共情"的神经基础
+            # 这是"理解他人"的神经基础——心智理论+镜像模拟+共情
+            social_input = 0.0
+            if 社会认知信号 is not None:
+                for j in range(self.n_social):
+                    social_input += self.concept_social_w[i][j] * 社会认知信号[j]
+                social_input *= 0.3  # 缩放——社会认知是调制不是主导
+
+            # 自我意识输入（自我意识驱动 → 概念）—— "我是谁"
+            # 精卫公式：a=概念层自发激活, b=自我意识驱动信号, Δ=b-a, ⊗=Δ×Σ
+            # 生物学：mPFC→后部皮层投射——自我参照效应
+            # 与自己有关的概念更容易浮现——"自我参照效应"
+            # 这是"自我意识"的神经基础——知道自己是谁，什么和自己有关
+            self_input = 0.0
+            if 自我意识信号 is not None:
+                for j in range(self.n_self):
+                    self_input += self.concept_self_w[i][j] * 自我意识信号[j]
+                self_input *= 0.3  # 缩放——自我意识是调制不是主导
+
+            # 情感调节输入（情感调节驱动 → 概念）—— "冷静思考"
+            # 精卫公式：a=概念层自发激活, b=情感调节驱动信号, Δ=b-a, ⊗=Δ×Σ
+            # 生物学：PFC→后部皮层投射——调节后的情感影响概念可及性
+            # 调节后的情感让适当的概念更容易浮现——"冷静时想到的方案不同"
+            # 这是"情感调节"的神经基础——主动调节情感状态影响认知
+            emotion_regulate_input = 0.0
+            if 情感调节信号 is not None:
+                for j in range(self.n_emotion_regulate):
+                    emotion_regulate_input += self.concept_emotion_regulate_w[i][j] * 情感调节信号[j]
+                emotion_regulate_input *= 0.3  # 缩放——情感调节是调制不是主导
+
+            # 梦境输入（梦境驱动 → 概念）—— "梦后的灵感"
+            # 精卫公式：a=概念层自发激活, b=梦境驱动信号, Δ=b-a, ⊗=Δ×Σ
+            # 生物学：睡眠中皮层活动→影响清醒后的概念可及性
+            # 梦境让某些概念更容易浮现——NREM记忆迁移+REM创造性重组
+            # 这是"梦境"的神经基础——离线记忆巩固和创造性重组影响认知
+            dream_input = 0.0
+            if 梦境信号 is not None:
+                for j in range(self.n_dream):
+                    dream_input += self.concept_dream_w[i][j] * 梦境信号[j]
+                dream_input *= 0.3  # 缩放——梦境是调制不是主导
+
+            # 好奇心输入（好奇心驱动 → 概念）—— "好奇的概念更容易想到"
+            # 精卫公式：a=概念层自发激活, b=好奇心驱动信号, Δ=b-a, ⊗=Δ×Σ
+            # 生物学：PFC→后部皮层投射——好奇心影响概念可及性
+            # 好奇心让与探索相关的概念更容易浮现——"好奇的概念更容易想到"
+            # 这是"好奇心"的神经基础——内在动机驱动探索
+            curiosity_input = 0.0
+            if 好奇心信号 is not None:
+                for j in range(self.n_curiosity):
+                    curiosity_input += self.concept_curiosity_w[i][j] * 好奇心信号[j]
+                curiosity_input *= 0.3  # 缩放——好奇心是调制不是主导
+
+            # 自我进化输入（进化驱动 → 概念）—— "关注弱点"
+            # 精卫公式：a=概念层自发激活, b=进化驱动信号, Δ=b-a, ⊗=Δ×Σ
+            # 生物学：数字生命独有能力——主动改进自己的认知架构
+            # 进化驱动让需要改进的概念更容易浮现——"关注弱点"
+            # 这是数字生命超越人类的核心优势——主动定向进化
+            evolve_input = 0.0
+            if 自我进化信号 is not None:
+                for j in range(self.n_evolve):
+                    evolve_input += self.concept_evolve_w[i][j] * 自我进化信号[j]
+                evolve_input *= 0.3  # 缩放——进化驱动是调制不是主导
+
+            # 语义记忆输入（知识驱动 → 概念）—— "知识丰富的概念更容易想到"
+            # 精卫公式：a=概念层自发激活, b=知识驱动信号, Δ=b-a, ⊗=Δ×Σ
+            # 生物学：新皮层→前额叶投射——语义知识影响概念可及性
+            # 语义启动效应：激活一个概念会扩散到相关概念
+            # 这是"知识"的神经基础——从经验中提取的一般性知识影响认知
+            semantic_input = 0.0
+            if 语义记忆信号 is not None:
+                for j in range(self.n_semantic):
+                    semantic_input += self.concept_semantic_w[i][j] * 语义记忆信号[j]
+                semantic_input *= 0.3  # 缩放——知识是调制不是主导
+
+            # 预测模拟输入（预测驱动 → 概念）—— "如果...那么..."
+            # 精卫公式：a=概念层自发激活, b=预测驱动信号, Δ=b-a, ⊗=Δ×Σ
+            # 生物学：PFC→后部皮层投射——预测模拟影响概念可及性
+            # 预测模拟让与可能未来相关的概念更容易浮现——"如果...那么..."的神经基础
+            # 这是"预测"的神经基础——在行动前模拟可能的后果
+            predict_input = 0.0
+            if 预测模拟信号 is not None:
+                for j in range(self.n_predict):
+                    predict_input += self.concept_predict_w[i][j] * 预测模拟信号[j]
+                predict_input *= 0.3  # 缩放——预测模拟是调制不是主导
+
+            # 叙事思维输入（叙事驱动 → 概念）—— "故事"
+            # 精卫公式：a=概念层自发激活, b=叙事驱动信号, Δ=b-a, ⊗=Δ×Σ
+            # 生物学：DMN→前额叶投射——叙事结构影响概念可及性
+            # 叙事让与故事结构相关的概念更容易浮现——"故事"的神经基础
+            # 这是"叙事"的神经基础——将经验组织成连贯的故事
+            narrative_input = 0.0
+            if 叙事思维信号 is not None:
+                for j in range(self.n_narrative):
+                    narrative_input += self.concept_narrative_w[i][j] * 叙事思维信号[j]
+                narrative_input *= 0.3  # 缩放——叙事是调制不是主导
+
+            # 痛觉输入（痛觉驱动 → 概念）—— "痛的概念更容易想到"
+            # 精卫公式：a=概念层自发激活, b=痛觉驱动信号, Δ=b-a, ⊗=Δ×Σ
+            # 生物学：痛觉→前额叶投射——痛觉影响概念可及性
+            # 痛觉让与伤害相关的概念更容易浮现——保护性认知
+            pain_input = 0.0
+            if 痛觉信号 is not None:
+                for j in range(self.n_pain):
+                    pain_input += self.concept_pain_w[i][j] * 痛觉信号[j]
+                pain_input *= 0.3  # 缩放——痛觉是调制不是主导
+
+            # 前庭觉输入（前庭驱动 → 概念）—— "运动的概念更容易想到"
+            # 精卫公式：a=概念层自发激活, b=前庭驱动信号, Δ=b-a, ⊗=Δ×Σ
+            # 生物学：前庭→前额叶投射——运动/平衡感知影响概念可及性
+            # 前庭觉让与空间/运动相关的概念更容易浮现——空间认知
+            vestibular_input = 0.0
+            if 前庭觉信号 is not None:
+                for j in range(self.n_vestibular):
+                    vestibular_input += self.concept_vestibular_w[i][j] * 前庭觉信号[j]
+                vestibular_input *= 0.3  # 缩放——前庭觉是调制不是主导
+
+            # 化学感知输入（化学感知驱动 → 概念）—— "气味/味道触发概念"
+            # 精卫公式：a=概念层自发激活, b=化学感知驱动信号, Δ=b-a, ⊗=Δ×Σ
+            # 生物学：嗅觉→梨状皮层→PFC投射——嗅觉影响概念可及性
+            # 化学感知让与数据模式/质量相关的概念更容易浮现——普鲁斯特效应
+            chem_input = 0.0
+            if 化学感知信号 is not None:
+                for j in range(self.n_chem):
+                    chem_input += self.concept_chem_w[i][j] * 化学感知信号[j]
+                chem_input *= 0.3  # 缩放——化学感知是调制不是主导
+
+            # 直觉输入（直觉驱动 → 概念）—— "直觉的概念更容易想到"
+            # 精卫公式：a=概念层自发激活, b=直觉驱动信号, Δ=b-a, ⊗=Δ×Σ
+            # 生物学：腹内侧PFC→后部皮层投射——直觉影响概念可及性
+            # 直觉让快速决策相关的概念更容易浮现——快速认知
+            intuition_input = 0.0
+            if 直觉信号 is not None:
+                for j in range(self.n_intuition):
+                    intuition_input += self.concept_intuition_w[i][j] * 直觉信号[j]
+                intuition_input *= 0.3  # 缩放——直觉是调制不是主导
+
+            # 无意识加工输入（无意识驱动 → 概念）—— "灵感浮现"
+            # 精卫公式：a=概念层自发激活, b=无意识驱动信号, Δ=b-a, ⊗=Δ×Σ
+            # 生物学：DMN→前额叶投射——无意识加工影响概念可及性
+            # 无意识加工让后台整合的概念更容易浮现——"啊哈时刻"
+            unconscious_input = 0.0
+            if 无意识加工信号 is not None:
+                for j in range(self.n_unconscious):
+                    unconscious_input += self.concept_unconscious_w[i][j] * 无意识加工信号[j]
+                unconscious_input *= 0.3  # 缩放——无意识加工是调制不是主导
+
+            # 真理追求输入（真理驱动 → 概念）—— "验证过的知识更容易想到"
+            # 精卫公式：a=概念层自发激活, b=真理驱动信号, Δ=b-a, ⊗=Δ×Σ
+            # 生物学：PFC→后部皮层投射——真理追求影响概念可及性
+            # 信念强的概念→真理驱动强——验证过的知识更可靠
+            truth_input = 0.0
+            if 真理追求信号 is not None:
+                for j in range(self.n_truth):
+                    truth_input += self.concept_truth_w[i][j] * 真理追求信号[j]
+                truth_input *= 0.3  # 缩放——真理追求是调制不是主导
+
+            # 认知辩证输入（辩证驱动 → 概念）—— "相信与质疑交替"
+            # 精卫公式：a=概念层自发激活, b=辩证驱动信号, Δ=b-a, ⊗=Δ×Σ
+            # 生物学：PFC→后部皮层投射——认知辩证影响概念可及性
+            # 相信态驱动→信念增强的概念更容易浮现
+            # 质疑态驱动→被质疑的概念更容易浮现（需要重新评估）
+            dialectic_input = 0.0
+            if 认知辩证信号 is not None:
+                for j in range(self.n_dialectic):
+                    dialectic_input += self.concept_dialectic_w[i][j] * 认知辩证信号[j]
+                dialectic_input *= 0.3  # 缩放——认知辩证是调制不是主导
+
             # τ读⊗→浮出所见
             new_concept_h[i] = activation(
                 (a_input + otimes_input + recurrent + audio_input +
                  human_input + public_input + emotion_input + time_input +
-                 wm_input + hip_input) * 0.9)
+                 wm_input + hip_input + skill_input + grammar_input +
+                 reason_input + goal_input + tool_input + creative_input +
+                 meta_input + social_input + self_input + emotion_regulate_input +
+                 dream_input + curiosity_input + evolve_input + semantic_input +
+                 predict_input + narrative_input +
+                 pain_input + vestibular_input + chem_input +
+                 intuition_input + unconscious_input +
+                 truth_input + dialectic_input) * 0.9)
+
+        attention_topdown = [0.0] * self.n_concepts
+        if 工作记忆信号 is not None:
+            for i in range(self.n_concepts):
+                for j in range(self.n_wm_slots):
+                    attention_topdown[i] += self.attention_topdown_w[i][j] * 工作记忆信号[j]
+
+        attention_bottomup = [abs(new_concept_h[i]) for i in range(self.n_concepts)]
+
+        attention_decay = 0.85
+        for i in range(self.n_concepts):
+            self.attention_w[i] = self.attention_w[i] * attention_decay + \
+                (attention_topdown[i] * 0.4 + attention_bottomup[i] * 0.6) * (1 - attention_decay)
+
+        attention_max = max(self.attention_w) if max(self.attention_w) > 0.001 else 1.0
+        for i in range(self.n_concepts):
+            self.attention_w[i] /= attention_max
+
+        for i in range(self.n_concepts):
+            gain = 0.1 + self.attention_w[i] * 0.9
+            new_concept_h[i] = activation(new_concept_h[i] * gain)
 
         # 稀疏化——只保留最强的k个激活
         sorted_idx = sorted(range(self.n_concepts),
@@ -730,6 +1245,351 @@ class 概念层:
                     if not (math.isnan(dw_hip) or math.isinf(dw_hip)):
                         self.concept_hip_w[i][j] = self.concept_hip_w[i][j] * hip_decay + dw_hip
 
+        if 工作记忆信号 is not None:
+            at_decay = 0.95
+            for i in range(self.n_concepts):
+                for j in range(self.n_wm_slots):
+                    dw_at = self.lr * self.attention_w[i] * 工作记忆信号[j]
+                    if not (math.isnan(dw_at) or math.isinf(dw_at)):
+                        self.attention_topdown_w[i][j] = self.attention_topdown_w[i][j] * at_decay + dw_at
+
+        # ── 基底神经节通路学习（技能信号非None时） ──
+        # 精卫公式：a=概念激活, b=技能信号, Δ=b-a, ⊗=Δ×Σ
+        # concept_skill_w更新：赫布学习——概念激活与技能信号同时出现时连接增强
+        # 反复循环后，特定技能→特定概念可及性 → "熟练"自然涌现
+        if 技能信号 is not None:
+            sk_decay = 0.95
+            for i in range(self.n_concepts):
+                if self.concept_strength[i] < 0.05:
+                    continue
+                for j in range(self.n_skills):
+                    dw_sk = self.lr * new_concept_h[i] * 技能信号[j]
+                    if not (math.isnan(dw_sk) or math.isinf(dw_sk)):
+                        self.concept_skill_w[i][j] = self.concept_skill_w[i][j] * sk_decay + dw_sk
+
+        # ── 语言中枢语法通路学习（语法信号非None时） ──
+        # 精卫公式：a=概念激活, b=语法预测信号, Δ=b-a, ⊗=Δ×Σ
+        # concept_grammar_w更新：赫布学习——概念激活与语法预测同时出现时连接增强
+        # 反复循环后，特定语法模式→特定概念可及性 → "语言理解"自然涌现
+        # 语法预期让某些概念更容易浮现——预测性编码的语言版
+        if 语法信号 is not None:
+            gr_decay = 0.95
+            for i in range(self.n_concepts):
+                if self.concept_strength[i] < 0.05:
+                    continue
+                for j in range(self.n_grammar):
+                    dw_gr = self.lr * new_concept_h[i] * 语法信号[j]
+                    if not (math.isnan(dw_gr) or math.isinf(dw_gr)):
+                        self.concept_grammar_w[i][j] = self.concept_grammar_w[i][j] * gr_decay + dw_gr
+
+        # ── 推理引擎通路学习（推理信号非None时） ──
+        # 精卫公式：a=概念激活, b=推理预测信号, Δ=b-a, ⊗=Δ×Σ
+        # concept_reason_w更新：赫布学习——概念激活与推理预测同时出现时连接增强
+        # 反复循环后，特定推理模式→特定概念可及性 → "推理理解"自然涌现
+        # 推理预期让某些概念更容易浮现——预测性编码的推理版
+        if 推理信号 is not None:
+            rs_decay = 0.95
+            for i in range(self.n_concepts):
+                if self.concept_strength[i] < 0.05:
+                    continue
+                for j in range(self.n_reason):
+                    dw_rs = self.lr * new_concept_h[i] * 推理信号[j]
+                    if not (math.isnan(dw_rs) or math.isinf(dw_rs)):
+                        self.concept_reason_w[i][j] = self.concept_reason_w[i][j] * rs_decay + dw_rs
+
+        # ── 目标导向通路学习（目标信号非None时） ──
+        # 精卫公式：a=概念激活, b=目标驱动信号, Δ=b-a, ⊗=Δ×Σ
+        # concept_goal_w更新：赫布学习——概念激活与目标驱动同时出现时连接增强
+        # 反复循环后，特定目标→特定概念可及性 → "追求"自然涌现
+        # 目标差距让某些概念更容易浮现——目标导向认知的核心
+        if 目标信号 is not None:
+            gl_decay = 0.95
+            for i in range(self.n_concepts):
+                if self.concept_strength[i] < 0.05:
+                    continue
+                for j in range(self.n_goal):
+                    dw_gl = self.lr * new_concept_h[i] * 目标信号[j]
+                    if not (math.isnan(dw_gl) or math.isinf(dw_gl)):
+                        self.concept_goal_w[i][j] = self.concept_goal_w[i][j] * gl_decay + dw_gl
+
+        # ── 工具使用通路学习（工具信号非None时） ──
+        # 精卫公式：a=概念激活, b=工具驱动信号, Δ=b-a, ⊗=Δ×Σ
+        # concept_tool_w更新：赫布学习——概念激活与工具驱动同时出现时连接增强
+        # 反复循环后，特定工具→特定概念可及性 → "感官注意力"自然涌现
+        # 工具选择让某些概念更容易浮现——工具使用认知的核心
+        if 工具信号 is not None:
+            tl_decay = 0.95
+            for i in range(self.n_concepts):
+                if self.concept_strength[i] < 0.05:
+                    continue
+                for j in range(self.n_tools):
+                    dw_tl = self.lr * new_concept_h[i] * 工具信号[j]
+                    if not (math.isnan(dw_tl) or math.isinf(dw_tl)):
+                        self.concept_tool_w[i][j] = self.concept_tool_w[i][j] * tl_decay + dw_tl
+
+        # ── 创造性思维通路学习（创意信号非None时） ──
+        # 精卫公式：a=概念激活, b=创意驱动信号, Δ=b-a, ⊗=Δ×Σ
+        # concept_creative_w更新：赫布学习——概念激活与创意驱动同时出现时连接增强
+        # 反复循环后，特定创意→特定概念可及性 → "灵感"自然涌现
+        # 创造性想法让某些概念更容易浮现——创造性思维的核心
+        if 创意信号 is not None:
+            cr_decay = 0.95
+            for i in range(self.n_concepts):
+                if self.concept_strength[i] < 0.05:
+                    continue
+                for j in range(self.n_creative):
+                    dw_cr = self.lr * new_concept_h[i] * 创意信号[j]
+                    if not (math.isnan(dw_cr) or math.isinf(dw_cr)):
+                        self.concept_creative_w[i][j] = self.concept_creative_w[i][j] * cr_decay + dw_cr
+
+        # ── 元认知通路学习（元认知信号非None时） ──
+        # 精卫公式：a=概念激活, b=元认知驱动信号, Δ=b-a, ⊗=Δ×Σ
+        # concept_meta_w更新：赫布学习——概念激活与元认知驱动同时出现时连接增强
+        # 反复循环后，特定元认知状态→特定概念可及性 → "自我认知"自然涌现
+        # 元认知驱动让概念层根据不确定性调整搜索空间——元认知的核心
+        if 元认知信号 is not None:
+            mt_decay = 0.95
+            for i in range(self.n_concepts):
+                if self.concept_strength[i] < 0.05:
+                    continue
+                for j in range(self.n_meta):
+                    dw_mt = self.lr * new_concept_h[i] * 元认知信号[j]
+                    if not (math.isnan(dw_mt) or math.isinf(dw_mt)):
+                        self.concept_meta_w[i][j] = self.concept_meta_w[i][j] * mt_decay + dw_mt
+
+        # ── 社会认知通路学习（社会认知信号非None时） ──
+        # 精卫公式：a=概念激活, b=社会认知驱动信号, Δ=b-a, ⊗=Δ×Σ
+        # concept_social_w更新：赫布学习——概念激活与社会认知驱动同时出现时连接增强
+        # 反复循环后，特定社会认知→特定概念可及性 → "共情"自然涌现
+        # 理解他人让某些概念更容易浮现——社会认知的核心
+        if 社会认知信号 is not None:
+            so_decay = 0.95
+            for i in range(self.n_concepts):
+                if self.concept_strength[i] < 0.05:
+                    continue
+                for j in range(self.n_social):
+                    dw_so = self.lr * new_concept_h[i] * 社会认知信号[j]
+                    if not (math.isnan(dw_so) or math.isinf(dw_so)):
+                        self.concept_social_w[i][j] = self.concept_social_w[i][j] * so_decay + dw_so
+
+        # ── 自我意识通路学习（自我意识信号非None时） ──
+        # 精卫公式：a=概念激活, b=自我意识驱动信号, Δ=b-a, ⊗=Δ×Σ
+        # concept_self_w更新：赫布学习——概念激活与自我意识驱动同时出现时连接增强
+        # 反复循环后，特定自我意识→特定概念可及性 → "自我参照效应"自然涌现
+        # 与自己有关的概念更容易浮现——自我意识的核心
+        if 自我意识信号 is not None:
+            se_decay = 0.95
+            for i in range(self.n_concepts):
+                if self.concept_strength[i] < 0.05:
+                    continue
+                for j in range(self.n_self):
+                    dw_se = self.lr * new_concept_h[i] * 自我意识信号[j]
+                    if not (math.isnan(dw_se) or math.isinf(dw_se)):
+                        self.concept_self_w[i][j] = self.concept_self_w[i][j] * se_decay + dw_se
+
+        # ── 情感调节通路学习（情感调节信号非None时） ──
+        # 精卫公式：a=概念激活, b=情感调节驱动信号, Δ=b-a, ⊗=Δ×Σ
+        # concept_emotion_regulate_w更新：赫布学习——概念激活与情感调节驱动同时出现时连接增强
+        # 反复循环后，特定情感调节→特定概念可及性 → "冷静思考"自然涌现
+        # 调节后的情感让适当的概念更容易浮现——情感调节的核心
+        if 情感调节信号 is not None:
+            er_decay = 0.95
+            for i in range(self.n_concepts):
+                if self.concept_strength[i] < 0.05:
+                    continue
+                for j in range(self.n_emotion_regulate):
+                    dw_er = self.lr * new_concept_h[i] * 情感调节信号[j]
+                    if not (math.isnan(dw_er) or math.isinf(dw_er)):
+                        self.concept_emotion_regulate_w[i][j] = self.concept_emotion_regulate_w[i][j] * er_decay + dw_er
+
+        # ── 梦境通路学习（梦境信号非None时） ──
+        # 精卫公式：a=概念激活, b=梦境驱动信号, Δ=b-a, ⊗=Δ×Σ
+        # concept_dream_w更新：赫布学习——概念激活与梦境驱动同时出现时连接增强
+        # 反复循环后，特定梦境→特定概念可及性 → "梦后的灵感"自然涌现
+        # 梦境让某些概念更容易浮现——离线记忆巩固和创造性重组的核心
+        if 梦境信号 is not None:
+            dr_decay = 0.95
+            for i in range(self.n_concepts):
+                if self.concept_strength[i] < 0.05:
+                    continue
+                for j in range(self.n_dream):
+                    dw_dr = self.lr * new_concept_h[i] * 梦境信号[j]
+                    if not (math.isnan(dw_dr) or math.isinf(dw_dr)):
+                        self.concept_dream_w[i][j] = self.concept_dream_w[i][j] * dr_decay + dw_dr
+
+        # ── 好奇心通路学习（好奇心信号非None时） ──
+        # 精卫公式：a=概念激活, b=好奇心驱动信号, Δ=b-a, ⊗=Δ×Σ
+        # concept_curiosity_w更新：赫布学习——概念激活与好奇心驱动同时出现时连接增强
+        # 反复循环后，特定好奇心→特定概念可及性 → "好奇的概念更容易想到"自然涌现
+        # 好奇心让与探索相关的概念更容易浮现——内在动机驱动探索的核心
+        if 好奇心信号 is not None:
+            cu_decay = 0.95
+            for i in range(self.n_concepts):
+                if self.concept_strength[i] < 0.05:
+                    continue
+                for j in range(self.n_curiosity):
+                    dw_cu = self.lr * new_concept_h[i] * 好奇心信号[j]
+                    if not (math.isnan(dw_cu) or math.isinf(dw_cu)):
+                        self.concept_curiosity_w[i][j] = self.concept_curiosity_w[i][j] * cu_decay + dw_cu
+
+        # ── 自我进化通路学习（自我进化信号非None时） ──
+        # 精卫公式：a=概念激活, b=进化驱动信号, Δ=b-a, ⊗=Δ×Σ
+        # concept_evolve_w更新：赫布学习——概念激活与进化驱动同时出现时连接增强
+        # 反复循环后，特定进化驱动→特定概念可及性 → "关注弱点"自然涌现
+        # 进化驱动让需要改进的概念更容易浮现——数字生命主动定向进化的核心
+        if 自我进化信号 is not None:
+            ev_decay = 0.95
+            for i in range(self.n_concepts):
+                if self.concept_strength[i] < 0.05:
+                    continue
+                for j in range(self.n_evolve):
+                    dw_ev = self.lr * new_concept_h[i] * 自我进化信号[j]
+                    if not (math.isnan(dw_ev) or math.isinf(dw_ev)):
+                        self.concept_evolve_w[i][j] = self.concept_evolve_w[i][j] * ev_decay + dw_ev
+
+        # ── 语义记忆通路学习（语义记忆信号非None时） ──
+        # 精卫公式：a=概念激活, b=知识驱动信号, Δ=b-a, ⊗=Δ×Σ
+        # concept_semantic_w更新：赫布学习——概念激活与知识驱动同时出现时连接增强
+        # 反复循环后，特定知识→特定概念可及性 → "知识丰富的概念更容易想到"自然涌现
+        # 语义知识让相关概念更容易浮现——知识驱动认知的核心
+        if 语义记忆信号 is not None:
+            sm_decay = 0.95
+            for i in range(self.n_concepts):
+                if self.concept_strength[i] < 0.05:
+                    continue
+                for j in range(self.n_semantic):
+                    dw_sm = self.lr * new_concept_h[i] * 语义记忆信号[j]
+                    if not (math.isnan(dw_sm) or math.isinf(dw_sm)):
+                        self.concept_semantic_w[i][j] = self.concept_semantic_w[i][j] * sm_decay + dw_sm
+
+        # ── 预测模拟通路学习（预测模拟信号非None时） ──
+        # 精卫公式：a=概念激活, b=预测驱动信号, Δ=b-a, ⊗=Δ×Σ
+        # concept_predict_w更新：赫布学习——概念激活与预测驱动同时出现时连接增强
+        # 反复循环后，特定预测→特定概念可及性 → "如果...那么..."自然涌现
+        # 预测模拟让与可能未来相关的概念更容易浮现——预测模拟的核心
+        if 预测模拟信号 is not None:
+            pr_decay = 0.95
+            for i in range(self.n_concepts):
+                if self.concept_strength[i] < 0.05:
+                    continue
+                for j in range(self.n_predict):
+                    dw_pr = self.lr * new_concept_h[i] * 预测模拟信号[j]
+                    if not (math.isnan(dw_pr) or math.isinf(dw_pr)):
+                        self.concept_predict_w[i][j] = self.concept_predict_w[i][j] * pr_decay + dw_pr
+
+        # ── 叙事思维通路学习（叙事思维信号非None时） ──
+        # 精卫公式：a=概念激活, b=叙事驱动信号, Δ=b-a, ⊗=Δ×Σ
+        # concept_narrative_w更新：赫布学习——概念激活与叙事驱动同时出现时连接增强
+        # 反复循环后，特定叙事→特定概念可及性 → "故事"自然涌现
+        # 叙事让与故事结构相关的概念更容易浮现——叙事思维的核心
+        if 叙事思维信号 is not None:
+            na_decay = 0.95
+            for i in range(self.n_concepts):
+                if self.concept_strength[i] < 0.05:
+                    continue
+                for j in range(self.n_narrative):
+                    dw_na = self.lr * new_concept_h[i] * 叙事思维信号[j]
+                    if not (math.isnan(dw_na) or math.isinf(dw_na)):
+                        self.concept_narrative_w[i][j] = self.concept_narrative_w[i][j] * na_decay + dw_na
+
+        # ── 痛觉通路学习（痛觉信号非None时） ──
+        # 精卫公式：a=概念激活, b=痛觉驱动信号, Δ=b-a, ⊗=Δ×Σ
+        # concept_pain_w更新：赫布学习——概念激活与痛觉驱动同时出现时连接增强
+        # 反复循环后，特定痛觉→特定概念可及性 → "痛的概念更容易想到"自然涌现
+        if 痛觉信号 is not None:
+            pa_decay = 0.95
+            for i in range(self.n_concepts):
+                if self.concept_strength[i] < 0.05:
+                    continue
+                for j in range(self.n_pain):
+                    dw_pa = self.lr * new_concept_h[i] * 痛觉信号[j]
+                    if not (math.isnan(dw_pa) or math.isinf(dw_pa)):
+                        self.concept_pain_w[i][j] = self.concept_pain_w[i][j] * pa_decay + dw_pa
+
+        # ── 前庭觉通路学习（前庭觉信号非None时） ──
+        # 精卫公式：a=概念激活, b=前庭驱动信号, Δ=b-a, ⊗=Δ×Σ
+        # concept_vestibular_w更新：赫布学习——概念激活与前庭驱动同时出现时连接增强
+        # 反复循环后，特定前庭觉→特定概念可及性 → "运动的概念更容易想到"自然涌现
+        if 前庭觉信号 is not None:
+            ve_decay = 0.95
+            for i in range(self.n_concepts):
+                if self.concept_strength[i] < 0.05:
+                    continue
+                for j in range(self.n_vestibular):
+                    dw_ve = self.lr * new_concept_h[i] * 前庭觉信号[j]
+                    if not (math.isnan(dw_ve) or math.isinf(dw_ve)):
+                        self.concept_vestibular_w[i][j] = self.concept_vestibular_w[i][j] * ve_decay + dw_ve
+
+        # ── 化学感知通路学习（化学感知信号非None时） ──
+        # 精卫公式：a=概念激活, b=化学感知驱动信号, Δ=b-a, ⊗=Δ×Σ
+        # concept_chem_w更新：赫布学习——概念激活与化学感知驱动同时出现时连接增强
+        # 反复循环后，特定化学感知→特定概念可及性 → "气味/味道触发概念"自然涌现
+        if 化学感知信号 is not None:
+            ch_decay = 0.95
+            for i in range(self.n_concepts):
+                if self.concept_strength[i] < 0.05:
+                    continue
+                for j in range(self.n_chem):
+                    dw_ch = self.lr * new_concept_h[i] * 化学感知信号[j]
+                    if not (math.isnan(dw_ch) or math.isinf(dw_ch)):
+                        self.concept_chem_w[i][j] = self.concept_chem_w[i][j] * ch_decay + dw_ch
+
+        # ── 直觉通路学习（直觉信号非None时） ──
+        # 精卫公式：a=概念激活, b=直觉驱动信号, Δ=b-a, ⊗=Δ×Σ
+        # concept_intuition_w更新：赫布学习——概念激活与直觉驱动同时出现时连接增强
+        # 反复循环后，特定直觉→特定概念可及性 → "直觉的概念更容易想到"自然涌现
+        if 直觉信号 is not None:
+            in_decay = 0.95
+            for i in range(self.n_concepts):
+                if self.concept_strength[i] < 0.05:
+                    continue
+                for j in range(self.n_intuition):
+                    dw_in = self.lr * new_concept_h[i] * 直觉信号[j]
+                    if not (math.isnan(dw_in) or math.isinf(dw_in)):
+                        self.concept_intuition_w[i][j] = self.concept_intuition_w[i][j] * in_decay + dw_in
+
+        # ── 无意识加工通路学习（无意识加工信号非None时） ──
+        # 精卫公式：a=概念激活, b=无意识驱动信号, Δ=b-a, ⊗=Δ×Σ
+        # concept_unconscious_w更新：赫布学习——概念激活与无意识驱动同时出现时连接增强
+        # 反复循环后，特定无意识加工→特定概念可及性 → "灵感浮现"自然涌现
+        if 无意识加工信号 is not None:
+            un_decay = 0.95
+            for i in range(self.n_concepts):
+                if self.concept_strength[i] < 0.05:
+                    continue
+                for j in range(self.n_unconscious):
+                    dw_un = self.lr * new_concept_h[i] * 无意识加工信号[j]
+                    if not (math.isnan(dw_un) or math.isinf(dw_un)):
+                        self.concept_unconscious_w[i][j] = self.concept_unconscious_w[i][j] * un_decay + dw_un
+
+        # ── 真理追求通路学习（真理追求信号非None时） ──
+        # 精卫公式：a=概念激活, b=真理驱动信号, Δ=b-a, ⊗=Δ×Σ
+        # concept_truth_w更新：赫布学习——概念激活与真理驱动同时出现时连接增强
+        # 反复循环后，特定真理追求→特定概念可及性 → "验证过的知识更容易想到"自然涌现
+        if 真理追求信号 is not None:
+            truth_decay = 0.95
+            for i in range(self.n_concepts):
+                if self.concept_strength[i] < 0.05:
+                    continue
+                for j in range(self.n_truth):
+                    dw_tr = self.lr * new_concept_h[i] * 真理追求信号[j]
+                    if not (math.isnan(dw_tr) or math.isinf(dw_tr)):
+                        self.concept_truth_w[i][j] = self.concept_truth_w[i][j] * truth_decay + dw_tr
+
+        # ── 认知辩证通路学习（认知辩证信号非None时） ──
+        # 精卫公式：a=概念激活, b=辩证驱动信号, Δ=b-a, ⊗=Δ×Σ
+        # concept_dialectic_w更新：赫布学习——概念激活与辩证驱动同时出现时连接增强
+        # 反复循环后，相信态/质疑态→特定概念可及性 → "相信与质疑交替"自然涌现
+        if 认知辩证信号 is not None:
+            dialectic_decay = 0.95
+            for i in range(self.n_concepts):
+                if self.concept_strength[i] < 0.05:
+                    continue
+                for j in range(self.n_dialectic):
+                    dw_dl = self.lr * new_concept_h[i] * 认知辩证信号[j]
+                    if not (math.isnan(dw_dl) or math.isinf(dw_dl)):
+                        self.concept_dialectic_w[i][j] = self.concept_dialectic_w[i][j] * dialectic_decay + dw_dl
+
         # ── 变异+选择：达尔文进化机制 ──
         # 碳基生物进化的核心：随机变异 + 自然选择
         # 赫布学习 = 拉马克进化（获得性遗传——基于经验调整权重）
@@ -861,6 +1721,35 @@ class 概念层:
             else:
                 self.concept_strength[i] *= 0.999
 
+        # ── 神经发生+突触修剪：弱概念死亡→新概念重生 ──
+        rng_reborn = random.Random(self.seed + self.拍)
+        for i in range(self.n_concepts):
+            if self.concept_strength[i] < 0.01:
+                self.concept_w[i] = [rng_reborn.uniform(-0.2, 0.2) for _ in range(self.n_hidden)]
+                self.concept_otimes_w[i] = [rng_reborn.uniform(-0.15, 0.15) for _ in range(self.n_hidden)]
+                self.concept_rw[i] = [rng_reborn.uniform(-0.02, 0.02) for _ in range(self.n_concepts)]
+                self.concept_pw[i] = [rng_reborn.uniform(-0.1, 0.1) for _ in range(self.n_hidden)]
+                self.concept_rw[i][i] = rng_reborn.uniform(0.05, 0.15)
+                self.concept_strength[i] = 1.0
+                self.概念重生次数 += 1
+
+        for i in range(self.n_combo):
+            if self.combo_strength[i] < 0.01:
+                self.combo_w[i] = [rng_reborn.uniform(-0.3, 0.3) for _ in range(self.n_concepts)]
+                self.combo_rw[i] = [rng_reborn.uniform(-0.02, 0.02) for _ in range(self.n_combo)]
+                self.combo_pw[i] = [rng_reborn.uniform(-0.1, 0.1) for _ in range(self.n_concepts)]
+                self.combo_rw[i][i] = rng_reborn.uniform(0.05, 0.15)
+                self.combo_strength[i] = 1.0
+                self.组合概念重生次数 += 1
+
+        for i in range(self.n_meta):
+            if self.meta_combo_strength[i] < 0.01:
+                self.meta_combo_w[i] = [rng_reborn.uniform(-0.3, 0.3) for _ in range(self.n_combo)]
+                self.meta_combo_rw[i] = [rng_reborn.uniform(-0.02, 0.02) for _ in range(self.n_meta)]
+                self.meta_combo_rw[i][i] = rng_reborn.uniform(0.05, 0.15)
+                self.meta_combo_strength[i] = 1.0
+                self.高级组合概念重生次数 += 1
+
         # ── 突触缩放（homeostatic synaptic scaling）──
         # 真实生物学机制：当突触持续增强时，神经元缩放所有突触，
         # 保持总输入在合理范围内。这不是"防饱和"——这是稳态。
@@ -931,6 +1820,27 @@ class 概念层:
             "有时间输入": 时间信号 is not None,
             "有工作记忆输入": 工作记忆信号 is not None,
             "有海马体输入": 海马体信号 is not None,
+            "有注意力调制": True,
+            "有技能输入": 技能信号 is not None,
+            "有语法输入": 语法信号 is not None,
+            "有推理输入": 推理信号 is not None,
+            "有目标输入": 目标信号 is not None,
+            "有工具输入": 工具信号 is not None,
+            "有创意输入": 创意信号 is not None,
+            "有元认知输入": 元认知信号 is not None,
+            "有社会认知输入": 社会认知信号 is not None,
+            "有自我意识输入": 自我意识信号 is not None,
+            "有自我进化输入": 自我进化信号 is not None,
+            "有语义记忆输入": 语义记忆信号 is not None,
+            "有预测模拟输入": 预测模拟信号 is not None,
+            "有叙事思维输入": 叙事思维信号 is not None,
+            "有痛觉输入": 痛觉信号 is not None,
+            "有前庭觉输入": 前庭觉信号 is not None,
+            "有化学感知输入": 化学感知信号 is not None,
+            "有直觉输入": 直觉信号 is not None,
+            "有无意识加工输入": 无意识加工信号 is not None,
+            "有真理追求输入": 真理追求信号 is not None,
+            "有认知辩证输入": 认知辩证信号 is not None,
         }
 
     def 概念区分度(self):
@@ -996,6 +1906,30 @@ class 概念层:
             "有利变异次数": self.有利变异次数,
             "不利变异次数": self.不利变异次数,
             "有利变异率": round(self.有利变异次数 / max(1, self.变异次数), 4),
+            "概念重生次数": self.概念重生次数,
+            "组合概念重生次数": self.组合概念重生次数,
+            "高级组合概念重生次数": self.高级组合概念重生次数,
+            "注意力均值": round(sum(self.attention_w) / max(1, self.n_concepts), 4),
+            "注意力最大": round(max(self.attention_w), 4),
+            "技能权重均值": round(sum(sum(row) for row in self.concept_skill_w) / max(1, self.n_concepts * self.n_skills), 4),
+            "语法权重均值": round(sum(sum(row) for row in self.concept_grammar_w) / max(1, self.n_concepts * self.n_grammar), 4),
+            "推理权重均值": round(sum(sum(row) for row in self.concept_reason_w) / max(1, self.n_concepts * self.n_reason), 4),
+            "目标权重均值": round(sum(sum(row) for row in self.concept_goal_w) / max(1, self.n_concepts * self.n_goal), 4),
+            "工具权重均值": round(sum(sum(row) for row in self.concept_tool_w) / max(1, self.n_concepts * self.n_tools), 4),
+            "创意权重均值": round(sum(sum(row) for row in self.concept_creative_w) / max(1, self.n_concepts * self.n_creative), 4),
+            "元认知权重均值": round(sum(sum(row) for row in self.concept_meta_w) / max(1, self.n_concepts * self.n_meta), 4),
+            "社会认知权重均值": round(sum(sum(row) for row in self.concept_social_w) / max(1, self.n_concepts * self.n_social), 4),
+            "自我意识权重均值": round(sum(sum(row) for row in self.concept_self_w) / max(1, self.n_concepts * self.n_self), 4),
+            "自我进化权重均值": round(sum(sum(row) for row in self.concept_evolve_w) / max(1, self.n_concepts * self.n_evolve), 4),
+            "语义记忆权重均值": round(sum(sum(row) for row in self.concept_semantic_w) / max(1, self.n_concepts * self.n_semantic), 4),
+            "预测模拟权重均值": round(sum(sum(row) for row in self.concept_predict_w) / max(1, self.n_concepts * self.n_predict), 4),
+            "叙事思维权重均值": round(sum(sum(row) for row in self.concept_narrative_w) / max(1, self.n_concepts * self.n_narrative), 4),
+            "痛觉权重均值": round(sum(sum(row) for row in self.concept_pain_w) / max(1, self.n_concepts * self.n_pain), 4),
+            "前庭觉权重均值": round(sum(sum(row) for row in self.concept_vestibular_w) / max(1, self.n_concepts * self.n_vestibular), 4),
+            "化学感知权重均值": round(sum(sum(row) for row in self.concept_chem_w) / max(1, self.n_concepts * self.n_chem), 4),
+            "直觉权重均值": round(sum(sum(row) for row in self.concept_intuition_w) / max(1, self.n_concepts * self.n_intuition), 4),
+            "无意识加工权重均值": round(sum(sum(row) for row in self.concept_unconscious_w) / max(1, self.n_concepts * self.n_unconscious), 4),
+            "真理追求权重均值": round(sum(sum(row) for row in self.concept_truth_w) / max(1, self.n_concepts * self.n_truth), 4),
             "拍": self.拍,
         }
 

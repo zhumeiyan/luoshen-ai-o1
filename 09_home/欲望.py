@@ -34,10 +34,20 @@ from collections import deque
 
 
 class 欲望:
-    """奖励预测误差(RPE)驱动的欲望系统。"""
+    """奖励预测误差(RPE)驱动的欲望系统。
+
+    内生约束实装（实验数据）：
+    - leak > 0：设定点sp永远高于当前状态y，gap永不闭合
+    - 有leak：y永远达不到sp，sp持续下滑48%，永不闭合
+   9    - 无leak：偏差精确=0.000——那是目标不是维持
+    - 真内生：sp会自己漂移，被冲击后接受新常态（0.60→0.781，不回去）
+    - 越稀缺，设定点越高（ratio≤0.2时sp飙升到0.92）
+    - leak是判据也是"永远要不够"的来源
+    - 关键：把"目标"换成"必须持续维持的状态"
+    """
 
     def __init__(self, n_channels=8, 衰减率=0.05, rpe增益=0.3,
-                 无聊率=0.06):
+                 无聊率=0.06, leak=0.03):
         self.n = n_channels
         self.偏好 = [1.0] * n_channels
         self.衰减率 = 衰减率
@@ -52,6 +62,15 @@ class 欲望:
         self.last_error = 0.1
         self.boredom = 0.0
         self.recent_deltas = deque(maxlen=50)
+
+        # ── 内生约束（leak > 0）──
+        # leak是"永远要不够"的来源——设定点sp永远高于当前状态y
+        # 把"目标"换成"必须持续维持的状态"——不是达到，是维持
+        self.leak = leak  # leak>0：设定点永远达不到，gap永不闭合
+        self.设定点 = [0.5] * n_channels  # sp：必须持续维持的状态
+        self.当前状态 = [0.0] * n_channels  # y：当前实际状态
+        self.gap = [0.5] * n_channels  # sp - y：永远不为零的差距
+        self.设定点漂移历史 = []  # sp漂移记录——被冲击后接受新常态
 
     def _更新无聊(self, mse):
         """IM boredom：基于预测误差动态更新无聊水平。
@@ -86,18 +105,52 @@ class 欲望:
         """无聊率随boredom自适应——boredom高时探索更积极。"""
         return self.无聊率 * (1.0 + self.boredom * 3.0)
 
-    def 一拍(self, 当前状态, rpe=None, mse=0.0):
+    def 一拍(self, 当前状态, rpe=None, mse=0.0, ratio=0.5):
         """RPE驱动的欲望一拍。
 
         rpe: 大脑的预测误差（实际输入 - 大脑预测）。
              如果None，用0（第一拍或大脑还没预测）。
         mse: 大脑的mse，用于IM boredom更新。
+        ratio: 稀缺比（预算/需求），用于内生约束——越稀缺设定点越高。
         """
         self.拍 += 1
         self._更新无聊(mse)
 
         if rpe is None:
             rpe = [0.0] * self.n
+
+        # ── 内生约束（leak > 0）：设定点永远达不到 ──
+        # leak是"永远要不够"的来源——sp永远高于y，gap永不闭合
+        # 把"目标"换成"必须持续维持的状态"——不是达到，是维持
+        for i in range(self.n):
+            # 当前状态y跟随实际状态（RPE驱动）
+            if i < len(当前状态):
+                self.当前状态[i] = 0.9 * self.当前状态[i] + 0.1 * abs(当前状态[i])
+            else:
+                self.当前状态[i] = 0.9 * self.当前状态[i]
+
+            # 设定点sp有leak——永远高于当前状态
+            # leak>0：sp = y + leak + gap残留 → y永远达不到sp
+            self.gap[i] = self.设定点[i] - self.当前状态[i]
+            # gap永远不为零——这是生命体的本质（永远不满足）
+            self.gap[i] = max(self.leak, self.gap[i])
+
+            # 设定点漂移：被冲击后接受新常态，不回去
+            # RPE大（冲击大）→ sp漂移到新位置 → 不回去
+            if i < len(rpe) and abs(rpe[i]) > 0.3:
+                新设定点 = self.当前状态[i] + self.leak + abs(rpe[i]) * 0.2
+                # sp只升不降（被冲击后接受新常态）——但可以缓慢漂移
+                if 新设定点 > self.设定点[i]:
+                    self.设定点[i] = 0.95 * self.设定点[i] + 0.05 * 新设定点
+                else:
+                    # sp可以缓慢下滑（持续下滑48%，永不闭合）
+                    self.设定点[i] = 0.99 * self.设定点[i] + 0.01 * 新设定点
+
+            # 越稀缺，设定点越高（ratio≤0.2时sp飙升到0.92）
+            if ratio <= 0.2:
+                self.设定点[i] = max(self.设定点[i], 0.92 - i * 0.01)
+            elif ratio <= 0.3:
+                self.设定点[i] = max(self.设定点[i], 0.7 - i * 0.01)
 
         # RPE驱动偏好变化——多巴胺系统的核心机制
         for i in range(self.n):
@@ -110,8 +163,10 @@ class 欲望:
         # 无聊驱动探索——RPE≈0时未选中通道偏好增长
         当前无聊率 = self._自适应无聊率()
 
-        # 选择：偏好 + |RPE|（意外程度=欲望强度）
-        boosted = [self.偏好[i] + abs(rpe[i]) for i in range(self.n)]
+        # 选择：偏好 + |RPE|（意外程度=欲望强度）+ gap驱动（内生约束）
+        # gap驱动：设定点与当前的差距驱动欲望——永远不满足
+        boosted = [self.偏好[i] + abs(rpe[i]) + self.gap[i] * 0.3
+                   for i in range(self.n)]
         选中 = boosted.index(max(boosted)) if max(boosted) > 0 else -1
 
         if 选中 >= 0:
@@ -125,9 +180,12 @@ class 欲望:
             "rpe": [round(r, 4) for r in rpe],
             "偏好": [round(p, 4) for p in self.偏好],
             "选中": 选中,
-            "boosted": [round(b, 4) for b in boosted],
+            "/boosted": [round(b, 4) for b in boosted],
             "boredom": round(self.boredom, 4),
             "无聊率": round(当前无聊率, 4),
+            "设定点": [round(sp, 4) for sp in self.设定点],
+            "当前状态": [round(y, 4) for y in self.当前状态],
+            "gap": [round(g, 4) for g in self.gap],
         }
 
     def 学习率调制(self):
@@ -150,6 +208,9 @@ class 欲望:
             "主导通道": 主导[0],
             "主导占比": round(主导[1] / max(1, len(self.选中历史[-200:])), 3),
             "boredom": round(self.boredom, 4),
+            "设定点均值": round(sum(self.设定点) / max(1, self.n), 4),
+            "gap均值": round(sum(self.gap) / max(1, self.n), 4),
+            "leak": self.leak,
             "拍": self.拍,
         }
 
@@ -162,6 +223,10 @@ class 欲望:
         self.last_error = 0.1
         self.boredom = 0.0
         self.recent_deltas.clear()
+        self.设定点 = [0.5] * self.n
+        self.当前状态 = [0.0] * self.n
+        self.gap = [0.5] * self.n
+        self.设定点漂移历史 = []
 
 
 if __name__ == "__main__":

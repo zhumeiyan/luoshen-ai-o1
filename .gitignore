@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+*.pkl
+home_state/chain.jsonl
+home_state/episodic_memory.jsonl
+home_state/快照_*.pkl
+home_state/binding.json
