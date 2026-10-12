@@ -6,6 +6,20 @@ import random, time
 import numpy as np
 from numba import njit
 
+# ── 核心常数：费根鲍姆分岔预警 ──
+# 心率旋钮g接近费根鲍姆点(3.5699)时系统进入混沌
+# 这是数学常数决定的自然临界点——不是人为阈值
+import os as _os
+import sys as _sys
+_axioms_path = _os.path.join(_os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))), "00_axioms")
+if _axioms_path not in _sys.path:
+    _sys.path.insert(0, _axioms_path)
+try:
+    from 核心常数 import 分岔预警 as _分岔预警
+except ImportError:
+    def _分岔预警(g, 预测误差=None):
+        return {"预警级别": "正常", "分岔阶段": "未知", "临界度": 0.0, "g值": g}
+
 痕文件 = "/mnt/data/catpaw/home/workspace/洛神赋1.1/body_trace.jsonl"
 
 @njit
@@ -584,7 +598,10 @@ class 身体:
         self.饿感 *= 0.5
 
     def 五条件摘要(self):
-        """五条件状态摘要——稀缺+代谢+不可逆+心率旋钮+死亡。"""
+        """五条件状态摘要——稀缺+代谢+不可逆+心率旋钮+死亡+分岔预警。"""
+        # 分岔预警——心率旋钮g接近费根鲍姆点时系统进入混沌
+        # 这是数学常数决定的自然临界点——不是人为阈值
+        _预警 = _分岔预警(self.心率旋钮)
         return {
             "能量": round(self.能量, 4),
             "ratio": round(self.ratio, 4),
@@ -599,6 +616,9 @@ class 身体:
             "稀缺带": "活的" if 0.3 <= self.ratio <= 0.6 else (
                 "坍缩" if self.ratio < 0.2 else (
                     "不缺" if self.ratio > 0.8 else "过渡")),
+            "分岔阶段": _预警["分岔阶段"],
+            "分岔预警": _预警["预警级别"],
+            "分岔临界度": _预警["临界度"],
         }
 
 
