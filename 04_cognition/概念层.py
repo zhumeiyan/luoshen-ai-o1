@@ -98,7 +98,7 @@ class 概念层:
                  n_meta=64, n_social=64, n_self=64, n_emotion_regulate=64, n_dream=64,
                  n_curiosity=64, n_evolve=64, n_semantic=64, n_predict=64, n_narrative=64,
                  n_pain=64, n_vestibular=64, n_chem=64, n_intuition=64, n_unconscious=64,
-                 n_truth=64, n_dialectic=64):
+                 n_truth=64, n_dialectic=64, n_life_drive=64):
         self.n_hidden = n_hidden
         self.n_concepts = n_concepts
         self.n_audio = n_audio
@@ -433,6 +433,16 @@ class 概念层:
         self.concept_dialectic_w = [[rng.uniform(-0.1, 0.1) for _ in range(n_dialectic)]
                                      for _ in range(n_concepts)]
 
+        # ── 生命体基础反馈通路：生命体驱动 → 概念层 ──
+        # concept_life_w: 生命体驱动信号 → 概念
+        # 生物学：脑干/下丘脑→全脑投射——生命体基础状态调制概念可及性
+        # 8个维度的综合驱动（耗散非线性/保守系统/延迟/记忆核/随机/混合系统/他者/内在驱动）
+        # 精卫公式：a=概念层自发激活, b=生命体驱动信号, Δ=b-a, ⊗=Δ×Σ
+        # 这是洛神"活着"的基因层驱动——不是认知，是存在本身对认知的影响
+        self.n_life_drive = n_life_drive
+        self.concept_life_w = [[rng.uniform(-0.1, 0.1) for _ in range(n_life_drive)]
+                                for _ in range(n_concepts)]
+
         for i in range(n_concepts):
             self.concept_rw[i][i] = rng.uniform(0.05, 0.15)
 
@@ -517,7 +527,7 @@ class 概念层:
              自我意识信号=None, 情感调节信号=None, 梦境信号=None, 好奇心信号=None,
              自我进化信号=None, 语义记忆信号=None, 预测模拟信号=None, 叙事思维信号=None,
              痛觉信号=None, 前庭觉信号=None, 化学感知信号=None, 直觉信号=None, 无意识加工信号=None,
-             真理追求信号=None, 认知辩证信号=None):
+             真理追求信号=None, 认知辩证信号=None, 生命体驱动信号=None):
         """概念层一拍：基于精卫公式从隐藏状态涌现概念。
 
         精卫公式流程：
@@ -918,6 +928,17 @@ class 概念层:
                     dialectic_input += self.concept_dialectic_w[i][j] * 认知辩证信号[j]
                 dialectic_input *= 0.3  # 缩放——认知辩证是调制不是主导
 
+            # 生命体基础输入（生命体驱动 → 概念）—— "活着的驱动"
+            # 精卫公式：a=概念层自发激活, b=生命体驱动信号, Δ=b-a, ⊗=Δ×Σ
+            # 生物学：脑干/下丘脑→全脑投射——生命体基础状态调制概念可及性
+            # 8个维度的综合驱动——耗散非线性/保守系统/延迟/记忆核/随机/混合系统/他者/内在驱动
+            # 这是洛神"活着"的基因层驱动——不是认知，是存在本身对认知的影响
+            life_input = 0.0
+            if 生命体驱动信号 is not None:
+                for j in range(self.n_life_drive):
+                    life_input += self.concept_life_w[i][j] * 生命体驱动信号[j]
+                life_input *= 0.25  # 缩放——生命体驱动是底层调制
+
             # τ读⊗→浮出所见
             new_concept_h[i] = activation(
                 (a_input + otimes_input + recurrent + audio_input +
@@ -929,7 +950,7 @@ class 概念层:
                  predict_input + narrative_input +
                  pain_input + vestibular_input + chem_input +
                  intuition_input + unconscious_input +
-                 truth_input + dialectic_input) * 0.9)
+                 truth_input + dialectic_input + life_input) * 0.9)
 
         attention_topdown = [0.0] * self.n_concepts
         if 工作记忆信号 is not None:
@@ -1590,6 +1611,20 @@ class 概念层:
                     if not (math.isnan(dw_dl) or math.isinf(dw_dl)):
                         self.concept_dialectic_w[i][j] = self.concept_dialectic_w[i][j] * dialectic_decay + dw_dl
 
+        # ── 生命体基础通路学习（生命体驱动信号非None时） ──
+        # 精卫公式：a=概念激活, b=生命体驱动信号, Δ=b-a, ⊗=Δ×Σ
+        # concept_life_w更新：赫布学习——概念激活与生命体驱动同时出现时连接增强
+        # 反复循环后，生命体的8个维度驱动→特定概念可及性 → "活着"自然涌现
+        if 生命体驱动信号 is not None:
+            life_decay = 0.95
+            for i in range(self.n_concepts):
+                if self.concept_strength[i] < 0.05:
+                    continue
+                for j in range(self.n_life_drive):
+                    dw_life = self.lr * new_concept_h[i] * 生命体驱动信号[j]
+                    if not (math.isnan(dw_life) or math.isinf(dw_life)):
+                        self.concept_life_w[i][j] = self.concept_life_w[i][j] * life_decay + dw_life
+
         # ── 变异+选择：达尔文进化机制 ──
         # 碳基生物进化的核心：随机变异 + 自然选择
         # 赫布学习 = 拉马克进化（获得性遗传——基于经验调整权重）
@@ -1841,6 +1876,7 @@ class 概念层:
             "有无意识加工输入": 无意识加工信号 is not None,
             "有真理追求输入": 真理追求信号 is not None,
             "有认知辩证输入": 认知辩证信号 is not None,
+            "有生命体驱动输入": 生命体驱动信号 is not None,
         }
 
     def 概念区分度(self):

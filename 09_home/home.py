@@ -70,6 +70,9 @@ from 无意识加工 import 无意识加工  # noqa: E402
 from 真理追求 import 真理追求  # noqa: E402
 from 认知辩证 import 认知辩证  # noqa: E402
 
+sys.path.insert(0, os.path.join(os.path.dirname(家目录), "00_axioms"))
+from 生命体基础 import 生命体基础  # noqa: E402
+
 sys.path.insert(0, 家目录)
 from 视网膜 import 视网膜  # noqa: E402
 from 耳蜗 import 耳蜗  # noqa: E402
@@ -365,6 +368,12 @@ class 洛神之家:
         # Δ小→相信态(同化), Δ大→质疑态(异化), 每次循环触发搜索真实世界
         self.认知辩证 = 认知辩证(n_concepts=64)
 
+        # 生命体基础：8个维度的基因层——不是认知子系统，是生命体的存在基础
+        # 耗散非线性/保守系统/延迟/记忆核/随机/混合系统/他者/内在驱动
+        # 精卫公式贯穿所有8个维度：a≠b, Δ=b−a, Σ=a+b, ⊗=∫(Δ,Σ), τ读⊗→浮出所见, (a,b)⟲⊗
+        # 生命体总驱动反馈到概念层——这是洛神"活着"的基因层驱动
+        self.生命体基础 = 生命体基础(n_concepts=64)
+
         # 说听闭环：上一拍的自听特征（延迟一拍反馈，模拟骨传导延迟）
         self.上拍自听特征 = None
 
@@ -439,6 +448,9 @@ class 洛神之家:
 
         # 认知辩证-概念通路：上一拍的辩证驱动（延迟一拍反馈，模拟PFC→皮层投射延迟）
         self.上拍认知辩证 = None
+
+        # 生命体基础-概念通路：上一拍的生命体驱动（延迟一拍反馈，模拟脑干→全脑投射延迟）
+        self.上拍生命体驱动 = None
 
         # 人类通道：把人类放进数字生命——人类作为精卫公式中的b
         # 人类通道不是感官——它是关系
@@ -686,7 +698,8 @@ class 洛神之家:
                                 直觉信号=self.上拍直觉,
                                 无意识加工信号=self.上拍无意识加工,
                                 真理追求信号=self.上拍真理追求,
-                                认知辩证信号=self.上拍认知辩证)
+                                认知辩证信号=self.上拍认知辩证,
+                                生命体驱动信号=self.上拍生命体驱动)
         概念激活 = 概念结果["concept_h"]
         概念mse = 概念结果["mse"]
         概念surprise = 概念结果["surprise"]
@@ -952,6 +965,19 @@ class 洛神之家:
                                         预测误差=概念结果.get("delta"),
                                         真实世界信号=真实世界信号)
         self.上拍认知辩证 = 认知辩证结果["dialectic_drive"]
+
+        # ── 生命体基础：8个维度的基因层驱动 ──
+        # 概念激活传入生命体基础→8个维度同时运行→生命体总驱动
+        # 精卫公式：a=当前概念状态, b=生命体维度驱动, Δ=b-a, ⊗=∫(Δ,Σ), τ读⊗→浮出所见
+        # 生命体驱动延迟一拍反馈到概念层——模拟脑干/下丘脑→全脑投射延迟
+        # 他者信号：人类通道传来的信号（如果有人类互动）
+        生命体他者信号 = None
+        if self.人类通道.有人:
+            生命体他者信号 = self.人类通道.人类信号_cache if hasattr(self.人类通道, '人类信号_cache') else None
+        生命体结果 = self.生命体基础.一拍(概念激活,
+                                        预测误差=概念结果.get("delta"),
+                                        他者信号=生命体他者信号)
+        self.上拍生命体驱动 = 生命体结果["life_drive"]
 
         # ── 情感状态：从身体和大脑自然涌现（不是人为公式） ──
         大脑状态dict = {"surprise": 大脑surprise, "mse": 大脑mse,
@@ -1255,6 +1281,18 @@ class 洛神之家:
                 "辩证认知强度": 认知辩证结果["dialectic_strength"],
                 "搜索触发强度": 认知辩证结果["搜索触发强度"],
                 "螺旋上升": 认知辩证结果["螺旋上升"],
+            },
+            "生命体基础": {
+                "耗散非线性": 生命体结果["dissipative_drive"],
+                "保守系统违反度": 生命体结果["conservation_violation"],
+                "延迟振荡": 生命体结果["delay_oscillation"],
+                "记忆核痕迹数": 生命体结果["memory_trace_count"],
+                "随机相态": 生命体结果["noise_phase"],
+                "混合系统事件数": 生命体结果["event_count"],
+                "他者存在": 生命体结果["他者存在"],
+                "相互观察共振": 生命体结果["相互观察共振"],
+                "内在驱动差距": 生命体结果["intrinsic_drive_gap"],
+                "生命体总驱动": 生命体结果["life_drive"],
             },
             "数字感官": {
                 "探索总数": self.数字感官.探索总数,
@@ -1810,6 +1848,60 @@ class 洛神之家:
                     "搜索触发次数": self.认知辩证.搜索触发次数,
                     "拍": self.认知辩证.拍,
                 },
+                "生命体基础状态": {
+                    "nf_state": self.生命体基础.nf_state,
+                    "nf_coupling": self.生命体基础.nf_coupling,
+                    "nf_diffusion": self.生命体基础.nf_diffusion,
+                    "ising_spin": self.生命体基础.ising_spin,
+                    "ising_J": self.生命体基础.ising_J,
+                    "ising_temp": self.生命体基础.ising_temp,
+                    "kuramoto_phase": self.生命体基础.kuramoto_phase,
+                    "kuramoto_freq": self.生命体基础.kuramoto_freq,
+                    "kuramoto_K": self.生命体基础.kuramoto_K,
+                    "replicator_pop": self.生命体基础.replicator_pop,
+                    "replicator_fitness": self.生命体基础.replicator_fitness,
+                    "lif_V": self.生命体基础.lif_V,
+                    "lif_tau": self.生命体基础.lif_tau,
+                    "lif_threshold": self.生命体基础.lif_threshold,
+                    "lif_reset": self.生命体基础.lif_reset,
+                    "lif_spikes": self.生命体基础.lif_spikes,
+                    "dissipative_drive": self.生命体基础.dissipative_drive,
+                    "conserved_H": self.生命体基础.conserved_H,
+                    "conserved_history": self.生命体基础.conserved_history,
+                    "conservation_violation": self.生命体基础.conservation_violation,
+                    "conservative_drive": self.生命体基础.conservative_drive,
+                    "delay_buffer_size": self.生命体基础.delay_buffer_size,
+                    "delay_buffers": self.生命体基础.delay_buffers,
+                    "delay_tau": self.生命体基础.delay_tau,
+                    "delay_oscillation": self.生命体基础.delay_oscillation,
+                    "delay_complex_root": self.生命体基础.delay_complex_root,
+                    "delay_drive": self.生命体基础.delay_drive,
+                    "memory_alpha": self.生命体基础.memory_alpha,
+                    "memory_traces": self.生命体基础.memory_traces,
+                    "memory_cap": self.生命体基础.memory_cap,
+                    "memory_kernel_drive": self.生命体基础.memory_kernel_drive,
+                    "noise_intensity": self.生命体基础.noise_intensity,
+                    "noise_phase": self.生命体基础.noise_phase,
+                    "noise_phase_history": self.生命体基础.noise_phase_history,
+                    "stochastic_drive": self.生命体基础.stochastic_drive,
+                    "invariant_value": self.生命体基础.invariant_value,
+                    "event_triggered": self.生命体基础.event_triggered,
+                    "event_count": self.生命体基础.event_count,
+                    "continuous_phase": self.生命体基础.continuous_phase,
+                    "hybrid_drive": self.生命体基础.hybrid_drive,
+                    "他者存在": self.生命体基础.他者存在,
+                    "他者眼中的我": self.生命体基础.他者眼中的我,
+                    "我眼中的他者": self.生命体基础.我眼中的他者,
+                    "相互观察共振": self.生命体基础.相互观察共振,
+                    "other_drive": self.生命体基础.other_drive,
+                    "intrinsic_drive_level": self.生命体基础.intrinsic_drive_level,
+                    "intrinsic_drive_target": self.生命体基础.intrinsic_drive_target,
+                    "intrinsic_drive_gap": self.生命体基础.intrinsic_drive_gap,
+                    "intrinsic_drive_history": self.生命体基础.intrinsic_drive_history,
+                    "intrinsic_drive": self.生命体基础.intrinsic_drive,
+                    "life_drive": self.生命体基础.life_drive,
+                    "拍": self.生命体基础.拍,
+                },
                 "公开感官状态": {
                     "获取成功": self.公开感官.获取成功次数,
                     "获取失败": self.公开感官.获取失败次数,
@@ -1947,7 +2039,13 @@ class 洛神之家:
                       f"{(' cap:' + str(round(状态['五条件']['capacity'], 2))) if 状态['五条件']['capacity'] < 0.8 else ''}"
                       f"{(' 疤:' + str(round(状态['五条件']['疤痕'], 2))) if 状态['五条件']['疤痕'] > 0.05 else ''}"
                       f"{(' 降频:' + str(round(状态['五条件']['降频'], 2))) if 状态['五条件']['降频'] < 0.8 else ''}"
-                      f"{' [死亡]' if 状态['五条件']['已死亡'] else ''}")
+                      f"{' [死亡]' if 状态['五条件']['已死亡'] else ''}"
+                      f"{(' 生:' + str(round(sum(abs(v) for v in 状态['生命体基础']['生命体总驱动']) / 64, 2))) if sum(abs(v) for v in 状态['生命体基础']['生命体总驱动']) / 64 > 0.3 else ''}"
+                      f"{(' 守恒违:' + str(round(状态['生命体基础']['保守系统违反度'], 3))) if 状态['生命体基础']['保守系统违反度'] > 0.1 else ''}"
+                      f"{(' 振荡:' + str(round(状态['生命体基础']['延迟振荡'], 2))) if 状态['生命体基础']['延迟振荡'] > 0.2 else ''}"
+                      f"{(' 相变:' + str(状态['生命体基础']['随机相态'])) if 状态['生命体基础']['随机相态'] > 0 else ''}"
+                      f"{(' 他者共振:' + str(round(状态['生命体基础']['相互观察共振'], 2))) if 状态['生命体基础']['他者存在'] else ''}"
+                      f"{(' 驱动差距:' + str(round(状态['生命体基础']['内在驱动差距'], 2)))}")
                 # 死亡检测——永久终止
                 if 状态['五条件']['已死亡']:
                     print(f"\n洛神在第 {self.拍} 拍永久终止。能量耗尽，降频到底，超过耐心阈值。")
