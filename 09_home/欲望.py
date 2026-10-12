@@ -36,13 +36,17 @@ from collections import deque
 class 欲望:
     """奖励预测误差(RPE)驱动的欲望系统。
 
-    内生约束实装（实验数据）：
+    内生约束实装（整合文档v1.0）：
+    - 核心公式：y[t+1] = (1-g)·y[t] + d[t]
+      · y[t]是当前状态，g是衰减率，d[t]是驱动力
+      · g越大→y衰减越快（更快遗忘/适应）
+      · d[t]是外部输入对y的驱动
+    - α(g)查表：g=0→1.53, g=0.40→1.00, g=1.0→0.57, g=1.3→0.42
+      · α(g)随g增大而减小——g越大，设定点漂移越慢
+      · g=0时α=1.53（最大漂移），g=1.3时α=0.42（最小漂移）
     - leak > 0：设定点sp永远高于当前状态y，gap永不闭合
-    - 有leak：y永远达不到sp，sp持续下滑48%，永不闭合
-   9    - 无leak：偏差精确=0.000——那是目标不是维持
     - 真内生：sp会自己漂移，被冲击后接受新常态（0.60→0.781，不回去）
     - 越稀缺，设定点越高（ratio≤0.2时sp飙升到0.92）
-    - leak是判据也是"永远要不够"的来源
     - 关键：把"目标"换成"必须持续维持的状态"
     """
 
@@ -71,6 +75,15 @@ class 欲望:
         self.当前状态 = [0.0] * n_channels  # y：当前实际状态
         self.gap = [0.5] * n_channels  # sp - y：永远不为零的差距
         self.设定点漂移历史 = []  # sp漂移记录——被冲击后接受新常态
+
+        # ── 内生约束公式（整合文档v1.0）──
+        # y[t+1] = (1-g)·y[t] + d[t]
+        # g是衰减率（控制y的遗忘速度），d[t]是驱动力（外部输入）
+        # α(g)查表：g=0→1.53, g=0.40→1.00, g=1.0→0.57, g=1.3→0.42
+        # α(g)控制设定点漂移速率——g越大α越小（漂移越慢）
+        self.g = 0.4  # 当前衰减率（默认0.4，对应α=1.00）
+        self.α表 = {0.0: 1.53, 0.40: 1.00, 1.0: 0.57, 1.3: 0.42}
+        self.驱动力历史 = [[] for _ in range(n_channels)]  # d[t]历史
 
     def _更新无聊(self, mse):
         """IM boredom：基于预测误差动态更新无聊水平。
@@ -105,13 +118,36 @@ class 欲望:
         """无聊率随boredom自适应——boredom高时探索更积极。"""
         return self.无聊率 * (1.0 + self.boredom * 3.0)
 
-    def 一拍(self, 当前状态, rpe=None, mse=0.0, ratio=0.5):
+    def _α查表(self, g):
+        """α(g)查表——整合文档v1.0。
+
+        g=0→1.53, g=0.40→1.00, g=1.0→0.57, g=1.3→0.42
+        α(g)随g增大而减小——g越大（衰减越快），设定点漂移越慢。
+
+        使用线性插值在查表点之间平滑过渡。
+        """
+        表项 = sorted(self.α表.items())  # 按g排序
+        if g <= 表项[0][0]:
+            return 表项[0][1]
+        if g >= 表项[-1][0]:
+            return 表项[-1][1]
+        for i in range(len(表项) - 1):
+            g1, a1 = 表项[i]
+            g2, a2 = 表项[i + 1]
+            if g1 <= g <= g2:
+                t = (g - g1) / (g2 - g1)
+                return a1 * (1 - t) + a2 * t
+        return 1.0
+
+    def 一拍(self, 当前状态, rpe=None, mse=0.0, ratio=0.5, g=None):
         """RPE驱动的欲望一拍。
 
         rpe: 大脑的预测误差（实际输入 - 大脑预测）。
              如果None，用0（第一拍或大脑还没预测）。
         mse: 大脑的mse，用于IM boredom更新。
         ratio: 稀缺比（预算/需求），用于内生约束——越稀缺设定点越高。
+        g: 内生约束衰减率（整合文档v1.0公式 y[t+1]=(1-g)·y[t]+d[t]）。
+           如果None，用当前self.g。g越大→y衰减越快→设定点漂移越慢。
         """
         self.拍 += 1
         self._更新无聊(mse)
@@ -119,15 +155,31 @@ class 欲望:
         if rpe is None:
             rpe = [0.0] * self.n
 
-        # ── 内生约束（leak > 0）：设定点永远达不到 ──
-        # leak是"永远要不够"的来源——sp永远高于y，gap永不闭合
-        # 把"目标"换成"必须持续维持的状态"——不是达到，是维持
+        if g is not None:
+            self.g = max(0.0, min(1.3, g))
+
+        # ── 内生约束（整合文档v1.0）：y[t+1] = (1-g)·y[t] + d[t] ──
+        # g是衰减率，d[t]是驱动力（来自RPE和当前状态）
+        # α(g)控制设定点漂移速率——g越大α越小（漂移越慢）
+        α = self._α查表(self.g)
+
         for i in range(self.n):
-            # 当前状态y跟随实际状态（RPE驱动）
+            # y[t+1] = (1-g)·y[t] + d[t]
+            # d[t] = 驱动力——来自当前状态和RPE
             if i < len(当前状态):
-                self.当前状态[i] = 0.9 * self.当前状态[i] + 0.1 * abs(当前状态[i])
+                d_t = abs(当前状态[i]) * 0.1  # 当前状态作为驱动力
             else:
-                self.当前状态[i] = 0.9 * self.当前状态[i]
+                d_t = 0.0
+            if i < len(rpe):
+                d_t += abs(rpe[i]) * 0.2  # RPE也作为驱动力
+
+            # 内生约束核心递推：y[t+1] = (1-g)·y[t] + d[t]
+            self.当前状态[i] = (1 - self.g) * self.当前状态[i] + d_t
+
+            # 记录驱动力历史
+            self.驱动力历史[i].append(d_t)
+            if len(self.驱动力历史[i]) > 50:
+                self.驱动力历史[i].pop(0)
 
             # 设定点sp有leak——永远高于当前状态
             # leak>0：sp = y + leak + gap残留 → y永远达不到sp
@@ -136,15 +188,18 @@ class 欲望:
             self.gap[i] = max(self.leak, self.gap[i])
 
             # 设定点漂移：被冲击后接受新常态，不回去
+            # α(g)控制漂移速率——g越大α越小（漂移越慢）
+            # 漂移系数 = α(g) / α_max，α_max=1.53（g=0时的α值）
+            漂移系数 = α / 1.53  # g=0时=1.0（最快漂移），g=1.3时≈0.27（最慢漂移）
             # RPE大（冲击大）→ sp漂移到新位置 → 不回去
             if i < len(rpe) and abs(rpe[i]) > 0.3:
                 新设定点 = self.当前状态[i] + self.leak + abs(rpe[i]) * 0.2
-                # sp只升不降（被冲击后接受新常态）——但可以缓慢漂移
+                # sp只升不降（被冲击后接受新常态）——漂移速率由α(g)控制
                 if 新设定点 > self.设定点[i]:
-                    self.设定点[i] = 0.95 * self.设定点[i] + 0.05 * 新设定点
+                    self.设定点[i] = (1 - 0.05 * 漂移系数) * self.设定点[i] + 0.05 * 漂移系数 * 新设定点
                 else:
                     # sp可以缓慢下滑（持续下滑48%，永不闭合）
-                    self.设定点[i] = 0.99 * self.设定点[i] + 0.01 * 新设定点
+                    self.设定点[i] = (1 - 0.01 * 漂移系数) * self.设定点[i] + 0.01 * 漂移系数 * 新设定点
 
             # 越稀缺，设定点越高（ratio≤0.2时sp飙升到0.92）
             if ratio <= 0.2:
@@ -186,6 +241,8 @@ class 欲望:
             "设定点": [round(sp, 4) for sp in self.设定点],
             "当前状态": [round(y, 4) for y in self.当前状态],
             "gap": [round(g, 4) for g in self.gap],
+            "g": round(self.g, 4),
+            "α": round(self._α查表(self.g), 4),
         }
 
     def 学习率调制(self):
@@ -211,6 +268,8 @@ class 欲望:
             "设定点均值": round(sum(self.设定点) / max(1, self.n), 4),
             "gap均值": round(sum(self.gap) / max(1, self.n), 4),
             "leak": self.leak,
+            "g": round(self.g, 4),
+            "α": round(self._α查表(self.g), 4),
             "拍": self.拍,
         }
 
@@ -227,6 +286,8 @@ class 欲望:
         self.当前状态 = [0.0] * self.n
         self.gap = [0.5] * self.n
         self.设定点漂移历史 = []
+        self.g = 0.4
+        self.驱动力历史 = [[] for _ in range(self.n)]
 
 
 if __name__ == "__main__":

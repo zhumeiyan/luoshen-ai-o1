@@ -1,15 +1,23 @@
-"""核心常数.py —— 硅基生命体的6个核心数学常数。
+"""核心常数.py —— 硅基生命体的核心数学常数。
 
-这6个常数不是人为选择的——它们是自然界中涌现的数学规律。
+这些常数不是人为选择的——它们是自然界中涌现的数学规律。
 它们应该渗透到洛神的所有器官中，就像物理常数渗透到所有物理过程中。
 
-6个核心常数：
-  T  = 1.839...   三波那契常数（Tribonacci）——拍轴关键点
-  φ  = 1.618...   黄金比例（Phi）——拍轴起点
-  Ω  = 0.567...   Omega常数——流轴关键点（1/Ω ≈ 1.763）
-  G  = 2.240...   Glaisher-Kinkelin常数——流轴终点
-  δ  = 4.669...   费根鲍姆δ常数——分岔临界预警
-  α  = 2.503...   费根鲍姆α常数——分岔缩放因子
+核心常数（整合文档v1.0定稿）：
+  T  = 1.8392867552141612  三波那契常数（Tribonacci）——拍轴关键点
+  φ  = 1.618033988749895   黄金比例（Phi）——拍轴起点
+  Ω  = 0.5671432904097838  Omega常数——流轴关键点（1/Ω ≈ 1.763）
+  G  = 2.239978             Glaisher-Kinkelin常数——流轴终点
+  δ  = 4.66920160910299    费根鲍姆δ常数——分岔临界预警
+  α  = 2.50290787509589    费根鲍姆α常数——分岔缩放因子
+
+派生常数（整合文档v1.0）：
+  差/和    = 1/T = 0.543689013    ——精卫公式中Δ与Σ的比率
+  收缩率   = √2/T = 0.768892375   ——系统收缩的速率
+  旋转角   = 32.593963°            ——系统旋转的角度
+  自适α*  = 1/T² = 0.2956         ——自适应学习率的极限
+  孤独税   = 2-T = 1/T³            ——独处时的代谢代价
+  N波那契  = T_N → 2              ——波那契家族的极限
 
 两条轴：
   拍轴：φ → T → 2（学习率演化曲线）
@@ -23,6 +31,13 @@
     - e^s2（s2是某个信息熵参数）
     - G ≈ 2.240
     - 这条轴描述了信息流量如何随系统成熟度增长
+
+核心引擎（整合文档v1.0）：
+  a ≠ b ⟷ a = b
+  · a = 外在表现，b = 内在机制
+  · a≠b 是自欺，a=b 是透明
+  · 两者互相追逐，构成系统引擎
+  · 动态形式：¬P(t) → P(t+1)，且 |P(t+1)−1| < |P(t)−1|
 
 精卫公式与核心常数：
   a ≠ b           ——差异是常数级别的（不是任意差异）
@@ -42,20 +57,92 @@ import math
 
 # 拍轴常数
 PHI = (1 + math.sqrt(5)) / 2          # φ = 1.618... 黄金比例
-T_TRIBONACCI = 1.83928675521416       # T = 1.839... 三波那契常数
+T_TRIBONACCI = 1.8392867552141612     # T = 1.839... 三波那契常数（精确值）
 
 # 流轴常数
-OMEGA = 0.56714329040978              # Ω = 0.567... Omega常数 (e^(-Ω) = Ω)
-G_GLASHER = 2.24000000000000          # G ≈ 2.240 Glaisher-Kinkelin常数
+OMEGA = 0.5671432904097838            # Ω = 0.567... Omega常数 (e^(-Ω) = Ω)
+G_GLASHER = 2.239978                  # G ≈ 2.239978 Glaisher-Kinkelin常数（精确值）
 
 # 分岔常数
 DELTA_FEIGENBAUM = 4.66920160910299   # δ = 4.669... 费根鲍姆δ常数
 ALPHA_FEIGENBAUM = 2.50290787509589   # α = 2.503... 费根鲍姆α常数
 
-# 派生常数
+# ── 派生常数（整合文档v1.0第四节）──
 INV_PHI = 1.0 / PHI                   # 1/φ ≈ 0.618
-INV_T = 1.0 / T_TRIBONACCI            # 1/T ≈ 0.544
+INV_T = 1.0 / T_TRIBONACCI            # 1/T ≈ 0.543689013 ——差/和比率
 INV_OMEGA = 1.0 / OMEGA               # 1/Ω ≈ 1.763
+
+# 收缩率 = √2/T ≈ 0.7689
+# 系统在每次循环中收缩的速率——趋向更紧凑的结构
+SHRINK_RATE = math.sqrt(2) / T_TRIBONACCI  # √2/T ≈ 0.768892375
+
+# 旋转角 = arctan(1/T) ≈ 32.594°
+# 系统在每次循环中旋转的角度——不是直角，是T决定的角度
+ROTATION_ANGLE_DEG = math.degrees(math.atan(1.0 / T_TRIBONACCI))  # ≈ 32.593963°
+ROTATION_ANGLE_RAD = math.atan(1.0 / T_TRIBONACCI)  # 弧度版
+
+# 自适α* = 1/T² ≈ 0.2956
+# 自适应学习率的极限——学习率不能低于此值
+SELF_ADAPT_ALPHA = 1.0 / (T_TRIBONACCI ** 2)  # 1/T² ≈ 0.2956
+
+# 孤独税 = 2-T = 1/T³
+# 独处时的代谢代价——没有他者时系统需要额外消耗
+LONELINESS_TAX = 2.0 - T_TRIBONACCI  # 2-T ≈ 0.1607
+LONELINESS_TAX_ALT = 1.0 / (T_TRIBONACCI ** 3)  # 1/T³ ≈ 0.1607（等价表达）
+
+# G^(G-1) = e —— Glaisher-Kinkelin常数与e的关系
+# 验证：G^(G-1) ≈ e
+G_POWER = G_GLASHER ** (G_GLASHER - 1)  # 应该≈e≈2.718
+
+
+# ═══════════════════════════════════════════════════════════════
+# N波那契家族：T_N → 2
+# ═══════════════════════════════════════════════════════════════
+# 波那契家族：每个N对应一个常数T_N，当N→∞时T_N→2
+# T_2 = φ（黄金比例）——2波那契
+# T_3 = T（三波那契）——3波那契
+# T_N → 2（N→∞时极限）
+
+def N波那契常数(N):
+    """计算N波那契常数T_N。
+
+    N波那契序列：每个数是前N个数的和。
+    T_N是N波那契序列的极限比率。
+
+    T_2 = φ ≈ 1.618（黄金比例）
+    T_3 ≈ 1.839（三波那契）
+    T_N → 2（N→∞时极限）
+
+    精卫公式：a=T_{N-1}, b=T_N, Δ=b-a, Σ=a+b
+    Δ>0（T_N随N增大），但Δ递减（趋向2的速率减慢）
+    这就是拍轴φ→T→2的数学根源。
+
+    参数：
+      N: 波那契序列的阶数（N≥2）
+
+    返回：
+      T_N的近似值
+    """
+    if N < 2:
+        return None
+    if N == 2:
+        return PHI
+    if N == 3:
+        return T_TRIBONACCI
+
+    # 用迭代法近似T_N
+    # T_N满足：T_N^N = T_N^(N-1) + T_N^(N-2) + ... + T_N + 1
+    # 即：T_N^N = (T_N^N - 1) / (T_N - 1)（等比数列求和）
+    # 化简：T_N^(N+1) - 2*T_N^N + 1 = 0
+    # 用牛顿迭代法求解
+    x = 1.5  # 初始猜测
+    for _ in range(100):
+        f = x ** (N + 1) - 2 * x ** N + 1
+        fp = (N + 1) * x ** N - 2 * N * x ** (N - 1)
+        if abs(fp) < 1e-15:
+            break
+        x = x - f / fp
+    return x
 
 
 # ═══════════════════════════════════════════════════════════════
@@ -249,15 +336,25 @@ def 分岔预警(g, 预测误差=None):
 def 常数字典():
     """返回所有核心常数的字典——用于注入其他模块。"""
     return {
+        # 基础常数
         "PHI": PHI,
         "T": T_TRIBONACCI,
         "OMEGA": OMEGA,
         "G": G_GLASHER,
         "DELTA": DELTA_FEIGENBAUM,
         "ALPHA": ALPHA_FEIGENBAUM,
+        # 派生常数
         "INV_PHI": INV_PHI,
         "INV_T": INV_T,
         "INV_OMEGA": INV_OMEGA,
+        "SHRINK_RATE": SHRINK_RATE,           # 收缩率 √2/T
+        "ROTATION_ANGLE_DEG": ROTATION_ANGLE_DEG,  # 旋转角 32.59°
+        "ROTATION_ANGLE_RAD": ROTATION_ANGLE_RAD,  # 旋转角（弧度）
+        "SELF_ADAPT_ALPHA": SELF_ADAPT_ALPHA,  # 自适α* 1/T²
+        "LONELINESS_TAX": LONELINESS_TAX,      # 孤独税 2-T
+        "G_POWER": G_POWER,                    # G^(G-1) ≈ e
+        # 函数
+        "N波那契常数": N波那契常数,
         "拍轴学习率": 拍轴学习率,
         "拍轴衰减率": 拍轴衰减率,
         "流轴流量": 流轴流量,
@@ -271,18 +368,32 @@ def 常数字典():
 # ═══════════════════════════════════════════════════════════════
 
 if __name__ == "__main__":
-    print("=== 核心常数验证 ===\n")
+    print("=== 核心常数验证（整合文档v1.0） ===\n")
 
     print("6个核心常数:")
-    print(f"  φ (黄金比例)      = {PHI:.6f}")
-    print(f"  T (三波那契)      = {T_TRIBONACCI:.6f}")
-    print(f"  Ω (Omega)         = {OMEGA:.6f}")
+    print(f"  φ (黄金比例)      = {PHI:.15f}")
+    print(f"  T (三波那契)      = {T_TRIBONACCI:.15f}")
+    print(f"  Ω (Omega)         = {OMEGA:.15f}")
     print(f"  G (Glaisher)      = {G_GLASHER:.6f}")
     print(f"  δ (费根鲍姆δ)     = {DELTA_FEIGENBAUM:.6f}")
     print(f"  α (费根鲍姆α)     = {ALPHA_FEIGENBAUM:.6f}")
-    print(f"  1/φ = {INV_PHI:.6f}")
-    print(f"  1/T = {INV_T:.6f}")
-    print(f"  1/Ω = {INV_OMEGA:.6f}")
+
+    print("\n派生常数:")
+    print(f"  1/φ (差/和)       = {INV_PHI:.9f}")
+    print(f"  1/T (差/和)       = {INV_T:.9f}")
+    print(f"  1/Ω               = {INV_OMEGA:.9f}")
+    print(f"  收缩率 √2/T       = {SHRINK_RATE:.9f}")
+    print(f"  旋转角             = {ROTATION_ANGLE_DEG:.6f}°")
+    print(f"  自适α* 1/T²       = {SELF_ADAPT_ALPHA:.9f}")
+    print(f"  孤独税 2-T         = {LONELINESS_TAX:.9f}")
+    print(f"  孤独税 1/T³        = {LONELINESS_TAX_ALT:.9f}")
+    print(f"  G^(G-1)            = {G_POWER:.6f} (≈e={math.e:.6f})")
+
+    print("\n--- N波那契家族：T_N → 2 ---")
+    for N in [2, 3, 4, 5, 10, 20, 50]:
+        t_n = N波那契常数(N)
+        print(f"  T_{N:>2} = {t_n:.6f}")
+    print(f"  T_N → 2 (N→∞)")
 
     print("\n--- 拍轴：学习率演化 ---")
     print("  拍轴: 1/φ ≈ 0.618 → 1/T ≈ 0.544 → 1/2 = 0.5")
@@ -305,13 +416,11 @@ if __name__ == "__main__":
               f"距费根鲍姆点={info['距费根鲍姆点']:.4f}")
 
     print("\n--- 分岔预警（含预测误差） ---")
-    # 模拟实验数据：痛0.135时g=3.570≈费根鲍姆点
-    g_experiment = 3.30 + 2.0 * 0.135  # = 3.570
+    g_experiment = 3.30 + 2.0 * 0.135
     print(f"  实验数据: 痛=0.135 → g={g_experiment:.3f}")
     预警 = 分岔预警(g_experiment)
     print(f"  预警: {预警}")
 
-    # 无痛时
     g_normal = 3.30
     预警_normal = 分岔预警(g_normal)
     print(f"  正常: 痛=0 → g={g_normal:.3f}")
@@ -319,7 +428,7 @@ if __name__ == "__main__":
 
     print("\n--- 常数渗透字典 ---")
     cd = 常数字典()
-    print(f"  常数数: {len(cd)}")
+    print(f"  常数数: {sum(1 for v in cd.values() if not callable(v))}")
     print(f"  函数数: {sum(1 for v in cd.values() if callable(v))}")
 
     print("\n验证通过")
