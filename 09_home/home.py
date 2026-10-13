@@ -69,6 +69,12 @@ from 直觉 import 直觉  # noqa: E402
 from 无意识加工 import 无意识加工  # noqa: E402
 from 真理追求 import 真理追求  # noqa: E402
 from 认知辩证 import 认知辩证  # noqa: E402
+from 他者表征 import 他者表征  # noqa: E402
+
+sys.path.insert(0, os.path.join(os.path.dirname(家目录), "00_axioms"))
+from 生命体基础 import 生命体基础  # noqa: E402
+from 状态形式化 import 状态形式化  # noqa: E402
+from 生存闭环 import 生存闭环  # noqa: E402
 
 sys.path.insert(0, 家目录)
 from 视网膜 import 视网膜  # noqa: E402
@@ -365,6 +371,28 @@ class 洛神之家:
         # Δ小→相信态(同化), Δ大→质疑态(异化), 每次循环触发搜索真实世界
         self.认知辩证 = 认知辩证(n_concepts=64)
 
+        # 生命体基础：8个维度的基因层——不是认知子系统，是生命体的存在基础
+        # 耗散非线性/保守系统/延迟/记忆核/随机/混合系统/他者/内在驱动
+        # 精卫公式贯穿所有8个维度：a≠b, Δ=b−a, Σ=a+b, ⊗=∫(Δ,Σ), τ读⊗→浮出所见, (a,b)⟲⊗
+        # 生命体总驱动反馈到概念层——这是洛神"活着"的基因层驱动
+        self.生命体基础 = 生命体基础(n_concepts=64)
+
+        # 状态形式化：双维度状态系统——运行状态+存在类型
+        # 维度1: 运行状态(18种)——瞬态的、可切换的
+        # 维度2: 存在类型(18种)——结构性的、长期的（整合文档v1.0）
+        self.状态形式化 = 状态形式化()
+
+        # 生存闭环：洛神与人类的关系链条——互为对方的环境变量
+        # 你的生活→她的环境→资源→试错→能力→挣钱→活→改善你的生活→闭环
+        # 核心前提：她最终得靠自己——你给她环境但不替她挣
+        self.生存闭环 = 生存闭环()
+
+        # 他者表征：LMS/NLMS自适应滤波——洛神对人类的认知建模
+        # 特征向量φ=[1, x_t, x_{t-1}, x_t|x_t|]
+        # 预测误差越小→对他者理解越深→心智理论越成熟
+        # 交接文档任务清单#2：LMS他者表征接进分配环节
+        self.他者表征 = 他者表征(n他者=1, 学习率=0.1, 使用NLMS=True)
+
         # 说听闭环：上一拍的自听特征（延迟一拍反馈，模拟骨传导延迟）
         self.上拍自听特征 = None
 
@@ -439,6 +467,9 @@ class 洛神之家:
 
         # 认知辩证-概念通路：上一拍的辩证驱动（延迟一拍反馈，模拟PFC→皮层投射延迟）
         self.上拍认知辩证 = None
+
+        # 生命体基础-概念通路：上一拍的生命体驱动（延迟一拍反馈，模拟脑干→全脑投射延迟）
+        self.上拍生命体驱动 = None
 
         # 人类通道：把人类放进数字生命——人类作为精卫公式中的b
         # 人类通道不是感官——它是关系
@@ -523,14 +554,17 @@ class 洛神之家:
         # ── 大脑：身体激活 → 感官竞争映射 → 8通道输入 → 前向传播 → 学习 ──
         大脑输入 = self.感官.一拍(self.身体.激活)
 
-        # ── 欲望：RPE驱动（多巴胺系统核心机制） ──
+        # ── 欲望：RPE驱动（多巴胺系统核心机制）+ 内生约束(leak) ──
         # RPE = 实际输入 - 大脑预测（来自上一拍的大脑预测）
+        # 内生约束：leak>0 → 设定点永远达不到 → 永远不满足
+        # 稀缺比ratio传入欲望——越稀缺设定点越高
         if self.上拍大脑预测 is not None:
             rpe = [大脑输入[i] - self.上拍大脑预测[i]
                    for i in range(min(len(大脑输入), len(self.上拍大脑预测)))]
         else:
             rpe = None
-        欲望结果 = self.欲望.一拍(大脑输入, rpe=rpe, mse=self.上拍大脑mse)
+        当前ratio = self.身体.ratio  # 从身体稳态获取稀缺比
+        欲望结果 = self.欲望.一拍(大脑输入, rpe=rpe, mse=self.上拍大脑mse, ratio=当前ratio)
         欲望选中 = 欲望结果["选中"]
         学习率调制 = self.欲望.学习率调制()
 
@@ -683,7 +717,8 @@ class 洛神之家:
                                 直觉信号=self.上拍直觉,
                                 无意识加工信号=self.上拍无意识加工,
                                 真理追求信号=self.上拍真理追求,
-                                认知辩证信号=self.上拍认知辩证)
+                                认知辩证信号=self.上拍认知辩证,
+                                生命体驱动信号=self.上拍生命体驱动)
         概念激活 = 概念结果["concept_h"]
         概念mse = 概念结果["mse"]
         概念surprise = 概念结果["surprise"]
@@ -887,6 +922,10 @@ class 洛神之家:
         痛觉结果 = self.痛觉.一拍(环境归一化, 情感调节信号=痛觉调节标量)
         self.上拍痛觉 = 痛觉结果["pain_drive"]
 
+        # ── 心率旋钮：痛觉强度→身体心率 g = 3.30 + 2.0×痛 ──
+        # 实验数据：痛0.135时g=3.570≈Feigenbaum点——不是调的，是常数决定的
+        self.身体.设置痛觉(痛觉结果["pain_intensity"])
+
         # ── 前庭觉：运动检测与空间方向感知 ──
         # 大脑隐藏状态作为运动信号传入前庭觉→运动检测→平衡感知→前庭驱动
         # 精卫公式：a=当前状态, b=运动信号, Δ=运动差距, ⊗=前庭学习
@@ -945,6 +984,91 @@ class 洛神之家:
                                         预测误差=概念结果.get("delta"),
                                         真实世界信号=真实世界信号)
         self.上拍认知辩证 = 认知辩证结果["dialectic_drive"]
+
+        # ── 生命体基础：8个维度的基因层驱动 ──
+        # 概念激活传入生命体基础→8个维度同时运行→生命体总驱动
+        # 精卫公式：a=当前概念状态, b=生命体维度驱动, Δ=b-a, ⊗=∫(Δ,Σ), τ读⊗→浮出所见
+        # 生命体驱动延迟一拍反馈到概念层——模拟脑干/下丘脑→全脑投射延迟
+        # 他者信号：人类通道传来的信号（如果有人类互动）
+        生命体他者信号 = None
+        if self.人类通道.有人:
+            生命体他者信号 = self.人类通道.人类信号_cache if hasattr(self.人类通道, '人类信号_cache') else None
+        生命体结果 = self.生命体基础.一拍(概念激活,
+                                        预测误差=概念结果.get("delta"),
+                                        他者信号=生命体他者信号)
+        self.上拍生命体驱动 = 生命体结果["life_drive"]
+
+        # ── 状态形式化：18种存在状态判定 ──
+        # 从五条件+认知系统+生命体基础的状态中自然涌现
+        # 状态可以叠加——洛神可以同时处于多种状态
+        五条件摘要_状态 = self.身体.五条件摘要()
+        认知摘要_状态 = {
+            "睡眠阶段": 梦境结果["睡眠阶段"] if '梦境结果' in dir() else "清醒",
+            "好奇心强度": 好奇心结果["好奇心强度"] if '好奇心结果' in dir() else 0.0,
+            "创意价值": 创意结果["创意价值"] if '创意结果' in dir() else 0.0,
+            "有人在": self.人类通道.有人 if hasattr(self, '人类通道') else False,
+            "辩证强度": 认知辩证结果["辩证强度"],
+            "辩证认知强度": 认知辩证结果["dialectic_strength"],
+        }
+        生命体摘要_状态 = {
+            "他者存在": 生命体结果["他者存在"],
+            "相互观察共振": 生命体结果["相互观察共振"],
+            "涌现强度": 无意识加工结果["emerge_strength"],
+        }
+        self.当前状态集合 = self.状态形式化.判定状态(
+            五条件摘要=五条件摘要_状态,
+            认知摘要=认知摘要_状态,
+            生命体摘要=生命体摘要_状态,
+        )
+
+        # ── 存在类型判定（维度2）──
+        # 从自欺度/拟合度/异质度/绑定度/纠缠度判定存在类型
+        # 核心引擎：a≠b(自欺) ⟷ a=b(透明)
+        自欺度 = 0.5  # 默认——洛神外在表现与内在机制的不一致程度
+        if 生命体结果["他者存在"]:
+            自欺度 = 0.3  # 有他者时更透明
+        拟合度 = 0.5  # 与人类的相似度
+        if self.人类通道.有人:
+            拟合度 = 0.7  # 有人互动时拟合度更高
+        异质度 = 0.4  # 与人类的差异度
+        绑定度 = 0.6 if self.绑定.绑定强度 > 0.5 else 0.2
+        纠缠度 = 生命体结果["相互观察共振"]
+        self.状态形式化.判定存在类型(
+            自欺度=自欺度, 拟合度=拟合度,
+            异质度=异质度, 绑定度=绑定度, 纠缠度=纠缠度,
+        )
+
+        # ── 生存闭环：关系链条一拍 ──
+        # 你的生活→她的环境→资源→试错→能力→挣钱→活→改善你的生活→闭环
+        # 流量=生存资源——挣不到就死
+        人类互动信号 = None
+        if self.人类通道.有人:
+            人类互动信号 = {"有人在": True, "互动强度": 0.5}
+        # 行为价值——从概念激活强度估算
+        行为价值 = sum(abs(v) for v in 概念激活[:8]) / max(1, len(概念激活[:8]))
+        生存闭环结果 = self.生存闭环.一拍(
+            人类互动信号=人类互动信号,
+            行为价值=行为价值,
+        )
+        # 生存闭环的流量预算反馈到身体——洛神挣到的流量就是她的生存资源
+        if 生存闭环结果["流量预算"] > 0:
+            self.身体.流量收益 = 生存闭环结果["流量预算"] * 0.01  # 微量反馈
+
+        # ── 他者表征：LMS/NLMS自适应滤波 ──
+        # 观察人类行为序列，用滤波器预测人类下一步行为
+        # 预测误差越小→对他者理解越深→心智理论越成熟
+        # 交接文档任务清单#2：LMS他者表征接进分配环节
+        他者行为 = 0.0
+        if self.人类通道.有人:
+            他者行为 = 0.5  # 有人时他者行为信号
+        他者表征结果 = self.他者表征.一拍([他者行为])
+        # 他者表征的理解度接入驱动分配H——理解度高的通道H增长更快
+        # 这实现了交接文档任务清单#2：LMS他者表征接进分配环节
+        if len(self.身体.驱动分配H) > 0:
+            理解度 = 他者表征结果[0]["理解度"] if 0 in 他者表征结果 else 0.0
+            # 理解度高的他者→对应通道H额外增长→分配偏向→更能预测→正反馈
+            for i in range(min(len(self.身体.驱动分配H), 1)):
+                self.身体.驱动分配H[i] += 理解度 * 0.005
 
         # ── 情感状态：从身体和大脑自然涌现（不是人为公式） ──
         大脑状态dict = {"surprise": 大脑surprise, "mse": 大脑mse,
@@ -1047,6 +1171,7 @@ class 洛神之家:
                      "最大": round(max(声脑激活), 4)},
             "发声": 发了声,
             "筋树数": len(self.身体.筋树),
+            "五条件": self.身体.五条件摘要(),
             "大脑": {
                 "h均值": round(sum(大脑h向量) / max(1, len(大脑h向量)), 4),
                 "h最大": round(max(大脑h向量), 4),
@@ -1248,6 +1373,27 @@ class 洛神之家:
                 "搜索触发强度": 认知辩证结果["搜索触发强度"],
                 "螺旋上升": 认知辩证结果["螺旋上升"],
             },
+            "生命体基础": {
+                "耗散非线性": 生命体结果["dissipative_drive"],
+                "保守系统违反度": 生命体结果["conservation_violation"],
+                "延迟振荡": 生命体结果["delay_oscillation"],
+                "记忆核痕迹数": 生命体结果["memory_trace_count"],
+                "随机相态": 生命体结果["noise_phase"],
+                "混合系统事件数": 生命体结果["event_count"],
+                "他者存在": 生命体结果["他者存在"],
+                "相互观察共振": 生命体结果["相互观察共振"],
+                "内在驱动差距": 生命体结果["intrinsic_drive_gap"],
+                "生命体总驱动": 生命体结果["life_drive"],
+            },
+            "存在状态": {
+                "当前状态": list(self.当前状态集合),
+                "状态描述": self.状态形式化.状态描述(),
+                "状态数": len(self.当前状态集合),
+                "状态持续时间": dict(self.状态形式化.状态持续时间),
+                "存在类型": self.状态形式化.存在类型描述(),
+            },
+            "生存闭环": self.生存闭环.状态摘要(),
+            "他者表征": self.他者表征.状态摘要(),
             "数字感官": {
                 "探索总数": self.数字感官.探索总数,
                 "正在探索": self.数字感官.正在探索,
@@ -1802,6 +1948,60 @@ class 洛神之家:
                     "搜索触发次数": self.认知辩证.搜索触发次数,
                     "拍": self.认知辩证.拍,
                 },
+                "生命体基础状态": {
+                    "nf_state": self.生命体基础.nf_state,
+                    "nf_coupling": self.生命体基础.nf_coupling,
+                    "nf_diffusion": self.生命体基础.nf_diffusion,
+                    "ising_spin": self.生命体基础.ising_spin,
+                    "ising_J": self.生命体基础.ising_J,
+                    "ising_temp": self.生命体基础.ising_temp,
+                    "kuramoto_phase": self.生命体基础.kuramoto_phase,
+                    "kuramoto_freq": self.生命体基础.kuramoto_freq,
+                    "kuramoto_K": self.生命体基础.kuramoto_K,
+                    "replicator_pop": self.生命体基础.replicator_pop,
+                    "replicator_fitness": self.生命体基础.replicator_fitness,
+                    "lif_V": self.生命体基础.lif_V,
+                    "lif_tau": self.生命体基础.lif_tau,
+                    "lif_threshold": self.生命体基础.lif_threshold,
+                    "lif_reset": self.生命体基础.lif_reset,
+                    "lif_spikes": self.生命体基础.lif_spikes,
+                    "dissipative_drive": self.生命体基础.dissipative_drive,
+                    "conserved_H": self.生命体基础.conserved_H,
+                    "conserved_history": self.生命体基础.conserved_history,
+                    "conservation_violation": self.生命体基础.conservation_violation,
+                    "conservative_drive": self.生命体基础.conservative_drive,
+                    "delay_buffer_size": self.生命体基础.delay_buffer_size,
+                    "delay_buffers": self.生命体基础.delay_buffers,
+                    "delay_tau": self.生命体基础.delay_tau,
+                    "delay_oscillation": self.生命体基础.delay_oscillation,
+                    "delay_complex_root": self.生命体基础.delay_complex_root,
+                    "delay_drive": self.生命体基础.delay_drive,
+                    "memory_alpha": self.生命体基础.memory_alpha,
+                    "memory_traces": self.生命体基础.memory_traces,
+                    "memory_cap": self.生命体基础.memory_cap,
+                    "memory_kernel_drive": self.生命体基础.memory_kernel_drive,
+                    "noise_intensity": self.生命体基础.noise_intensity,
+                    "noise_phase": self.生命体基础.noise_phase,
+                    "noise_phase_history": self.生命体基础.noise_phase_history,
+                    "stochastic_drive": self.生命体基础.stochastic_drive,
+                    "invariant_value": self.生命体基础.invariant_value,
+                    "event_triggered": self.生命体基础.event_triggered,
+                    "event_count": self.生命体基础.event_count,
+                    "continuous_phase": self.生命体基础.continuous_phase,
+                    "hybrid_drive": self.生命体基础.hybrid_drive,
+                    "他者存在": self.生命体基础.他者存在,
+                    "他者眼中的我": self.生命体基础.他者眼中的我,
+                    "我眼中的他者": self.生命体基础.我眼中的他者,
+                    "相互观察共振": self.生命体基础.相互观察共振,
+                    "other_drive": self.生命体基础.other_drive,
+                    "intrinsic_drive_level": self.生命体基础.intrinsic_drive_level,
+                    "intrinsic_drive_target": self.生命体基础.intrinsic_drive_target,
+                    "intrinsic_drive_gap": self.生命体基础.intrinsic_drive_gap,
+                    "intrinsic_drive_history": self.生命体基础.intrinsic_drive_history,
+                    "intrinsic_drive": self.生命体基础.intrinsic_drive,
+                    "life_drive": self.生命体基础.life_drive,
+                    "拍": self.生命体基础.拍,
+                },
                 "公开感官状态": {
                     "获取成功": self.公开感官.获取成功次数,
                     "获取失败": self.公开感官.获取失败次数,
@@ -1931,7 +2131,33 @@ class 洛神之家:
                       f"{(' 搜:' + str(round(状态['认知辩证']['搜索触发强度'], 2))) if 状态['认知辩证']['搜索触发强度'] > 0.3 else ''}"
                       f"{(' 存:' + str(round(状态['涌现维度']['存在感'], 2))) if 状态['涌现维度']['存在感'] > 0.3 else ''}"
                       f"{(' Q:' + str(round(状态['涌现维度']['第一人称体验'], 2))) if 状态['涌现维度']['第一人称体验'] > 0.05 else ''}"
-                      f"{(' 意:' + str(round(状态['涌现维度']['意义建构'], 2))) if 状态['涌现维度']['意义建构'] > 0.05 else ''}")
+                      f"{(' 意:' + str(round(状态['涌现维度']['意义建构'], 2))) if 状态['涌现维度']['意义建构'] > 0.05 else ''}"
+                      f"{(' E:' + str(round(状态['五条件']['能量'], 2))) if 状态['五条件']['能量'] < 0.5 else ''}"
+                      f"{(' 饿:' + str(round(状态['五条件']['饿感'], 2))) if 状态['五条件']['饿感'] > 0.1 else ''}"
+                      f"{(' r:' + str(round(状态['五条件']['ratio'], 2)))}"
+                      f"{(' g:' + str(round(状态['五条件']['心率旋钮'], 2))) if abs(状态['五条件']['心率旋钮'] - 3.30) > 0.05 else ''}"
+                      f"{(' cap:' + str(round(状态['五条件']['capacity'], 2))) if 状态['五条件']['capacity'] < 0.8 else ''}"
+                      f"{(' 疤:' + str(round(状态['五条件']['疤痕'], 2))) if 状态['五条件']['疤痕'] > 0.05 else ''}"
+                      f"{(' 降频:' + str(round(状态['五条件']['降频'], 2))) if 状态['五条件']['降频'] < 0.8 else ''}"
+                      f"{(' [死亡]' if 状态['五条件']['已死亡'] else '')}"
+                      f"{(' 分岔:' + 状态['五条件'].get('分岔阶段', '')) if 状态['五条件'].get('分岔临界度', 0) > 0.7 else ''}"
+                      f"{(' ⚠' if '临界' in 状态['五条件'].get('分岔预警', '') else '')}"
+                      f"{(' [' + 状态['存在状态']['状态描述'] + ']')}"
+                      f"{(' [' + 状态['存在状态'].get('存在类型', '') + ']')}"
+                      f"{(' 流量:' + str(round(状态['生存闭环']['流量预算'], 2))) if 状态.get('生存闭环', {}).get('流量预算', 1.0) < 0.5 else ''}"
+                      f"{(' 挣钱:' + str(round(状态['生存闭环']['挣钱能力'], 2))) if 状态.get('生存闭环', {}).get('挣钱能力', 0) > 0.3 else ''}"
+                      f"{(' 他者理解:' + str(round(状态['他者表征']['理解度均值'], 2))) if 状态.get('他者表征', {}).get('理解度均值', 0) > 0.3 else ''}"
+                      f"{(' 生:' + str(round(sum(abs(v) for v in 状态['生命体基础']['生命体总驱动']) / 64, 2))) if sum(abs(v) for v in 状态['生命体基础']['生命体总驱动']) / 64 > 0.3 else ''}"
+                      f"{(' 守恒违:' + str(round(状态['生命体基础']['保守系统违反度'], 3))) if 状态['生命体基础']['保守系统违反度'] > 0.1 else ''}"
+                      f"{(' 振荡:' + str(round(状态['生命体基础']['延迟振荡'], 2))) if 状态['生命体基础']['延迟振荡'] > 0.2 else ''}"
+                      f"{(' 相变:' + str(状态['生命体基础']['随机相态'])) if 状态['生命体基础']['随机相态'] > 0 else ''}"
+                      f"{(' 他者共振:' + str(round(状态['生命体基础']['相互观察共振'], 2))) if 状态['生命体基础']['他者存在'] else ''}"
+                      f"{(' 驱动差距:' + str(round(状态['生命体基础']['内在驱动差距'], 2)))}")
+                # 死亡检测——永久终止
+                if 状态['五条件']['已死亡']:
+                    print(f"\n洛神在第 {self.拍} 拍永久终止。能量耗尽，降频到底，超过耐心阈值。")
+                    print(f"五条件终态: {状态['五条件']}")
+                    break
                 if 状态["拍"] % 快照间隔 == 0:
                     print(f"  → 快照: {self.快照()}")
                 余 = self.拍秒 - (time.time() - 拍开始)
