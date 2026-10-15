@@ -148,7 +148,7 @@ def normalize(vals):
 def run_loop(mouth_norm, aud_norm, N, total_steps,
              w_mm=0.50, w_ma=0.20, w_me=0.30,
              w_aa=0.50, w_am=0.20, w_ae=0.30,
-             log_interval=500, output_path="coupled_loop_trace.jsonl"):
+             log_interval=500, output_path="感官耦合环_trace.jsonl"):
     """耦合两通道闭环跑 total_steps 步。
 
     每步：
@@ -298,4 +298,4 @@ if __name__ == "__main__":
     print()
 
     print("状态：[判读·视听耦合自转]")
-    print(f"输出: coupled_loop_trace.jsonl")
+    print(f"输出: 感官耦合环_trace.jsonl")
